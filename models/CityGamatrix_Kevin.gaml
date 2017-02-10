@@ -1,8 +1,8 @@
-/**
+/*
 * Name: PEV Model
 * Authosr: Arnaud Grignard, Kevin Lyons
 * Description: Load CityMatrix view and run PEV agent simulation over time.
-* Tags:  pev, cityMatrix, gama
+* Tags: pev, cityMatrix, gama
 */
 
 model pev_model
