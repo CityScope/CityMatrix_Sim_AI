@@ -12,7 +12,7 @@ class Generator {
   
   int maxBuildingDensity = 25;
   int citySize = 16;
-  float roadDensity = 0.4;
+  float roadDensity = 0.2;
   ArrayList<Road> queue = new ArrayList<Road>();
   int[][] matrix = new int[citySize][citySize];
   Roads roads = new Roads();
@@ -305,12 +305,12 @@ class Generator {
     
     extendAllRoads(roads);
     
-    println(roads.roads.size());
+    //println(roads.roads.size());
     
     if (roads.roads.size() <= roadCount/4)
       return run();
       
-    printMatrix();
+    //printMatrix();
     
     return parseInputMatrix(null, false);
     

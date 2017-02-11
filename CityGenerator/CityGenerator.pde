@@ -5,11 +5,11 @@
 // Dec.8th.2015
 
 // Generation parameters
-int numCities = 1;
-String outputFile = "./out/city_" // Will have '[Number].json' appended
+int numCities = 1000;
+String outputFile = "./out/city_"; // Will have '[Number].json' appended
 
   // City generation parameters
-  int totalRoadNum;
+int totalRoadNum;
 float scaleMeterPerPixel = 2.15952; //meter per pixel in processing; meter per mm in rhino
 float constantFactor = 100.0;
 float starting = 100;
@@ -34,7 +34,10 @@ void setup() {
     jsonCity.setJSONObject("objects", generateProperties());
     jsonCity.setInt("new_delta", -1);
     
-    saveJSONObject(jsonCity, outputFile + nf(i, numPadding) + ".json");
+    String filename = outputFile + nf(i, numPadding) + ".json";
+    println("Saving file " + filename);
+    saveJSONObject(jsonCity, filename);
+    i ++;
   }
 }
 
