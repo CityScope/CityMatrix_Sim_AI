@@ -18,11 +18,12 @@ global {
     map<int,rgb> buildingColors <-[0::rgb(189,183,107), 1::rgb(189,183,107), 2::rgb(189,183,107),3::rgb(230,230,230), 4::rgb(230,230,230), 5::rgb(230,230,230),6::rgb(40,40,40)];
     list<map<string, int>> cells;
 	list<float> density_array;
+	float max_density;
 	
-	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
-	bool dynamicGrid <- true parameter: "Update Grid:" category: "Grid";
+	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
+	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
 	int refresh <- 1000 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
-	bool surround <- true parameter: "Surrounding Road:" category: "Grid";
+	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 18;
 	string filename <- './../includes/cityIO.json';
@@ -42,6 +43,7 @@ global {
 		cells <- matrixData["grid"];
 		//density_array <- matrixData["objects"]["density"];
 		density_array <- [30.0, 20.0, 10.0, 25.0, 15.0, 5.0];
+		max_density <- max(density_array);
 		int a <- (matrix_size = 18) ? 1 : 0;
 		loop c over: cells {
 			int x <- 15 - c["x"] + a;
