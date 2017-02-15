@@ -23,7 +23,7 @@ global {
 	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
 	bool dynamicGrid <- true parameter: "Update Grid:" category: "Grid";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
-	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
+	bool surround <- true parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 18;
 	string filename <- './../includes/cityIO.json';
