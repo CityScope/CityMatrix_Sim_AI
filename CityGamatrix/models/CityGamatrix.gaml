@@ -20,9 +20,9 @@ global {
 	list<float> density_array;
 	float max_density;
 	
-	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
-	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
-	int refresh <- 1000 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
+	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
+	bool dynamicGrid <- true parameter: "Update Grid:" category: "Grid";
+	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
 	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 18;
@@ -35,7 +35,7 @@ global {
 	
 	action initGrid{
 		if(onlineGrid = true){
-		  matrixData <- json_file("http://cityscope.media.mit.edu/citymatrix_ml.json").contents;
+		  matrixData <- json_file("http://45.55.73.103/table/citymatrix_ml").contents;
 	    }
 	    else{
 	      matrixData <- json_file(filename).contents;
