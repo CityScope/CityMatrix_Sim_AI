@@ -14,38 +14,43 @@ global {
 	// Configurations.
 	
 	// 1. Vehicle information.
-    int nb_pev <- 30 parameter: "Number of PEVs:" category: "Environment";
+    int nb_pev <- 10 parameter: "Number of PEVs:" category: "Environment";
     float pev_speed <- 15 # km / # h;
     
     // 2. Trip generation..
     list< map<string, unknown> > trip_queue <- [];
-    int trip_interval <- 2;
-	float maximumTripCount <- 5.0 parameter: "Max Trip Count:" category: "Environment";
+    int trip_interval <- 1;
+	float maximumTripCount <- 4.0 parameter: "Max Trip Count:" category: "Environment";
+	// So, we generate at most 4 jobs every 10 seconds.
 	int max_wait_time <- 20 parameter: "Max Wait Time (minutes):" category: "Environment";
 	int missed_trips <- 0;
 	int completed_trips <- 0;
 	int total_trips <- 0;
     file prob <- text_file("../includes/demand.txt");
 	list<float> prob_array <- [];
+	int total_population;
+	list<int> peoplePerFloor <- [5, 8, 16, 16, 23, 59];
 	
 	// 3. Timing and traffic visualization.
-	float step <- 10 # seconds;
+	float step <- 10 # seconds; // visualize ? 1 # seconds : 10 # seconds;
 	int current_second update: (time / # second) mod 86400;
 	int graph_interval <- 1000;
-	int traffic_interval <- 60 * 60 # cycles;
+	int traffic_interval <- 100 # cycles;
 	bool visualize;
 	matrix traffic;
 	matrix waiting;
 	string time_string;
 	int current_day;
 	float box_size;
+	date s;
    
 	init {
 		
 		time_string <- "12:00 AM";
 		starting_date <- date([2017,1,1,0,0,0]);
+		s <- # now;
 		
-		filename <- '../includes/mobility_configurations/diagonal.json';
+		filename <- '../includes/generator_configurations/city_hope.json';
 		
 		matrix_size <- 18;
 		
@@ -100,6 +105,16 @@ global {
         ask pev {
         	do findNewTarget;
         }
+        
+        ask cityMatrix where (each.density > 0) {
+        	total_population <- total_population + peoplePerFloor[type] * int(density);
+        }
+        
+        int expected_trips <- int(0.3 * total_population);
+        
+        write expected_trips * 2 color: # black;
+        
+        write length(cityMatrix where (each.density > 0)) color: # black;
 	}
 	
 	// Init a road cell.
@@ -175,7 +190,12 @@ global {
 	}
 	
 	action completeDay {
-		write float(completed_trips) / float(total_trips) color: # black;
+		float rate <- float(completed_trips) / float(total_trips);
+		write rate color: # black;
+		int elapsed_seconds <- int(# now - s);
+		write total_trips color: # black;
+		write elapsed_seconds color: # black;
+		write "Simulation day complete!" color: # black;
 		// Output JSON format.
 	}
 	
@@ -268,9 +288,15 @@ species pev skills: [moving] {
 	
 	// Allows PEV to move through our matrix.
 	reflex move {
-		do goto target: target on: cityMatrix where (each.type = 6) speed: speed;
+		path p <- goto(target: target, on: cityMatrix where (each.type = 6), speed: speed, return_path: true);
 		if (target = location) {
 			do findNewTarget;
+		} else if (length(p.segments) = 0) {
+			// Bad road.
+			ask world {
+				write "Bad road detected. Heading to " + string(myself.target) + "." color: # black;
+				do pause;
+			}
 		} else if (status = 'wander' and length(trip_queue) > 0) {
 			do claim;
 		}

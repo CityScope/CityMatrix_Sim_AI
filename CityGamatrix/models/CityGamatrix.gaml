@@ -41,8 +41,8 @@ global {
 	      matrixData <- json_file(filename).contents;
 	    }	
 		cells <- matrixData["grid"];
-		//density_array <- matrixData["objects"]["density"];
-		density_array <- [30.0, 20.0, 10.0, 25.0, 15.0, 5.0];
+		density_array <- matrixData["objects"]["density"];
+		//density_array <- [30.0, 20.0, 10.0, 25.0, 15.0, 5.0];
 		max_density <- max(density_array);
 		int a <- (matrix_size = 18) ? 1 : 0;
 		loop c over: cells {
