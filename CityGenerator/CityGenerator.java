@@ -10,17 +10,18 @@ public class CityGenerator {
 
 	// Properties configuration.
 
-	public static int numberCities = 5000;
+	public static int numberCities = 100;
 	public static int citySize = 16;
-	public double roadDensity = 0.3;
-	public double extProbability = 0.9;
-	public int[][] matrix = new int[citySize][citySize];
+	public static double roadDensity = 0.2; // Vary 0.15 to 0.3.
+	public static double extProbability = 0.9; // Vary 0.75 to 0.95;
+	public static int[][] matrix;
 	public static String prefix = "/out/city_";
 	public int numDensity = 6;
 	public int maxDensity = 30;
 	public int lowType = -1;
 	public int highType = 5;
 	public int roadId = 6;
+	public static double buildingProb = 0.8; // Vary 0.6 (sparse) to 1.0 (dense).
 
 	public static void main(String[] args) {
 
@@ -31,6 +32,11 @@ public class CityGenerator {
 		CityGenerator g = new CityGenerator();
 
 		for (int i = 0; i < numberCities; i++) {
+			matrix = new int[citySize][citySize];
+			// Varying parameters here.
+			roadDensity = Utils.randDouble(0.15, 0.3);
+			extProbability = Utils.randDouble(0.755, 0.95);
+			buildingProb = Utils.randDouble(0.6, 1.0);
 			g.generate();
 			g.outputCity(prefix + Integer.toString(i) + ".json");
 			System.out.println(i);
@@ -80,6 +86,8 @@ public class CityGenerator {
 				queue.add(another);
 			}
 		}
+		
+		printMatrix();
 	}
 
 	public Road generateFirstRoad() {
@@ -397,7 +405,9 @@ public class CityGenerator {
 							break outer;
 						}
 					} catch (Exception e) {
-						// Move on, we are in a corner.
+						// Move on, we are in a corner/edge
+						found = true;
+						break outer;
 					}
 
 				}
@@ -410,6 +420,7 @@ public class CityGenerator {
 		for (int i = 0; i < numDensity; i++) {
 			d.put((int)(Math.pow(Utils.randDouble(0, 1), 2) * (maxDensity - 1) + 1));
 		}
+		System.out.println(d);
 		return d;
 	}
 
@@ -424,7 +435,7 @@ public class CityGenerator {
 					grid.put(jsonBuilding(j, i, 6));
 				else {
 					// Add building only if we touch a road and with 60 % probability.
-					if (touchesRoad(i, j) && Utils.randDouble(0, 1) <= 0.6) {
+					if (touchesRoad(i, j) && Utils.randDouble(0, 1) <= buildingProb) {
 						grid.put(jsonBuilding(j, i, Utils.randInt(lowType, highType)));
 					} else {
 						grid.put(jsonBuilding(j, i, -1));

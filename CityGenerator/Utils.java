@@ -14,7 +14,7 @@ public class Utils {
 		return randomNum;
 	}
 
-	public static double randDouble(int min, int max) {
+	public static double randDouble(double min, double max) {
 		return ThreadLocalRandom.current().nextDouble(min, max);
 	}
 
