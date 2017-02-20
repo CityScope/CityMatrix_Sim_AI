@@ -1,26 +1,31 @@
 /*
-* Name: PEV Model
+* Name: CityGamatrix_PEV
 * Authosr: Arnaud Grignard, Kevin Lyons
-* Description: Load CityMatrix view and run PEV agent simulation over time.
+* Description: Load CityMatrix view and run PEV agent simulation over time. Also has batch run functionality.
 * Tags: pev, cityMatrix, gama
 */
 
-model pev_model
+model CityGamatrix_PEV
 
+// Import generic matrix loader.
 import "CityGamatrix.gaml"
 
 global {
 	
 	// Configurations.
 	
+	// 0. Directory strings!!! Need to include trailing slash.
+	string input_dir <- '../includes/generator_configurations/';
+	string output_dir <- '../includes/outputs/';
+	
 	// 1. Vehicle information.
-    int nb_pev <- 10 parameter: "Number of PEVs:" category: "Environment";
+    int nb_pev <- 50 parameter: "Number of PEVs:" category: "Environment";
     float pev_speed <- 15 # km / # h;
     
     // 2. Trip generation..
     list< map<string, unknown> > trip_queue <- [];
     int trip_interval <- 1;
-	float maximumTripCount <- 4.0 parameter: "Max Trip Count:" category: "Environment";
+	float maximumTripCount <- 6.0 parameter: "Max Trip Count:" category: "Environment";
 	// So, we generate at most 4 jobs every 10 seconds.
 	int max_wait_time <- 20 parameter: "Max Wait Time (minutes):" category: "Environment";
 	int missed_trips <- 0;
@@ -30,6 +35,8 @@ global {
 	list<float> prob_array <- [];
 	int total_population;
 	list<int> peoplePerFloor <- [5, 8, 16, 16, 23, 59];
+	map<point, list<map<string, float>> > buildingMap;
+	float scaleFactor <- 1370.0; // Helps us map expected jobs to actual 10 seconds intervals. Subject to change if necessary.
 	
 	// 3. Timing and traffic visualization.
 	float step <- 10 # seconds; // visualize ? 1 # seconds : 10 # seconds;
@@ -43,21 +50,34 @@ global {
 	int current_day;
 	float box_size;
 	date s;
+	
+	// 4. Batch properties.
+	bool did_finish <- true;
+	bool day_done <- false;
+	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
+	bool isBatch <- false;
+	string raw_filename;
    
 	init {
+		
+		if (isBatch) {
+			raw_filename <- replace(filename, '.json', ''); 
+			filename <- input_dir + filename;
+		} else {
+			filename <- '../includes/generator_configurations/city_late.json';
+		}
+		
+		write "Current file: " + filename color: # black;
 		
 		time_string <- "12:00 AM";
 		starting_date <- date([2017,1,1,0,0,0]);
 		s <- # now;
-		
-		filename <- '../includes/generator_configurations/city_hope.json';
 		
 		matrix_size <- 18;
 		
 		box_size <- 1 # km / matrix_size;
 		
 		traffic <- 0 as_matrix({ matrix_size, matrix_size });
-		
 		waiting <- 0 as_matrix({ matrix_size, matrix_size });
  		
 		do initGrid;
@@ -89,8 +109,7 @@ global {
 		}
         
         // Initialize trip probability array.
-        loop r from: 0 to: length(prob) - 1
-		{
+        loop r from: 0 to: length(prob) - 1 {
 			add (float(prob[r]) * maximumTripCount) to: prob_array;
 		}
         	
@@ -101,20 +120,21 @@ global {
     	  	speed <- pev_speed;
     	  	status <- "wander";
     	}
+    	
+    	// Map buildings to their respective nearest roads.
+    	do mapBuildings; 
         
+        // Set all PEV's with some initial wandering target.
         ask pev {
         	do findNewTarget;
         }
         
+        // Get total population and trip statistics.
         ask cityMatrix where (each.density > 0) {
         	total_population <- total_population + peoplePerFloor[type] * int(density);
         }
-        
-        int expected_trips <- int(0.3 * total_population);
-        
-        write expected_trips * 2 color: # black;
-        
-        write length(cityMatrix where (each.density > 0)) color: # black;
+        int expected_trips <- int(0.3 * total_population * 2);
+        maximumTripCount <- float(expected_trips) / scaleFactor;
 	}
 	
 	// Init a road cell.
@@ -122,6 +142,24 @@ global {
 		cell.type <- surround ? 6 : -1;
 		cell.color <- surround ? buildingColors[6] : # black;
 		cell.density <- 0.0;
+	}
+	
+	// Map buildings to their respective nearest roads.
+	action mapBuildings {
+		loop building over: cityMatrix where (each.density > 0) {
+			cityMatrix nearest_neighbor <- (cityMatrix where (each.type = 6)) closest_to building;
+			float d <- building.location distance_to nearest_neighbor.location;
+			list<cityMatrix> n <- (cityMatrix where (each.type = 6 and each.location distance_to building.location = d));
+			buildingMap[{building.grid_x, building.grid_y, 0}] <- [];
+			loop r over: n {
+				map<string, float> result;
+				result['x'] <- float(r.location.x);
+				result['y'] <- float(r.location.y);
+				result['grid_x'] <- int(r.grid_x);
+				result['grid_y'] <- int(r.grid_y);
+				add result to: buildingMap[{building.grid_x, building.grid_y, 0}];
+			}
+		}
 	}
 	
 	// Accumulate traffic/waiting time on each road cell.
@@ -172,44 +210,62 @@ global {
 	action findLocation(map<string, float> result) {
 		float random_density <- rnd(1, max_density);
 		cityMatrix building <- one_of(cityMatrix where (each.density >= random_density));
-		list<cityMatrix> neighbors <- building neighbors_at box_size where (each.type = 6);
-		float i <- 2 * box_size;
-		loop while: (length(neighbors) = 0 and i < matrix_size / 2) {
-			neighbors <- building neighbors_at i where (each.type = 6);
-			i <- i + box_size;
-		}
-		cityMatrix final_cell <- one_of(neighbors);
-		if (final_cell = nil) {
-			final_cell <- one_of(cityMatrix where (each.type = 6));
-		}
-		result['x'] <- float(final_cell.location.x);
-		result['y'] <- float(final_cell.location.y);
-		result['grid_x'] <- int(final_cell.grid_x);
-		result['grid_y'] <- int(final_cell.grid_y);
+		map<string, float> r <- one_of(buildingMap[{building.grid_x, building.grid_y, 0}]);
+		result['x'] <- float(r['x']);
+		result['y'] <- float(r['y']);
+		result['grid_x'] <- int(r['grid_x']);
+		result['grid_y'] <- int(r['grid_y']);
 		return;
 	}
 	
+	//Output simulation data to JSON.
 	action completeDay {
-		float rate <- float(completed_trips) / float(total_trips);
-		write rate color: # black;
-		int elapsed_seconds <- int(# now - s);
-		write total_trips color: # black;
-		write elapsed_seconds color: # black;
-		write "Simulation day complete!" color: # black;
-		// Output JSON format.
+		
+		// Add data dict with traffic and wait to each ROAD cell.
+		int a <- (matrix_size = 18) ? 1 : 0;
+		loop c over: cells where (each["type"] = 6) {
+			int x <- 15 - int(c["x"]) + a;
+			int y <- int(c["y"]) + a;
+			map<string, int> data;
+			data["traffic"] <- int(traffic[x, y]);
+			data["wait"] <- int(waiting[x, y]);
+			c["data"] <- data;
+		}
+		
+		// Now, add all properties to data dict in objects
+		map<string, unknown> final_data;
+		final_data["completed"] <- completed_trips;
+		final_data["missed"] <- missed_trips;
+		final_data["total"] <- total_trips;
+		final_data["finished"] <- did_finish ? 1 : 1;
+		final_data["fleet"] <- nb_pev;
+		final_data["max_wait"] <- max_wait_time;
+		final_data["trip_prob"] <- maximumTripCount;
+		final_data["runtime"] <- int(# now - s);
+		final_data["total_wait"] <- int(sum(waiting));
+		objects["data"] <- final_data;
+		
+		// Write final result to JSON.
+		map<string, unknown> result;
+		result["grid"] <- cells;
+		result["objects"] <- objects;
+		json_file copy <- json_file(output_dir + raw_filename + '_output.json', result);
+		save copy;
+		
+		day_done <- true;
+		write "Day complete!" color: # black;
 	}
 	
 	// Manage our trip queue.
 	reflex trip_manage when: every(trip_interval # cycles)
 	{
-		// Stop after 1 day for testing purposes.
+		// Stop after 1 day.
 		if (time > # day and ! looping) {
 			do completeDay;
-			do pause;
+			do die;
 		}
 		
-		// Manage any missed trips.
-		
+		// Remove any missed trips.
 		if (length(trip_queue) > 0) {
 			loop trip over: trip_queue where (current_second - int(each['start']) > max_wait_time * 60) {
 				missed_trips <- missed_trips + 1;
@@ -254,6 +310,7 @@ species pev skills: [moving] {
 		draw circle(10) at: location color: color;
 	}
 	
+	// Find a new destination after previous one completed.
 	action findNewTarget {
 		if (status = 'wander') {
 			if (length(trip_queue) > 0) {
@@ -295,7 +352,9 @@ species pev skills: [moving] {
 			// Bad road.
 			ask world {
 				write "Bad road detected. Heading to " + string(myself.target) + "." color: # black;
-				do pause;
+				did_finish <- false;
+				do completeDay;
+				do die;
 			}
 		} else if (status = 'wander' and length(trip_queue) > 0) {
 			do claim;
@@ -303,6 +362,13 @@ species pev skills: [moving] {
 	}
 }
 
+// Batch experiment container.
+experiment Batch type: batch until: day_done {
+	parameter var: isBatch <- true;
+	parameter "Filename" var: filename among: file_list;
+}
+
+// Experiment for visualization purposes.
 experiment Display  type: gui {
 	parameter "Heat Map:" var: visualize <- true category: "Grid";
 	output {
@@ -312,6 +378,7 @@ experiment Display  type: gui {
 			species pev aspect:base;	
 		}
 		
+		// Several monitors for reference.
 		monitor 'Time' value:time_string refresh:every(1 # minute);
 		monitor 'Simulation Day' value: current_day refresh: every(1 # day);
 		monitor 'Completion Rate' value: string((completed_trips / (total_trips = 0 ? 1 : total_trips) * 100) with_precision 1) + "%" refresh: every(1 # minute);
@@ -319,6 +386,7 @@ experiment Display  type: gui {
 	}
 }
 
+// Experiment for personal day long testing.
 experiment Run type: gui {
 	parameter "Heat Map:" var: visualize <- false category: "Grid";
 }
