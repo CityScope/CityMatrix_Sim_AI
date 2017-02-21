@@ -25,8 +25,8 @@ global {
     // 2. Trip generation..
     list< map<string, unknown> > trip_queue <- [];
     int trip_interval <- 1;
-	float maximumTripCount <- 6.0 parameter: "Max Trip Count:" category: "Environment";
-	// So, we generate at most 4 jobs every 10 seconds.
+	float maximumTripCount; // <- 6.0 parameter: "Max Trip Count:" category: "Environment";
+	// Number of jobs generated every trip_interval cycles;
 	int max_wait_time <- 20 parameter: "Max Wait Time (minutes):" category: "Environment";
 	int missed_trips <- 0;
 	int completed_trips <- 0;
@@ -64,7 +64,7 @@ global {
 			raw_filename <- replace(filename, '.json', ''); 
 			filename <- input_dir + filename;
 		} else {
-			filename <- '../includes/generator_configurations/city_late.json';
+			filename <- './../includes/cityIO.json';
 		}
 		
 		write "Current file: " + filename color: # black;
@@ -107,6 +107,13 @@ global {
 			cityMatrix cell <- cityMatrix grid_at { matrix_size - 1 , i };
 			do initRoad(cell);
 		}
+		
+		// Get total population and trip statistics.
+        ask cityMatrix where (each.density > 0) {
+        	total_population <- total_population + peoplePerFloor[type] * int(density);
+        }
+        int expected_trips <- int(0.3 * total_population * 2);
+        maximumTripCount <- float(expected_trips) / scaleFactor;
         
         // Initialize trip probability array.
         loop r from: 0 to: length(prob) - 1 {
@@ -128,13 +135,6 @@ global {
         ask pev {
         	do findNewTarget;
         }
-        
-        // Get total population and trip statistics.
-        ask cityMatrix where (each.density > 0) {
-        	total_population <- total_population + peoplePerFloor[type] * int(density);
-        }
-        int expected_trips <- int(0.3 * total_population * 2);
-        maximumTripCount <- float(expected_trips) / scaleFactor;
 	}
 	
 	// Init a road cell.
@@ -254,6 +254,7 @@ global {
 		
 		day_done <- true;
 		write "Day complete!" color: # black;
+		write # now color: # black;
 	}
 	
 	// Manage our trip queue.
