@@ -5,6 +5,8 @@ Created on Wed Feb 15 23:13:35 2017
 @author: Alex
 """
 import json
+import pyqtgraph as pg
+import numpy as np
 
 EDGE_COST = 1
 ROAD_ID = 6
@@ -16,11 +18,19 @@ class City(object):
         self.densities = self.meta['density']
         self.cells = dict_from_cells(cells_from_json(json_obj['grid'], 
                                                      self.densities))
-        self.width = max(map(lambda c: c.x, self.cells.values()))
-        self.height = max(map(lambda c: c.y, self.cells.values()))
+        self.width = max(map(lambda c: c.x, self.cells.values())) + 1
+        self.height = max(map(lambda c: c.y, self.cells.values())) + 1
         
-        self.graph = self.get_graph()
-        self.calculate_road_densities()
+        try:
+            self.graph = self.get_graph()
+            self.road_graph = self.get_road_graph()
+            self.calculate_road_densities()
+        except Exception as e:
+            print "Something's wrong with the json file: " + str(e)
+            pass
+    
+    def get_cell(self, pos):
+        return self.cells[pos]
         
     def nesw(self, pos):
         x = pos[0]
@@ -28,11 +38,11 @@ class City(object):
         directions = []
         if x > 0:
             directions.append((x - 1, y))
-        if x < self.width:
+        if x < self.width - 1:
             directions.append((x + 1, y))
         if y > 0:
             directions.append((x, y - 1))
-        if y < self.height:
+        if y < self.height - 1:
             directions.append((x, y + 1))
         return directions
     
@@ -55,6 +65,7 @@ class City(object):
                 cell.density = road_density
     
     def get_road_graph(self):
+        if not self.graph: self.graph = self.get_graph()
         road_graph = {}
         for (pos, edges) in self.graph.iteritems():
             if self.cells[pos].type_id == ROAD_ID:
@@ -73,6 +84,7 @@ class Cell(object):
         self.y = y
         self.rot = rot
         self.magnitude = magnitude
+        self.traffic = 0
         
         if type_id == ROAD_ID:
             self.density = 0
@@ -98,4 +110,31 @@ def dict_from_cells(cells):
     for cell in cells:
         cell_dict[cell.get_pos()] = cell
     return cell_dict
+    
+def plot_city(city):
+    
+    plotWidget = pg.plot()
+    building_points = []
+    road_points = []
+    for c in city.cells.values():
+        if c.type_id == ROAD_ID:
+            road_points.append(c.get_pos())
+        else:
+            building_points.append(c.get_pos())
+    
+    plotWidget.plot([t[0] for t in road_points],
+                    [t[1] for t in road_points], pen=None, symbol='+')
+    plotWidget.plot([t[0] for t in building_points],
+                    [t[1] for t in building_points], pen=None, symbol='s')
+    
+def traffic_plot(city):
+    data = np.zeros([city.width,city.height])
+    for c in city.cells.values():
+        data[c.x][-c.y] = c.traffic
+    pg.image(data)
+    
+    
+    
+    
+    
     
