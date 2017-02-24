@@ -12,7 +12,7 @@ import "CityGamatrix.gaml"
 
 global {
 	
-	string dir <- '../includes/output_2/'; // Directory with output JSON files. 
+	string dir <- '../includes/output_0/'; // Directory with output JSON files. 
 	list<string> files <- folder(dir) select (string(each) contains "json");
 	int index <- 0;
 	
@@ -41,7 +41,7 @@ global {
 experiment Display type: gui {
 	output {
 		
-		display cityMatrixView type:opengl background: # black autosave: true {	
+		display cityMatrixView type:opengl background: # black autosave: true camera_pos: {500,1560,1060} camera_look_pos: {500.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	
 			species cityMatrix aspect:base;
 		}
 	}
