@@ -84,31 +84,7 @@ global {
  		
 		do initGrid;
 		
-		// Add surrounding road if surround = true, else add nothing.
-		
-		// Top edge.
-		loop i from: 0 to: matrix_size - 1 {
-			cityMatrix cell <- cityMatrix grid_at { i , 0 };
-			do initRoad(cell);
-		}
-		
-		// Bottom edge.
-		loop i from: 0 to: matrix_size - 1 {
-			cityMatrix cell <- cityMatrix grid_at { i , matrix_size - 1 };
-			do initRoad(cell);
-		}
-		 
-		// Left edge.
-		loop i from: 0 to: matrix_size - 1 {
-			cityMatrix cell <- cityMatrix grid_at { 0 , i };
-			do initRoad(cell);
-		}
-		
-		// Right edge.
-		loop i from: 0 to: matrix_size - 1 {
-			cityMatrix cell <- cityMatrix grid_at { matrix_size - 1 , i };
-			do initRoad(cell);
-		}
+		do setEdges;
 		
 		// Get total population and trip statistics.
         ask cityMatrix where (each.density > 0) {
@@ -137,13 +113,6 @@ global {
         ask pev {
         	do findNewTarget;
         }
-	}
-	
-	// Init a road cell.
-	action initRoad(cityMatrix cell) {
-		cell.type <- surround ? 6 : -1;
-		cell.color <- surround ? buildingColors[6] : # black;
-		cell.density <- 0.0;
 	}
 	
 	// Map buildings to their respective nearest roads.
