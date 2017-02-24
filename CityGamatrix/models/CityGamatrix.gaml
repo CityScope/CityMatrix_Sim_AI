@@ -82,7 +82,7 @@ grid cityMatrix width:matrix_size height:matrix_size {
 	}
 	
     aspect base{
-	  draw shape color:color depth:density * 2 border:#black;		
+	  draw shape color:color depth:density / max(density_array) * 4 * (1 # km / matrix_size) border:#black;		
 	}
 }
 

@@ -15,8 +15,8 @@ global {
 	// Configurations.
 	
 	// 0. Directory strings!!! Need to include trailing slash.
-	string input_dir <- '../includes/generator_configurations/';
-	string output_dir <- '../includes/outputs/';
+	string input_dir <- '../includes/input_2/';
+	string output_dir <- '../includes/output_2/';
 	
 	// 1. Vehicle information.
     int nb_pev <- 50 parameter: "Number of PEVs:" category: "Environment";
@@ -46,6 +46,8 @@ global {
 	bool visualize;
 	matrix traffic;
 	matrix waiting;
+	float max_traffic <- 10000.0;
+	float max_wait <- 25000.0;
 	string time_string;
 	int current_day;
 	float box_size;
@@ -78,7 +80,7 @@ global {
 		box_size <- 1 # km / matrix_size;
 		
 		traffic <- 0 as_matrix({ matrix_size, matrix_size });
-		waiting <- 0 as_matrix({ matrix_size, matrix_size });
+		waiting <- 0.0 as_matrix({ matrix_size, matrix_size });
  		
 		do initGrid;
 		
@@ -167,8 +169,9 @@ global {
 		ask cityMatrix where (each.type = 6) {
 			traffic[grid_x , grid_y] <- int(traffic[grid_x , grid_y]) + length(agents_inside(self));
 		}
-		loop trip over: trip_queue {
-			waiting[int(trip['x']), int(trip['y'])] <- int(waiting[int(trip['x']), int(trip['y'])]) + 1;
+		loop trip over: (trip_queue where (each['status'] = 'waiting' or each['status'] = 'waiting_active')) {
+			// Every 10 seconds, add 1/6 of a minute to the queue...
+			waiting[int(trip['x']), int(trip['y'])] <- float(waiting[int(trip['x']), int(trip['y'])]) + float(1/6);
 		}
 	}
 	
@@ -176,7 +179,7 @@ global {
 	reflex traffic_draw when: every(traffic_interval # cycles) and visualize {
 		ask cityMatrix where (each.type = 6) {
 			int recent_traffic <- int(traffic[grid_x , grid_y]);
-			float ratio <- 2 * float(recent_traffic) / float(max(traffic));
+			float ratio <- 2 * float(recent_traffic) / max_traffic;
 	    	int b <- int(max([0, 255*(1 - ratio)]));
 	    	int r <- int(max([0, 255*(ratio - 1)]));
 	    	int g <- 255 - b - r;
@@ -253,8 +256,12 @@ global {
 		save copy;
 		
 		day_done <- true;
-		write "Day complete!" color: # black;
+		write "Day complete." color: # black;
 		write # now color: # black;
+		
+		if (! isBatch) {
+			do pause;
+		}
 	}
 	
 	// Manage our trip queue.
@@ -263,12 +270,11 @@ global {
 		// Stop after 1 day.
 		if (time > # day and ! looping) {
 			do completeDay;
-			do die;
 		}
 		
 		// Remove any missed trips.
 		if (length(trip_queue) > 0) {
-			loop trip over: trip_queue where (current_second - int(each['start']) > max_wait_time * 60) {
+			loop trip over: trip_queue where (current_second - int(each['start']) > max_wait_time * 60 and each['status'] = 'waiting') {
 				missed_trips <- missed_trips + 1;
 				total_trips <- total_trips + 1;
 				remove trip from: trip_queue;
@@ -283,6 +289,7 @@ global {
 			{
 				loop times: trip_count {
 					map<string, unknown> m;
+					m['status'] <- 'waiting';
 					m['start'] <- current_second;
 					map<string, float> pickup;
 					do findLocation(pickup);
@@ -314,7 +321,7 @@ species pev skills: [moving] {
 	// Find a new destination after previous one completed.
 	action findNewTarget {
 		if (status = 'wander') {
-			if (length(trip_queue) > 0) {
+			if (length((trip_queue where (each['status'] = 'waiting'))) > 0) {
 				do claim;
 			} else {
 				status <- 'wander';
@@ -322,6 +329,7 @@ species pev skills: [moving] {
 				color <- # white;
 			}
 		} else if (status = 'pickup') {
+			remove pev_trip from: trip_queue;
 			status <- 'dropoff';
 			target <- { float(pev_trip['dropoff.x']), float(pev_trip['dropoff.y']), 0.0};
 			color <- # pink;
@@ -336,8 +344,8 @@ species pev skills: [moving] {
 	
 	// Pops trip from front of queue and assigns to this PEV.
 	action claim {
-		map<string, unknown> trip <- trip_queue[0];
-		remove trip from: trip_queue;
+		map<string, unknown> trip <- (trip_queue where (each['status'] = 'waiting'))[0];
+		trip['status'] <- 'waiting_active';
 		pev_trip <- trip;
 		status <- 'pickup';
 		target <- { float(trip['pickup.x']), float(trip['pickup.y']), 0.0};
@@ -357,7 +365,7 @@ species pev skills: [moving] {
 				do completeDay;
 				do die;
 			}
-		} else if (status = 'wander' and length(trip_queue) > 0) {
+		} else if (status = 'wander' and length((trip_queue where (each['status'] = waiting))) > 0) {
 			do claim;
 		}
 	}
@@ -374,9 +382,10 @@ experiment Display  type: gui {
 	parameter "Heat Map:" var: visualize <- true category: "Grid";
 	output {
 		
-		display cityMatrixView   type:opengl background:#black {	
+		display cityMatrixView type:opengl background:#black {	
 			species cityMatrix aspect:base;
-			species pev aspect:base;	
+			species pev aspect:base;
+			// Add autosave: true to the display.
 		}
 		
 		// Several monitors for reference.
