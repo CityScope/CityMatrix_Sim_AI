@@ -215,6 +215,9 @@ global {
 		final_data["trip_prob"] <- maximumTripCount;
 		final_data["runtime"] <- int(# now - s);
 		final_data["total_wait"] <- int(sum(waiting));
+		final_data["population"] <- total_population; // Latest add...
+		final_data["max_traffic"] <- max_traffic;
+		final_data["max_wait"] <- max_wait;
 		objects["data"] <- final_data;
 		
 		// Write final result to JSON.

@@ -123,12 +123,7 @@ grid cityMatrix width:matrix_size height:matrix_size {
 
 experiment Display  type: gui {
 	output {
-		display cityMatrixView  type:opengl  background:#black {	
-			graphics "text" 
-			{
-               draw "CityGamatrix" color: # white font: font("Helvetica", 20, #bold) at: { -400, 20};
-               draw "PEV Fleet" color: # white font: font("Helvetica", 14, #italic) at: { -400, 100};
-            }
+		display cityMatrixView  type:opengl  background:#black {
 			species cityMatrix aspect:base;
 		}
 	}
