@@ -70,6 +70,41 @@ global {
 		first <- false;	
 		do initGrid;
 	}
+	
+	action setEdges {
+		// Add surrounding road if surround = true, else add nothing.
+		
+		// Top edge.
+		loop i from: 0 to: matrix_size - 1 {
+			cityMatrix cell <- cityMatrix grid_at { i , 0 };
+			do initRoad(cell);
+		}
+		
+		// Bottom edge.
+		loop i from: 0 to: matrix_size - 1 {
+			cityMatrix cell <- cityMatrix grid_at { i , matrix_size - 1 };
+			do initRoad(cell);
+		}
+		 
+		// Left edge.
+		loop i from: 0 to: matrix_size - 1 {
+			cityMatrix cell <- cityMatrix grid_at { 0 , i };
+			do initRoad(cell);
+		}
+		
+		// Right edge.
+		loop i from: 0 to: matrix_size - 1 {
+			cityMatrix cell <- cityMatrix grid_at { matrix_size - 1 , i };
+			do initRoad(cell);
+		}
+	}
+	
+	// Init a road cell.
+	action initRoad(cityMatrix cell) {
+		cell.type <- surround ? 6 : -1;
+		cell.color <- surround ? buildingColors[6] : # black;
+		cell.density <- 0.0;
+	}
 }
 
 grid cityMatrix width:matrix_size height:matrix_size {
@@ -82,18 +117,13 @@ grid cityMatrix width:matrix_size height:matrix_size {
 	}
 	
     aspect base{
-	  draw shape color:color depth:density * 2 border:#black;		
+	  draw shape color:color depth:density / max(density_array) * 4 * (1 # km / matrix_size) border:#black;		
 	}
 }
 
 experiment Display  type: gui {
 	output {
-		display cityMatrixView  type:opengl  background:#black {	
-			overlay position: { 0, 0 } size: { 150 #px, 75 #px }   border: #black rounded: true
-			{
-               draw "CityGamatrix" color: # white font: font("Helvetica", 20, #bold) at: { 0, 20};
-               draw "PEV Fleet" color: # white font: font("Helvetica", 14, #italic) at: { 100, 20};
-            }
+		display cityMatrixView  type:opengl  background:#black {
 			species cityMatrix aspect:base;
 		}
 	}
