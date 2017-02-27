@@ -7,16 +7,18 @@ Created on Wed Feb 15 23:13:35 2017
 import json
 import pyqtgraph as pg
 import numpy as np
+import collections
+
 
 EDGE_COST = 1
 ROAD_ID = 6
 
 class City(object):
     def __init__(self, json_string):
-        json_obj = json.loads(json_string)
-        self.meta = json_obj['objects']
+        self.json_obj = json.loads(json_string)
+        self.meta = self.json_obj['objects']
         self.densities = self.meta['density']
-        self.cells = dict_from_cells(cells_from_json(json_obj['grid'], 
+        self.cells = dict_from_cells(cells_from_json(self.json_obj['grid'], 
                                                      self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
         self.height = max(map(lambda c: c.y, self.cells.values())) + 1
@@ -28,6 +30,17 @@ class City(object):
         except Exception as e:
             print "Something's wrong with the json file: " + str(e)
             pass
+    
+    def to_dict(self):
+        self.meta["density"] = self.densities
+        changes = {
+                   "objects": self.meta,
+                   "grid": [c.to_dict() for c in self.cells.values()]
+                   }
+        return update_dict(self.json_obj, changes)
+    
+    def to_json(self):
+        return json.dumps(self.to_dict())
     
     def get_cell(self, pos):
         return self.cells[pos]
@@ -78,28 +91,51 @@ class City(object):
 
         
 class Cell(object):
-    def __init__(self, type_id, x, y, rot, density_arr, magnitude=-1):
-        self.type_id = type_id
-        self.x = x
-        self.y = y
-        self.rot = rot
-        self.magnitude = magnitude
-        self.traffic = 0
+    def __init__(self, jcell, density_arr):
+        self.json_obj = jcell
+        self.type_id = jcell['type']
+        self.x = jcell['x']
+        self.y = jcell['y']
+        self.rot = jcell['rot']
+        self.magnitude = jcell['magnitude']
+        self.data = jcell.get('data', {'traffic': 0, 'wait': 0})
         
-        if type_id == ROAD_ID:
+        if self.type_id == ROAD_ID:
             self.density = 0
         else:
-            self.density = density_arr[type_id]
+            self.density = density_arr[self.type_id]
         
     def get_pos(self):
         return (self.x, self.y)
+        
+    def to_dict(self):
+        changes = {
+                     "type": self.type_id,
+                     "x": self.x,
+                     "y": self.y,
+                     "magnitude": self.magnitude,
+                     "rot": self.rot,
+                     "data": self.data
+                     }
+        return update_dict(self.json_obj, changes)
     
-
+def update_dict(d, u):
+    """
+    http://stackoverflow.com/questions/3232943
+    /update-value-of-a-nested-dictionary-of-varying-depth
+    """
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            r = update_dict(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
+                     
 def cells_from_json(json_buildings, densities):
     cells = []
     for jcell in json_buildings:
-        c = Cell(jcell['type'], jcell['x'], jcell['y'], jcell['rot'], 
-                     densities, magnitude=jcell['magnitude'])
+        c = Cell(jcell, densities)
         cells.append(c)
         
     return cells
@@ -130,7 +166,7 @@ def plot_city(city):
 def traffic_plot(city):
     data = np.zeros([city.width,city.height])
     for c in city.cells.values():
-        data[c.x][-c.y] = c.traffic
+        data[c.x][-c.y] = c.data["traffic"]
     pg.image(data)
     
     
