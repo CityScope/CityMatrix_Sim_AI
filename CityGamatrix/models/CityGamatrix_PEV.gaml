@@ -47,7 +47,7 @@ global {
 	matrix traffic;
 	matrix waiting;
 	float max_traffic <- 10000.0;
-	float max_wait <- 25000.0;
+	float max_wait <- 20000.0;
 	string time_string;
 	int current_day;
 	float box_size;
