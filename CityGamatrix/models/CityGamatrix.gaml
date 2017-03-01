@@ -21,8 +21,8 @@ global {
 	list<float> density_array;
 	float max_density;
 	
-	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
-	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
+	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
+	bool dynamicGrid <- true parameter: "Update Grid:" category: "Grid";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
 	bool surround <- true parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
@@ -121,10 +121,23 @@ grid cityMatrix width:matrix_size height:matrix_size {
 	}
 }
 
+
 experiment Display  type: gui {
 	output {
-		display cityMatrixView  type:opengl  background:#black {
-			species cityMatrix aspect:base;
+		display cityMatrixView  type:opengl fullscreen:0 
+		keystone: [{-0.03448275862068967,0.14245810055865915,0.0},{0.0235109717868337,1.0265363128491622,0.0},{0.9858934169278997,1.027932960893855,0.0},{1.0415360501567386,0.14804469273743026,0.0}]
+		background:#black {
+			species cityMatrix aspect:flat;
+		}
+	}
+}
+
+experiment DisplayKeystone  type: gui {
+	output {
+		display cityMatrixView  rotate:-90 type:opengl fullscreen:0 
+		keystone: [{-0.0345,0.1425,0.0},{0.0235,1.02654,0.0},{0.9859,1.02793,0.0},{1.041536,0.148045,0.0}]
+		background:#black {
+			species cityMatrix aspect:flat;
 		}
 	}
 }

@@ -56,7 +56,7 @@ global {
 	// 4. Batch properties.
 	bool did_finish <- true;
 	bool day_done <- false;
-	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
+	//list<string> file_list <- folder(input_dir) select (string(each) contains "json");
 	bool isBatch <- false;
 	string raw_filename;
    
@@ -346,11 +346,11 @@ species pev skills: [moving] {
 // Batch experiment container.
 experiment Batch type: batch until: day_done {
 	parameter var: isBatch <- true;
-	parameter "Filename" var: filename among: file_list;
+	//parameter "Filename" var: filename among: file_list;
 }
 
 // Experiment for visualization purposes.
-experiment Display  type: gui {
+experiment DisplayPEV  type: gui {
 	parameter "Heat Map:" var: visualize <- true category: "Grid";
 	output {
 		
@@ -358,6 +358,26 @@ experiment Display  type: gui {
 			species cityMatrix aspect:base;
 			species pev aspect:base;
 			// Add autosave: true to the display.
+		}
+		
+		// Several monitors for reference.
+		monitor 'Time' value:time_string refresh:every(1 # minute);
+		monitor 'Simulation Day' value: current_day refresh: every(1 # day);
+		monitor 'Completion Rate' value: string((completed_trips / (total_trips = 0 ? 1 : total_trips) * 100) with_precision 1) + "%" refresh: every(1 # minute);
+		monitor 'Total Trips' value:total_trips refresh: every(1 # minute);
+	}
+}
+
+experiment DisplayPEVKeystone  type: gui {
+	parameter "Heat Map:" var: visualize <- true category: "Grid";
+	output {
+		
+
+		display cityMatrixViewKeystone  rotate:-90 type:opengl fullscreen:0 
+		keystone: [{-0.0345,0.1425,0.0},{0.0235,1.02654,0.0},{0.9859,1.02793,0.0},{1.041536,0.148045,0.0}]
+		background:#black {
+			species cityMatrix aspect:flat;
+			species pev aspect:base;
 		}
 		
 		// Several monitors for reference.
