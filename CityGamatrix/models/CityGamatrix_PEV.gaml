@@ -15,8 +15,8 @@ global {
 	// Configurations.
 	
 	// 0. Directory strings!!! Need to include trailing slash.
-	string input_dir <- '../includes/input_2/';
-	string output_dir <- '../includes/output_2/';
+	string input_dir <- '../includes/general_input/'; // general_input folder if needed
+	string output_dir <- '../includes/general_output/'; // general_output folder if needed
 	
 	// 1. Vehicle information.
     int nb_pev <- 50 parameter: "Number of PEVs:" category: "Environment";
