@@ -16,6 +16,8 @@ global {
 	
     map<string, unknown> matrixData;
     map<int,rgb> buildingColors <-[0::rgb(189,183,107), 1::rgb(189,183,107), 2::rgb(189,183,107),3::rgb(230,230,230), 4::rgb(230,230,230), 5::rgb(230,230,230),6::rgb(40,40,40)];
+    map<int,rgb> buildingGAMAColors <-[0::rgb(244,165,40), 1::rgb(244,165,40), 2::rgb(217,72,33),3::rgb(217,72,33), 4::rgb(22,94,147), 5::rgb(22,94,147),6::rgb(0,0,0)];
+    map<int,rgb> buildingMinimalColors <-[0::#white, 1::#white, 2::#white,3::#white, 4::#white, 5::#white,6::#black];
     list<map<string, unknown>> cells;
     map<string, unknown> objects;
 	list<float> density_array;
@@ -29,6 +31,7 @@ global {
 	int matrix_size <- 18;
 	string filename <- './../includes/cityIO.json'; // Default option in case no other file is selected.
 	bool first <- true;
+	bool gama_view<-false;
 	
 	init {
         do initGrid;
@@ -60,7 +63,12 @@ global {
             	} else {
             		cell.type <- int(c["type"]);
             	}
-            	cell.color <- (cell.type = -1) ? # gray : buildingColors[cell.type];
+            	if(gama_view = true){
+            	  cell.color <- (cell.type = -1) ? # gray : buildingMinimalColors[cell.type];	
+            	}else{
+            	  cell.color <- (cell.type = -1) ? # gray : buildingColors[cell.type];	
+            	}
+            	
             }
             cell.density <- (cell.type = -1 or cell.type= 6) ? 0.0 : density_array[cell.type];
         }
@@ -115,7 +123,7 @@ grid cityMatrix width:matrix_size height:matrix_size {
 	aspect flat{
 	  draw shape color:color border:#black;		
 	}
-	
+		
     aspect base{
 	  draw shape color:color depth:density / max(density_array) * 4 * (1 # km / matrix_size) border:#black;		
 	}
