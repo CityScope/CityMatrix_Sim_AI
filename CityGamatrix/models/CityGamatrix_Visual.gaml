@@ -28,6 +28,8 @@ global {
 	
 	init {
 		
+		step <- 1 # second;
+		
 		surround <- true;
 		
 		raw_file <- files[index];
@@ -51,7 +53,7 @@ global {
 		}
 	}
 	
-	reflex addColor when:every(2000 # cycles) {
+	reflex addColor when:every(4000 # cycles) {
 		if (mode = 0) {
 			viewString <- "City";
 			mode <- 1;
@@ -60,13 +62,15 @@ global {
 		} else if (mode = 1) {
 			viewString <- "Traffic";
 			// Add traffic heatmap.
-			float m <- float(matrixData["objects"]["data"]["max_traffic"]);
+			float m <- float(matrixData["objects"]["data"]["max_traffic"]); // 10,000
+			m <- 10000.0;
 			do drawColors(m, false);
 			mode <- 2;
 		} else if (mode = 2) {
 			viewString <- "Wait";
 			// Add wait heatmap.
-			float m <- float(matrixData["objects"]["data"]["max_wait"]);
+			float m <- float(matrixData["objects"]["data"]["max_wait"]); // 20,000
+			m <- 20000.0;
 			do drawColors(m, false);
 			mode <- 0;
 		}
@@ -88,7 +92,7 @@ global {
 		}
 	}
 	
-	reflex changeCity when:every(6000 # cycles) {
+	reflex changeCity when:every(12000 # cycles) {
 		if (index = length(files)) {
 			do pause;
 			do die;
@@ -117,17 +121,17 @@ global {
 experiment Display type: gui {
 	output {
 		
-		display cityMatrixView autosave: true refresh:every(2000 #cycles) type:opengl background: # black autosave: true camera_pos: {500,1400,1500} camera_look_pos: {500.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	
+		display cityMatrixView autosave: true refresh:every(4000 #cycles) type:opengl background: # black autosave: true camera_pos: {500,1400,1500} camera_look_pos: {500.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	
 			species cityMatrix aspect:base;
 			graphics "text" {
-               draw "PEV Fleet: " + string(fleet) color: # white font: font("Helvetica", 24, #bold) at: { -800, 100};
-               draw "Total Trips: " + string(total) color: # white font: font("Helvetica", 24, #bold) at: { -800, 200};
-               draw "Complete: " + string(complete) color: # white font: font("Helvetica", 24, #bold) at: { -800, 300};
-               draw "Missed: " + string(missed) color: # white font: font("Helvetica", 24, #bold) at: { -800, 400};
-               draw "Total Wait: " + string(total_wait) color: # white font: font("Helvetica", 24, #bold) at: { -800, 500};
-               draw "Population: " + string(population) color: # white font: font("Helvetica", 24, #bold) at: { -800, 600};
-               draw "View: " + viewString color: # white font: font("Helvetica", 24, #bold) at: { -800, 700};
-               draw "File: " + raw_file color: # white font: font("Helvetica", 20, #bold) at: { -600, 1100};
+               draw "PEV Fleet: " + string(fleet) color: # white font: font("Helvetica", 24, #bold) at: { -800, 100} perspective: false;
+               draw "Total Trips: " + string(total) color: # white font: font("Helvetica", 24, #bold) at: { -800, 200} perspective: false;
+               draw "Complete: " + string(complete) color: # white font: font("Helvetica", 24, #bold) at: { -800, 300} perspective: false;
+               draw "Missed: " + string(missed) color: # white font: font("Helvetica", 24, #bold) at: { -800, 400} perspective: false;
+               draw "Total Wait: " + string(total_wait) color: # white font: font("Helvetica", 24, #bold) at: { -800, 500} perspective: false;
+               draw "Population: " + string(population) color: # white font: font("Helvetica", 24, #bold) at: { -800, 600} perspective: false;
+               draw "View: " + viewString color: # white font: font("Helvetica", 24, #bold) at: { -800, 700} perspective: false;
+               draw "File: " + raw_file color: # white font: font("Helvetica", 20, #bold) at: { -600, 1100} perspective: false;
             }
 		}
 	}
