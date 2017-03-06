@@ -12,7 +12,10 @@ import cityiograph
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn import tree
+from sklearn.pipeline import make_pipeline
 
 ROAD_ID = 6
 
@@ -36,6 +39,16 @@ def city_results(city):
     results = []
     return results
 
+def output_to_city(city, output):
+    i = 0
+    for x in range(city.width):
+        for y in range(city.height):
+            cell = city.cells.get((x,y))
+            cell.data["traffic"] = output[i]
+            cell.data["wait"] = output[i + 1]
+            i += 2
+        
+cities = []    
 input_vectors = []
 output_vectors = []
 
@@ -53,9 +66,10 @@ for filename in os.listdir(input_dir):
         for j in range(city.height):
             cell = city.cells.get((i, j))
             new_vector += cell_features(cell)
-
+            
     new_vector += city_features(city)
     input_vectors.append(new_vector)
+    cities.append(city)
 
 input_vectors = np.array(input_vectors)
 print "Input size: " + str(input_vectors.shape)    
@@ -76,27 +90,35 @@ for filename in os.listdir(output_dir):
     output_vectors.append(new_vector)
     
 output_vectors = np.array(output_vectors)
-print "Output size: " + str(output_vectors.shape)    
+print "Output size:", output_vectors.shape  
 
 print "Splitting dataset"
 X_train, X_test, y_train, y_test = train_test_split(
          input_vectors, output_vectors, test_size=0.25, random_state=0)
 
-print "Training linear model"
-linear_model = LinearRegression()
-linear_model.fit(X_train, y_train)
-"""
-print "Training logistic model"
-logistic_model = LogisticRegression()
-logistic_model.fit(X_train, y_train)
-"""
-linear_score = linear_model.score(X_test, y_test)
-#logistic_score = logistic_model.score(X_test, y_test)
-print "Linear Score: ", linear_score
-#print "Logistic Score: ", logistic_score
+print "Training models"
 
+estimators = [('linear', LinearRegression()),
+              ('polynomial', make_pipeline(PolynomialFeatures(degree=2), 
+                                           LinearRegression())),
+              ('tree', tree.DecisionTreeRegressor())]
 
-
+prediction_dir = "./data/prediction/"
+              
+for name, estimator in estimators:
+    print "Training:", name
+    estimator.fit(X_train, y_train)
+    score = estimator.score(X_test, y_test)
+    results = estimator.predict(input_vectors)
+    print "Score:", score
+    i = 0
+    print "Outputting files:", name
+    for city in cities:
+        output_to_city(city, results[i])
+        f = open(prediction_dir + name + "/" + "city_" + str(i), 'w')
+        f.write(city.to_json())
+        f.close()
+        i += 1
 
 
 
