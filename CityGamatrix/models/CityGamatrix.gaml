@@ -23,12 +23,12 @@ global {
 	list<float> density_array;
 	float max_density;
 	
-	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
-	bool dynamicGrid <- true parameter: "Update Grid:" category: "Grid";
+	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
+	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
-	bool surround <- true parameter: "Surrounding Road:" category: "Grid";
+	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
-	int matrix_size <- 18;
+	int matrix_size <- 16;
 	string filename <- './../includes/cityIO.json'; // Default option in case no other file is selected.
 	bool first <- true;
 	bool gama_view<-false;
@@ -51,8 +51,8 @@ global {
 		max_density <- max(density_array);
 		int a <- (matrix_size = 18) ? 1 : 0;
 		loop c over: cells {
-			int x <- 15 - int(c["x"]) + a;
-			int y <- int(c["y"]) + a;               
+			int x <- int(c["x"]) + a;
+			int y <- int(c["y"]) + a;
             cityMatrix cell <- cityMatrix grid_at { x, y };
             if (! first and c["type"] = cell.type) {
             	// Same type on update - don't change color.
@@ -63,12 +63,11 @@ global {
             	} else {
             		cell.type <- int(c["type"]);
             	}
-            	if(gama_view = true){
+            	if (gama_view = true) {
             	  cell.color <- (cell.type = -1) ? # gray : buildingMinimalColors[cell.type];	
-            	}else{
-            	  cell.color <- (cell.type = -1) ? # gray : buildingColors[cell.type];	
+            	} else {
+            	  	cell.color <- (cell.type = -1) ? # gray : buildingColors[cell.type];	
             	}
-            	
             }
             cell.density <- (cell.type = -1 or cell.type= 6) ? 0.0 : density_array[cell.type];
         }
@@ -127,6 +126,19 @@ grid cityMatrix width:matrix_size height:matrix_size {
     aspect base{
 	  draw shape color:color depth:density / max(density_array) * 4 * (1 # km / matrix_size) border:#black;		
 	}
+	
+	cityMatrix closestCell(list<cityMatrix> n) {
+		float minDistance <- float(matrix_size);
+		cityMatrix result <- nil;
+		loop c over: n {
+			float d <- sqrt((grid_x - c.grid_x)^2 + (grid_y - c.grid_y)^2);
+			if (d < minDistance) {
+				minDistance <- d;
+				result <- c;
+			}
+		}
+		return result;
+	}
 }
 
 
@@ -135,7 +147,7 @@ experiment Display  type: gui {
 		display cityMatrixView  type:opengl fullscreen:0 
 		keystone: [{-0.03448275862068967,0.14245810055865915,0.0},{0.0235109717868337,1.0265363128491622,0.0},{0.9858934169278997,1.027932960893855,0.0},{1.0415360501567386,0.14804469273743026,0.0}]
 		background:#black {
-			species cityMatrix aspect:flat;
+			species cityMatrix aspect:base;
 		}
 	}
 }

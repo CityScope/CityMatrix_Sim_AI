@@ -47,7 +47,7 @@ global {
 	matrix traffic;
 	matrix waiting;
 	float max_traffic <- 10000.0;
-	float max_wait <- 20000.0;
+	float max_wait <- 1000.0;
 	string time_string;
 	int current_day;
 	float box_size;
@@ -56,7 +56,7 @@ global {
 	// 4. Batch properties.
 	bool did_finish <- true;
 	bool day_done <- false;
-	//list<string> file_list <- folder(input_dir) select (string(each) contains "json");
+	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
 	bool isBatch <- false;
 	string raw_filename;
    
@@ -66,7 +66,7 @@ global {
 			raw_filename <- replace(filename, '.json', ''); 
 			filename <- input_dir + filename;
 		} else {
-			filename <- './../includes/cityIO.json';
+			filename <- './../includes/test/city_16_output.json';
 		}
 		
 		write "Current file: " + filename color: # black;
@@ -75,7 +75,7 @@ global {
 		starting_date <- date([2017,1,1,0,0,0]);
 		s <- # now;
 		
-		matrix_size <- 18;
+		matrix_size <- 16;
 		
 		box_size <- 1 # km / matrix_size;
 		
@@ -117,38 +117,55 @@ global {
 	
 	// Map buildings to their respective nearest roads.
 	action mapBuildings {
-		loop building over: cityMatrix where (each.density > 0) {
-			cityMatrix nearest_neighbor <- (cityMatrix where (each.type = 6)) closest_to building;
-			float d <- building.location distance_to nearest_neighbor.location;
-			list<cityMatrix> n <- (cityMatrix where (each.type = 6 and each.location distance_to building.location = d));
-			buildingMap[{building.grid_x, building.grid_y, 0}] <- [];
+		ask cityMatrix where (each.type != 6) {
+			list<cityMatrix> neigh <- neighbors where (each.type = 6);
+			int i <- 2;
+			loop while: length(neigh) = 0 {
+				neigh <- self neighbors_at i where (each.type = 6);
+				i <- i + 1;
+			}
+			cityMatrix nearest_neighbor <- self.closestCell(neigh);
+			// Returns the closest road cell to the building.
+			float d <- location distance_to nearest_neighbor.location;
+			list<cityMatrix> n <- (cityMatrix where (each.type = 6 and each.location distance_to location = d));
+			// N is a list of road cells that are all at the same minimum distance to building.
+			buildingMap[{grid_x, grid_y, 0}] <- [];
 			loop r over: n {
 				map<string, float> result;
 				result['x'] <- float(r.location.x);
 				result['y'] <- float(r.location.y);
 				result['grid_x'] <- int(r.grid_x);
 				result['grid_y'] <- int(r.grid_y);
-				add result to: buildingMap[{building.grid_x, building.grid_y, 0}];
+				add result to: buildingMap[{grid_x, grid_y, 0}];
 			}
 		}
 	}
 	
 	// Accumulate traffic/waiting time on each road cell.
 	reflex data_count {
-		ask cityMatrix where (each.type = 6) {
-			traffic[grid_x , grid_y] <- int(traffic[grid_x , grid_y]) + length(agents_inside(self));
+		ask pev {
+			agent c <- agent_closest_to(self);
+			if (string(c) index_of "cityMatrix" = 0) {
+				cityMatrix cell <- cityMatrix(c);
+				traffic[cell.grid_x, cell.grid_y] <- float(traffic[cell.grid_x, cell.grid_y]) + 1.0;
+			}
 		}
 		loop trip over: (trip_queue where (each['status'] = 'waiting' or each['status'] = 'waiting_active')) {
 			// Every 10 seconds, add 1/6 of a minute to the queue...
-			waiting[int(trip['x']), int(trip['y'])] <- float(waiting[int(trip['x']), int(trip['y'])]) + float(1/6);
+			waiting[int(trip['x']), int(trip['y'])] <- float(waiting[int(trip['x']), int(trip['y'])]) + float(1/6); // 10 seconds?
 		}
 	}
 	
 	// Draw traffic heatmap.
 	reflex traffic_draw when: every(traffic_interval # cycles) and visualize {
 		ask cityMatrix where (each.type = 6) {
-			int recent_traffic <- int(traffic[grid_x , grid_y]);
-			float ratio <- 2 * float(recent_traffic) / max_traffic;
+			int val <- int(traffic[grid_x , grid_y]);
+			float ratio;
+			if (val = 0) {
+				ratio <- 0.0;
+			} else {
+				ratio <- 2.5 * float(val) / float(max(traffic));
+			}
 	    	int b <- int(max([0, 255*(1 - ratio)]));
 	    	int r <- int(max([0, 255*(ratio - 1)]));
 	    	int g <- 255 - b - r;
@@ -206,6 +223,7 @@ global {
 		
 		// Now, add all properties to data dict in objects
 		map<string, unknown> final_data;
+		
 		final_data["completed"] <- completed_trips;
 		final_data["missed"] <- missed_trips;
 		final_data["total"] <- total_trips;
@@ -214,17 +232,15 @@ global {
 		final_data["max_wait"] <- max_wait_time;
 		final_data["trip_prob"] <- maximumTripCount;
 		final_data["runtime"] <- int(# now - s);
-		final_data["total_wait"] <- int(sum(waiting));
-		final_data["population"] <- total_population; // Latest add...
-		final_data["max_traffic"] <- max_traffic;
-		final_data["max_wait"] <- max_wait;
+		final_data["population"] <- total_population;
+
 		objects["data"] <- final_data;
 		
 		// Write final result to JSON.
 		map<string, unknown> result;
 		result["grid"] <- cells;
 		result["objects"] <- objects;
-		json_file copy <- json_file(output_dir + raw_filename + '_output.json', result);
+		json_file copy <- json_file(output_dir + raw_filename + '_' + string(# now) + '_output.json', result);
 		save copy;
 		
 		day_done <- true;
@@ -346,11 +362,11 @@ species pev skills: [moving] {
 // Batch experiment container.
 experiment Batch type: batch until: day_done {
 	parameter var: isBatch <- true;
-	//parameter "Filename" var: filename among: file_list;
+	parameter "Filename" var: filename among: file_list;
 }
 
 // Experiment for visualization purposes.
-experiment DisplayPEV  type: gui {
+experiment Display  type: gui {
 	parameter "Heat Map:" var: visualize <- true category: "Grid";
 	output {
 		
@@ -358,26 +374,6 @@ experiment DisplayPEV  type: gui {
 			species cityMatrix aspect:base;
 			species pev aspect:base;
 			// Add autosave: true to the display.
-		}
-		
-		// Several monitors for reference.
-		monitor 'Time' value:time_string refresh:every(1 # minute);
-		monitor 'Simulation Day' value: current_day refresh: every(1 # day);
-		monitor 'Completion Rate' value: string((completed_trips / (total_trips = 0 ? 1 : total_trips) * 100) with_precision 1) + "%" refresh: every(1 # minute);
-		monitor 'Total Trips' value:total_trips refresh: every(1 # minute);
-	}
-}
-
-experiment DisplayPEVKeystone  type: gui {
-	parameter "Heat Map:" var: visualize <- true category: "Grid";
-	output {
-		
-
-		display cityMatrixViewKeystone  rotate:-90 type:opengl fullscreen:0 
-		keystone: [{-0.0345,0.1425,0.0},{0.0235,1.02654,0.0},{0.9859,1.02793,0.0},{1.041536,0.148045,0.0}]
-		background:#black {
-			species cityMatrix aspect:flat;
-			species pev aspect:base;
 		}
 		
 		// Several monitors for reference.
