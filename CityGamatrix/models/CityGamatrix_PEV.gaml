@@ -240,7 +240,8 @@ global {
 		map<string, unknown> result;
 		result["grid"] <- cells;
 		result["objects"] <- objects;
-		json_file copy <- json_file(output_dir + raw_filename + '_' + string(# now) + '_output.json', result);
+		//json_file copy <- json_file(output_dir + raw_filename + '_' + string(# now) + '_output.json', result);
+		json_file copy <- json_file(output_dir + raw_filename + '_output.json', result);
 		save copy;
 		
 		day_done <- true;
