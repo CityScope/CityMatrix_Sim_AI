@@ -132,7 +132,7 @@ global {
 
 }
 
-experiment MyDisplay type: gui {
+experiment PNGDisplay type: gui {
 	float minimum_cycle_duration <- 1.0 #ms;
 	output {
 		
