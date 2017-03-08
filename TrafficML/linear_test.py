@@ -18,10 +18,16 @@ from sklearn import tree
 from sklearn.pipeline import make_pipeline
 
 ROAD_ID = 6
+POP_ARR = [5, 8, 16, 16, 23, 59]
+
+def density_to_pop(type_id, density):
+    if type_id not in range(len(POP_ARR)):
+        return 0
+    return density * POP_ARR[type_id]
 
 def cell_features(cell):
     feats = []
-    feats.append(cell.density)
+    feats.append(density_to_pop(cell.type_id, cell.density))
     feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
     return feats
 
@@ -44,8 +50,8 @@ def output_to_city(city, output):
     for x in range(city.width):
         for y in range(city.height):
             cell = city.cells.get((x,y))
-            cell.data["traffic"] = output[i]
-            cell.data["wait"] = output[i + 1]
+            cell.data["traffic"] = int(round(output[i]))
+            cell.data["wait"] = int(round(output[i + 1]))
             i += 2
         
 cities = []    
@@ -115,7 +121,7 @@ for name, estimator in estimators:
     print "Outputting files:", name
     for city in cities:
         output_to_city(city, results[i])
-        f = open(prediction_dir + name + "/" + "city_" + str(i), 'w')
+        f = open(prediction_dir + name + "/" + "city_" + str(i) + ".json", 'w')
         f.write(city.to_json())
         f.close()
         i += 1
