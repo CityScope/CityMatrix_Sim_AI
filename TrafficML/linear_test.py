@@ -18,16 +18,10 @@ from sklearn import tree
 from sklearn.pipeline import make_pipeline
 
 ROAD_ID = 6
-POP_ARR = [5, 8, 16, 16, 23, 59]
-
-def density_to_pop(type_id, density):
-    if type_id not in range(len(POP_ARR)):
-        return 0
-    return density * POP_ARR[type_id]
 
 def cell_features(cell):
     feats = []
-    feats.append(density_to_pop(cell.type_id, cell.density))
+    feats.append(cell.population)
     feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
     return feats
 
@@ -44,6 +38,24 @@ def city_features(city):
 def city_results(city):
     results = []
     return results
+    
+def get_features(city):
+    features = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            features += cell_features(cell) 
+    features += city_features(city)
+    return np.array(features)
+    
+def get_results(city):
+    results = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            results += cell_results(cell) 
+    results += city_results(city)
+    return np.array(results)
 
 def output_to_city(city, output):
     i = 0
@@ -53,7 +65,10 @@ def output_to_city(city, output):
             cell.data["traffic"] = int(round(output[i]))
             cell.data["wait"] = int(round(output[i + 1]))
             i += 2
-        
+            
+def verify_samecity(in_city, out_city):
+    return np.array_equal(get_features(in_city), get_features(out_city))
+            
 cities = []    
 input_vectors = []
 output_vectors = []
@@ -61,40 +76,25 @@ output_vectors = []
 input_dir = "./data/input/"
 output_dir = "./data/output/"
 
-print "Preparing input vectors"
-for filename in os.listdir(input_dir):
-    json = open(input_dir + filename).read()
-    city = cityiograph.City(json)
-    
-    new_vector = []
-    
-    for i in range(city.width):
-        for j in range(city.height):
-            cell = city.cells.get((i, j))
-            new_vector += cell_features(cell)
-            
-    new_vector += city_features(city)
-    input_vectors.append(new_vector)
-    cities.append(city)
+input_files = os.listdir(input_dir)
+output_files = os.listdir(output_dir)
 
+print "Preparing training features/results"
+for i in range(len(input_files)):
+    in_city = cityiograph.City(open(input_dir + input_files[i]).read())
+    out_city = cityiograph.City(open(output_dir + output_files[i]).read())
+    features = get_features(in_city)
+    results = get_results(out_city)
+    if not verify_samecity(in_city, out_city):
+        print input_files[i], output_files[i]
+        print features
+        print get_features(out_city)
+        raise RuntimeError("Mismatched input and output files!")
+    
+    input_vectors.append(features)
+    output_vectors.append(results)
+    
 input_vectors = np.array(input_vectors)
-print "Input size: " + str(input_vectors.shape)    
-
-print "Preparing output vectors"
-for filename in os.listdir(output_dir):
-    json = open(output_dir + filename).read()
-    city = cityiograph.City(json)
-    
-    new_vector = []
-    
-    for i in range(city.width):
-        for j in range(city.height):
-            cell = city.cells.get((i, j))
-            new_vector += cell_results(cell)
-
-    new_vector += city_results(city)
-    output_vectors.append(new_vector)
-    
 output_vectors = np.array(output_vectors)
 print "Output size:", output_vectors.shape  
 
@@ -105,7 +105,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 print "Training models"
 
 estimators = [('linear', LinearRegression()),
-              ('polynomial', make_pipeline(PolynomialFeatures(degree=2), 
+              ('polynomial-1', make_pipeline(PolynomialFeatures(degree=1), 
+                                           LinearRegression())),
+              ('polynomial-2', make_pipeline(PolynomialFeatures(degree=2), 
                                            LinearRegression())),
               ('tree', tree.DecisionTreeRegressor())]
 
