@@ -9,6 +9,7 @@ import pyqtgraph as pg
 import numpy as np
 import collections
 
+POP_ARR = [5, 8, 16, 16, 23, 59]
 
 EDGE_COST = 1
 ROAD_ID = 6
@@ -22,7 +23,11 @@ class City(object):
                                                      self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
         self.height = max(map(lambda c: c.y, self.cells.values())) + 1
-        
+
+        self.population = 0
+        for c in self.cells.values():
+            self.population += c.population
+
         try:
             self.graph = self.get_graph()
             self.road_graph = self.get_road_graph()
@@ -33,6 +38,7 @@ class City(object):
     
     def to_dict(self):
         self.meta["density"] = self.densities
+        self.meta["population"] = self.population
         changes = {
                    "objects": self.meta,
                    "grid": [c.to_dict() for c in self.cells.values()]
@@ -104,6 +110,8 @@ class Cell(object):
             self.density = 0
         else:
             self.density = density_arr[self.type_id]
+
+        self.population = density_to_pop(self.type_id, self.density)
         
     def get_pos(self):
         return (self.x, self.y)
@@ -169,8 +177,10 @@ def traffic_plot(city):
         data[c.x][-c.y] = c.data["traffic"]
     pg.image(data)
     
-    
-    
+def density_to_pop(type_id, density):
+    if type_id not in range(len(POP_ARR)):
+        return 0
+    return density * POP_ARR[type_id]
     
     
     
