@@ -68,7 +68,21 @@ def output_to_city(city, output):
             
 def verify_samecity(in_city, out_city):
     return np.array_equal(get_features(in_city), get_features(out_city))
-            
+
+def residuals(expected, predicted):
+    return predicted - expected
+    
+def residual_plot(input_vectors, output_vectors, model):
+    import pyqtgraph as pg
+    assert len(input_vectors) == len(output_vectors)
+    pred = model.predict(input_vectors)
+    res = []
+    for i in range(len(input_vectors)):
+        res.append(residuals(output_vectors[i], pred[i]).sum())
+    
+    pg.plot(res)
+    
+    
 cities = []    
 input_vectors = []
 output_vectors = []
