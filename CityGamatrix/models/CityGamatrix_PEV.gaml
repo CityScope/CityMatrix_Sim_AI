@@ -15,8 +15,8 @@ global {
 	// Configurations.
 	
 	// 0. Directory strings!!! Need to include trailing slash.
-	string input_dir <- '../includes/fourth_input/'; // general_input folder if needed
-	string output_dir <- '../includes/fourth_output/'; // general_output folder if needed
+	string input_dir <- '../includes/general_input/'; // general_input folder if needed
+	string output_dir <- '../includes/general_output/'; // general_output folder if needed
 	
 	// 1. Vehicle information.
     int nb_pev <- 50 parameter: "Number of PEVs:" category: "Environment";
@@ -62,12 +62,13 @@ global {
    
 	init {
 		
-		raw_filename <- replace(filename, '.json', '');
-		
 		if (isBatch) {
+			raw_filename <- replace(filename, '.json', '');
 			filename <- input_dir + filename;
 		} else {
-			filename <- './../includes/test/city_16_output.json';
+			filename <- 'city_0.json';
+			raw_filename <- replace(filename, '.json', '');
+			filename <- input_dir + filename;
 		}
 		
 		write "Current file: " + filename color: # black;
