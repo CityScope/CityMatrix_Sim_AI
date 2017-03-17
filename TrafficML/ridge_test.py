@@ -11,6 +11,7 @@ def print_array(b):
 	for row in b:
 		for c in row:
 			print(str(c) + ",	", end='')
+		print('')
 
 def get_population(t, density_array):
 	if t not in range(0, 6):
@@ -62,7 +63,7 @@ print('Successfully extracted data.')
 
 print('Fitting data to KRR model...')
 
-clf = KernelRidge(kernel='rbf', gamma=0.1, alpha = 1.0)
+clf = KernelRidge(kernel='rbf', gamma=100)
 
 clf.fit(train_x, train_y)
 
@@ -70,15 +71,15 @@ clf.fit(train_x, train_y)
 
 np.set_printoptions(threshold=np.nan)
 
-print(print_array(train_y[0].reshape((16, 32))))
+print(print_array(test_y[10].reshape((32, 16))))
 
 print('...')
 
 print('Predicting new data...')
 
-y = clf.predict(train_x).astype(int)
+y = (2 * clf.predict(test_x)).astype(int)
 
-print(print_array(y[0].reshape((16, 32))))
+print(print_array(y[10].reshape((32, 16))))
 
 print(clf.score(test_x, test_y)) # Prediction score?
 
