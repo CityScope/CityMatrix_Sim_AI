@@ -36,6 +36,7 @@ def extract_data(directory):
 				continue
 			for cell in d['grid']:
 				current_input.append(get_population(cell['type'], d['objects']['density']))
+				current_input.append(int(cell['type'] == 6))
 				if 'data' in cell:
 					current_output.append(cell['data']['traffic'])
 					current_output.append(cell['data']['wait'])
