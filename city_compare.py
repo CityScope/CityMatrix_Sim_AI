@@ -10,7 +10,7 @@ import os
 import numpy as np
 
 sys.path.insert(0, 'TrafficTreeSim/')
-from cityiograph import *
+import cityiograph
 
 sys.path.insert(0, 'TrafficML/')
 import traffic_regression as TR
@@ -20,10 +20,15 @@ Statistical extraction functions.
 
 Each expect raw data, nothing to do with the city structure
 """
+def normalize(data):
+    return np.array(data) / max(np.max(data), np.abs(np.min(data)))
 
 def residuals(expected, predicted):
     return expected - predicted
-            
+    
+def normalized_residuals(expected, predicted):
+    return residuals(normalize(expected), normalize(predicted))
+    
 def total_sum_squares(expectedVals):
     mean = np.mean(expectedVals)
     
@@ -49,8 +54,33 @@ City focused functions.
 
 """
 
+CITY_STATS = [("residuals", residuals),
+              ("norm_residuals", normalized_residuals)]
+
 def get_data(city):
-    return TR.get_results(city)
+    return np.array(TR.get_results(city)).astype(float)
     
+def city_stats(expectedCity, predictedCity):
+    stats = {}
+    for name, fun in CITY_STATS:
+        stats[name] = fun(expectedCity, predictedCity)
+    return stats
+    
+if __name__ == "__main__":
+    output_dir = "./TrafficML/data/output/"
+    prediction_dir = "./TrafficML/data/prediction/linear/"
+    
+    stats = []
+
+    for filename in os.listdir(output_dir):
+        expectedCity = cityiograph.City(open(output_dir + filename).read())
+        predictedCity = cityiograph.City(open(prediction_dir + filename).read())
+        
+        expected = get_data(expectedCity)
+        predicted = get_data(predictedCity)
+        
+        stats.append(city_stats(expected, predicted))
+        
+
 
     
