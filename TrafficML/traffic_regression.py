@@ -81,100 +81,92 @@ def output_to_city(city, output):
             i += 2
             
 def verify_samecity(in_city, out_city):
-    return np.array_equal(get_features(in_city), get_features(out_city))
+    return in_city.equals(out_city)
 
-def residuals(expected, predicted):
-    return predicted - expected
     
-def residual_plot(input_vectors, output_vectors, model):
-    import pyqtgraph as pg
-    assert len(input_vectors) == len(output_vectors)
-    pred = model.predict(input_vectors)
-    res = []
-    for i in range(len(input_vectors)):
-        res.append(residuals(output_vectors[i], pred[i]).sum())
+if __name__ == "__main__":
+        
+    log = []
+        
+    cities = []
+    input_vectors = []
+    output_vectors = []
     
-    pg.plot(res)
+    input_dir = "./data/input/"
+    output_dir = "./data/output/"
+    prediction_dir = "./data/prediction/"
     
-log = []
+    estimators = [('linear', LinearRegression()),
+                  ('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
+                                               LinearRegression())),
+                  ('decision_tree', tree.DecisionTreeRegressor())]
     
-cities = []
-input_vectors = []
-output_vectors = []
-
-input_dir = "./data/input/"
-output_dir = "./data/output/"
-
-input_files = os.listdir(input_dir)
-output_files = os.listdir(output_dir)
-
-log.append("Preparing training features/results")
-print log[-1]
-
-for i in range(len(input_files)):
-    in_city = cityiograph.City(open(input_dir + input_files[i]).read())
-    out_city = cityiograph.City(open(output_dir + output_files[i]).read())
-    features = get_features(in_city)
-    results = get_results(out_city)
-    """
-    if not verify_samecity(in_city, out_city):
-        print input_files[i], output_files[i]
-        print features
-        print get_features(out_city)
-        raise RuntimeError("Mismatched input and output files!")
-    """
-    cities.append((input_files[i], in_city))
-    input_vectors.append(features)
-    output_vectors.append(results)
     
-input_vectors = np.array(input_vectors)
-output_vectors = np.array(output_vectors)
-
-log.append("Output size:" + str(output_vectors.shape))
-print log[-1]  
-
-log.append("Splitting dataset")
-print log[-1]
-
-X_train, X_test, y_train, y_test = train_test_split(
-         input_vectors, output_vectors, test_size=0.25, random_state=0)
-
-log.append("Training models")
-print log[-1]
-
-estimators = [('linear', LinearRegression()),
-              ('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
-                                           LinearRegression())),
-              ('decision_tree', tree.DecisionTreeRegressor())]
-
-prediction_dir = "./data/prediction/"
-
-for name, estimator in estimators:
-    log.append("Training: " + str(name))
+    input_files = os.listdir(input_dir)
+    output_files = os.listdir(output_dir)
+    
+    log.append("Preparing training features/results")
     print log[-1]
-    estimator.fit(X_train, y_train)
-    score = estimator.score(X_test, y_test)
-    results = estimator.predict(input_vectors)
-    log.append("Score: " + str(score))
+    
+    for i in range(len(input_files)):
+        in_city = cityiograph.City(open(input_dir + input_files[i]).read())
+        out_city = cityiograph.City(open(output_dir + output_files[i]).read())
+        features = get_features(in_city)
+        results = get_results(out_city)
+        """
+        if not verify_samecity(in_city, out_city):
+            print input_files[i], output_files[i]
+            print features
+            print get_features(out_city)
+            raise RuntimeError("Mismatched input and output files!")
+        """
+        cities.append((input_files[i], in_city))
+        input_vectors.append(features)
+        output_vectors.append(results)
+        
+    input_vectors = np.array(input_vectors)
+    output_vectors = np.array(output_vectors)
+    
+    log.append("Output size:" + str(output_vectors.shape))
+    print log[-1]  
+    
+    log.append("Splitting dataset")
     print log[-1]
-    i = 0
-    log.append("Outputting files: " + str(name))
+    
+    X_train, X_test, y_train, y_test = train_test_split(
+             input_vectors, output_vectors, test_size=0.25, random_state=0)
+    
+    log.append("Training models")
     print log[-1]
-    if os.path.exists(prediction_dir + name):
-        shutil.rmtree(prediction_dir + name)
-    os.makedirs(prediction_dir + name)
-    for filename, city in cities:
-        output_to_city(city, results[i])
-        f = open(prediction_dir + name + "/" + filename, 'w')
-        f.write(city.to_json())
-        f.close()
-        i += 1
+    
 
-f = open(prediction_dir + "log.txt", 'w')
-f.write("\n".join(log))
-f.close()
-
-pickle.dump(estimators, open(prediction_dir + "models.pkl", 'wb'))
+    
+    for name, estimator in estimators:
+        log.append("Training: " + str(name))
+        print log[-1]
+        estimator.fit(X_train, y_train)
+        score = estimator.score(X_test, y_test)
+        results = estimator.predict(input_vectors)
+        log.append("Score: " + str(score))
+        print log[-1]
+        i = 0
+        log.append("Outputting files: " + str(name))
+        print log[-1]
+        if os.path.exists(prediction_dir + name):
+            shutil.rmtree(prediction_dir + name)
+        os.makedirs(prediction_dir + name)
+        for filename, city in cities:
+            output_to_city(city, results[i])
+            f = open(prediction_dir + name + "/" + filename, 'w')
+            f.write(city.to_json())
+            f.close()
+            i += 1
+    
+    f = open(prediction_dir + "log.txt", 'w')
+    f.write("\n".join(log))
+    f.close()
+    
+    pickle.dump(estimators, open(prediction_dir + "models.pkl", 'wb'))
 
 
 

@@ -36,6 +36,15 @@ class City(object):
             print "Something's wrong with the json file: " + str(e)
             pass
     
+    def equals(self, other):
+        """True iff all of this city's cells are equal to their corresponding 
+        cells in other and densities, width, and height are the same.
+        """
+        cells_equal = all([c.equals(other.cells.get(pos)) for pos, c in self.cells])
+        return cells_equal and (self.densities == other.densities) \
+            and (self.width == other.width) and (self.height == other.height)
+        
+        
     def to_dict(self):
         self.meta["density"] = self.densities
         self.meta["population"] = self.population
@@ -115,6 +124,13 @@ class Cell(object):
         
     def get_pos(self):
         return (self.x, self.y)
+    
+    def equals(self, other):
+        """True if type, x, y, rot and mag are the same
+        """
+        return (self.type_id == other.type_id) \
+            and (self.x == other.x) and (self.y == other.y) \
+            and (self.rot == other.rot) and (self.mag == other.mag)
         
     def to_dict(self):
         changes = {
