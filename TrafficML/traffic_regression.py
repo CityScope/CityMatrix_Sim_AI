@@ -5,10 +5,13 @@ Created on Tue Feb 28 23:03:34 2017
 @author: Alex
 """
 import os
+import shutil
+import pickle
 
 import sys
 sys.path.insert(0, '../TrafficTreeSim/')
 import cityiograph
+import traffictreesim
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -41,12 +44,23 @@ def city_results(city):
     
 def get_features(city):
     features = []
+    """
+    #Traffic Treesim features
+    traffictreesim.traffic_sim(city)
+    for i in range(city.width):
+        for j in range(city.height):
+            features.append(city.cells.get((i,j)).data["traffic"])
+            
+    return np.array(features)
+    """
+    features = []
     for i in range(city.width):
         for j in range(city.height):
             cell = city.cells.get((i, j))
             features += cell_features(cell) 
     features += city_features(city)
     return np.array(features)
+    
     
 def get_results(city):
     results = []
@@ -82,8 +96,9 @@ def residual_plot(input_vectors, output_vectors, model):
     
     pg.plot(res)
     
+log = []
     
-cities = []    
+cities = []
 input_vectors = []
 output_vectors = []
 
@@ -93,56 +108,73 @@ output_dir = "./data/output/"
 input_files = os.listdir(input_dir)
 output_files = os.listdir(output_dir)
 
-print "Preparing training features/results"
+log.append("Preparing training features/results")
+print log[-1]
+
 for i in range(len(input_files)):
     in_city = cityiograph.City(open(input_dir + input_files[i]).read())
     out_city = cityiograph.City(open(output_dir + output_files[i]).read())
     features = get_features(in_city)
     results = get_results(out_city)
+    """
     if not verify_samecity(in_city, out_city):
         print input_files[i], output_files[i]
         print features
         print get_features(out_city)
         raise RuntimeError("Mismatched input and output files!")
-    
+    """
+    cities.append((input_files[i], in_city))
     input_vectors.append(features)
     output_vectors.append(results)
     
 input_vectors = np.array(input_vectors)
 output_vectors = np.array(output_vectors)
-print "Output size:", output_vectors.shape  
 
-print "Splitting dataset"
+log.append("Output size:" + str(output_vectors.shape))
+print log[-1]  
+
+log.append("Splitting dataset")
+print log[-1]
+
 X_train, X_test, y_train, y_test = train_test_split(
          input_vectors, output_vectors, test_size=0.25, random_state=0)
 
-print "Training models"
+log.append("Training models")
+print log[-1]
 
 estimators = [('linear', LinearRegression()),
-              ('polynomial-1', make_pipeline(PolynomialFeatures(degree=1), 
+              ('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
                                            LinearRegression())),
-              ('polynomial-2', make_pipeline(PolynomialFeatures(degree=2), 
-                                           LinearRegression())),
-              ('tree', tree.DecisionTreeRegressor())]
+              ('decision_tree', tree.DecisionTreeRegressor())]
 
 prediction_dir = "./data/prediction/"
-              
+
 for name, estimator in estimators:
-    print "Training:", name
+    log.append("Training: " + str(name))
+    print log[-1]
     estimator.fit(X_train, y_train)
     score = estimator.score(X_test, y_test)
     results = estimator.predict(input_vectors)
-    print "Score:", score
+    log.append("Score: " + str(score))
+    print log[-1]
     i = 0
-    print "Outputting files:", name
-    for city in cities:
+    log.append("Outputting files: " + str(name))
+    print log[-1]
+    if os.path.exists(prediction_dir + name):
+        shutil.rmtree(prediction_dir + name)
+    os.makedirs(prediction_dir + name)
+    for filename, city in cities:
         output_to_city(city, results[i])
-        f = open(prediction_dir + name + "/" + "city_" + str(i) + ".json", 'w')
+        f = open(prediction_dir + name + "/" + filename, 'w')
         f.write(city.to_json())
         f.close()
         i += 1
 
+f = open(prediction_dir + "log.txt", 'w')
+f.write("\n".join(log))
+f.close()
 
+pickle.dump(estimators, open(prediction_dir + "models.pkl", 'wb'))
 
 
 
