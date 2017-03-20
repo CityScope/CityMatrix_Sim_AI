@@ -1,7 +1,21 @@
 # Traffic Machine Learning
 Machine learning methods for approximating the traffic simulation performed by CityGamatrix. Code should be runnable out of the box, with parameters changeable in the code.
 
+
+# traffic_regression.py
+
+## Running
+
+Edit the variables `input_dir` and `output_dir` to point towards json files storing input and output cities for training.  Edit `prediction_dir` to point towards the directory where the regression models defined in `estimators` should save the predicted cities based on training, and input cities.
+
+Then, run the script, preferably with an IDE.
+
+Model predictions will be saved in directories named after the model under `prediction_dir`.
+A log file with sklearn R^2 information will be saved, as well as a `models.pkl` file for portability.
+
 ## Dependencies
+Tested with Python 2.7, though Python 3 should work without too much trouble.
+
 Scikit-Learn  
 Numpy
 
