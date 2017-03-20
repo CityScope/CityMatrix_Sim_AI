@@ -63,10 +63,12 @@ global {
 	init {
 		
 		if (isBatch) {
-			raw_filename <- replace(filename, '.json', ''); 
+			raw_filename <- replace(filename, '.json', '');
 			filename <- input_dir + filename;
 		} else {
-			filename <- './../includes/test/city_16_output.json';
+			filename <- 'city_0.json';
+			raw_filename <- replace(filename, '.json', '');
+			filename <- input_dir + filename;
 		}
 		
 		write "Current file: " + filename color: # black;
