@@ -1,8 +1,8 @@
 # 0. Load output JSON files.
 
-import glob, json, time, numpy as np
+import glob, json, time, numpy as np , matplotlib.pyplot as plt
 from sklearn.kernel_ridge import KernelRidge
-
+import pickle
 # Utils
 
 POP_ARR = [5, 8, 16, 16, 23, 59]
@@ -51,41 +51,123 @@ def extract_data(directory):
 
 	return (inp, out)
 
-print('Extracting data...')
+def plot_data(feature):
+    n = len(feature)
+    m = len(feature[0])
+    matrix = np.zeros((n,m))
+    maxV = feature.max()
+    for i in range(n):
+    	for j in range(m):
+    		matrix[i][j] = feature[i][j][0]/float(maxV) if feature[i][j][1] == 0 else -1
+    print(matrix)
+    fig, ax = plt.subplots()
+    im = ax.imshow(matrix,interpolation='nearest')
+    fig.colorbar(im)
 
-train_x, train_y = extract_data('../../../data/train/*.json')
-test_x, test_y = extract_data('../../../data/test/*.json')
+# print('Extracting data...')
 
-print('Successfully extracted data.')
+# train_x, train_y = extract_data('../../../data/train/*.json')
+# test_x, test_y = extract_data('../../../data/test/*.json')
 
-# 2. Create ridge regression model and train on training data.
+# variables = {'train_x':train_x,'train_y':train_y,'test_x':test_x,'test_y':test_y}
+# pickle.dump(variables,open('data.p','wb'))
 
-# TODO. Tune gamma.
+data = pickle.load(open('data.p', 'rb'))
+train_x = data['train_x'].reshape((-1, 16, 16, 2))
+train_y = data['train_y'].reshape((-1, 16, 16, 2))
+test_x = data['test_x'].reshape((-1, 16, 16, 2))
+test_y = data['test_y'].reshape((-1, 16, 16, 2))
 
-print('Fitting data to KRR model...')
+# #  
 
-clf = KernelRidge(kernel='rbf', gamma=100)
+# print('Successfully extracted data.')
 
-clf.fit(train_x, train_y)
+# # 2. Create ridge regression model and train on training data.
 
-# 3. Run predictions on test data.
+# # TODO. Tune gamma.
 
-np.set_printoptions(threshold=np.nan)
+# print('Fitting data to KRR model...')
 
-print(print_array(test_y[10].reshape((32, 16))))
+# clf = KernelRidge(kernel='rbf')
 
-print('...')
+# clf.fit(train_x, train_y)
 
-print('Predicting new data...')
+# print (clf.predict(train_x[0]))
 
-y = (2 * clf.predict(test_x)).astype(int)
-
-print(print_array(y[10].reshape((32, 16))))
-
-print(clf.score(test_x, test_y)) # Prediction score?
+# print(clf.score(test_x, test_y)) # Prediction score?
 
 # Current train/test breakdown.
 
 # Train = [1, 2, 3, 4, 5, 6] <- 6000 examples
 
 # Test = [9, 10] <- 2000 examples
+
+# 3x3 Conv and 5x5 and combine <- zero padding, building or road whaterver - low population
+
+# Reshape
+
+# FC downstream
+
+# Try logistical first
+
+# Init Gaussian distribution.
+
+x = np.meshgrid(np.linspace(-2, 2, 31), np.linspace(-2, 2, 31))
+
+x = (x[0]**2 + x[1]**2)**(1/2)
+
+from scipy.stats import norm
+
+r = norm.pdf(x)*-2
+
+b = r * -1
+
+# plt.imshow(x)
+
+# plt.show()
+
+def evaluate_map(grid, r, b):
+	scores = np.zeros(grid.shape[0:2])
+
+	for i in range(len(grid)):
+		for j in range(len(grid[0])):
+			if grid[i][j][1] == 1:
+				# It's a road - update score
+				scores[i][j] = evaluate_cell(i, j, grid, r, b)
+
+	return scores
+
+def evaluate_cell(x, y, grid, r, b):
+	# Return a score here
+
+	# Update the score at a cell
+
+	# Just considering traffic
+
+	score = 0
+
+	for i in range(int(-len(r)/2), int(len(r)/2 + 1)):
+		for j in range(int(-len(r[0])/2), int(len(r[0])/2 + 1)):
+			if x + i >= 0 and x + i < len(grid) - 1 and y + j >= 0 and y + j < len(grid[0]) - 1:
+				# Evaluate the cell
+				# If road
+				if grid[x + i][y + j][1] == 1:
+					# we are a road
+					score += r[i][j]
+				else:
+					score += b[i][j]*grid[x + i][y + j][0]
+
+	return score
+
+format_y = np.delete(train_y, 1, 3)
+
+print(format_y[0].shape)
+
+a = evaluate_map(train_x[0], r, b)
+
+a /= a.max()
+
+# plot_data(train_x[0])
+
+# plt.imshow(a, alpha=0.5)
+# plt.show('hold')
