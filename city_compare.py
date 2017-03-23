@@ -44,7 +44,7 @@ def residual_sum_squares(expectedVals, predictedVals):
     return np.sum(np.array(res)**2)
     
 def R_squared(expectedVals, predictedVals):
-    sumRes = residual_sum_squares(expectedVals)
+    sumRes = residual_sum_squares(expectedVals, predictedVals)
     sumTot = total_sum_squares(predictedVals)
     
     return 1 - (sumRes / sumTot)
@@ -66,11 +66,15 @@ def city_stats(expectedCity, predictedCity):
         stats[name] = fun(expectedCity, predictedCity)
     return stats
     
+    
 if __name__ == "__main__":
     output_dir = "./TrafficML/data/output/"
     prediction_dir = "./TrafficML/data/prediction/linear/"
     
     stats = []
+
+    expected_vals = []
+    predicted_vals = []
 
     for filename in os.listdir(output_dir):
         expectedCity = cityiograph.City(open(output_dir + filename).read())
@@ -79,7 +83,13 @@ if __name__ == "__main__":
         expected = get_data(expectedCity)
         predicted = get_data(predictedCity)
         
+        expected_vals.append(expected)
+        predicted_vals.append(predicted)
+        
         stats.append(city_stats(expected, predicted))
+    
+    r_squared = R_squared(expected_vals, predicted_vals)
+        
         
 
 
