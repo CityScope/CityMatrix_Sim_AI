@@ -27,20 +27,13 @@ class City(object):
         self.population = 0
         for c in self.cells.values():
             self.population += c.population
-
-        try:
-            self.graph = self.get_graph()
-            self.road_graph = self.get_road_graph()
-            self.calculate_road_densities()
-        except Exception as e:
-            print "Something's wrong with the json file: " + str(e)
-            pass
+        
     
     def equals(self, other):
         """True iff all of this city's cells are equal to their corresponding 
         cells in other and densities, width, and height are the same.
         """
-        cells_equal = all([c.equals(other.cells.get(pos)) for pos, c in self.cells])
+        cells_equal = all([c.equals(other.cells.get(pos)) for pos, c in self.cells.iteritems()])
         return cells_equal and (self.densities == other.densities) \
             and (self.width == other.width) and (self.height == other.height)
         
@@ -82,20 +75,20 @@ class City(object):
                 edges[n] = EDGE_COST
             graph[cell.get_pos()] = edges
         return graph
-    
-    def calculate_road_densities(self):
-        for cell in self.cells.values():
+                
+    def get_road_nearby_population_map(self):
+        pop_map = {}
+        for pos, cell in self.cells.iteritems():
             if cell.type_id == ROAD_ID:
-                road_density = 0
-                for n in [self.cells[pos] for pos in self.nesw(cell.get_pos())]:
+                pop_map[pos] = 0
+                for n in [self.cells[p] for p in self.nesw(pos)]:
                     if n.type_id != ROAD_ID:
-                        road_density += n.density
-                cell.density = road_density
+                        pop_map[pos] += n.population
+        return pop_map
     
     def get_road_graph(self):
-        if not self.graph: self.graph = self.get_graph()
         road_graph = {}
-        for (pos, edges) in self.graph.iteritems():
+        for (pos, edges) in self.get_graph().iteritems():
             if self.cells[pos].type_id == ROAD_ID:
                 new_edges = {}
                 for (other_pos, cost) in edges.iteritems():
@@ -130,7 +123,7 @@ class Cell(object):
         """
         return (self.type_id == other.type_id) \
             and (self.x == other.x) and (self.y == other.y) \
-            and (self.rot == other.rot) and (self.mag == other.mag)
+            and (self.rot == other.rot) and (self.magnitude == other.magnitude)
         
     def to_dict(self):
         changes = {

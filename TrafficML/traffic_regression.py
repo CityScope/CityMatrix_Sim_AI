@@ -19,6 +19,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn import tree
 from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsRegressor
 
 ROAD_ID = 6
 
@@ -43,24 +44,26 @@ def city_results(city):
     return results
     
 def get_features(city):
+    #return get_features_treesim(city)
+    
     features = []
-    """
-    #Traffic Treesim features
+    #treesim_features = get_features_treesim(city)
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            features += cell_features(cell)
+            #features.append(treesim_features[i * city.height + j])
+    features += city_features(city)
+    return np.array(features)
+    
+    
+def get_features_treesim(city):
+    features = []
     traffictreesim.traffic_sim(city)
     for i in range(city.width):
         for j in range(city.height):
             features.append(city.cells.get((i,j)).data["traffic"])
-            
     return np.array(features)
-    """
-    features = []
-    for i in range(city.width):
-        for j in range(city.height):
-            cell = city.cells.get((i, j))
-            features += cell_features(cell) 
-    features += city_features(city)
-    return np.array(features)
-    
     
 def get_results(city):
     results = []
@@ -97,9 +100,11 @@ if __name__ == "__main__":
     prediction_dir = "./data/prediction/"
     
     estimators = [('linear', LinearRegression()),
-                  ('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
-                                               LinearRegression())),
-                  ('decision_tree', tree.DecisionTreeRegressor())]
+                  #('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
+                  #                             LinearRegression())),
+                  ('decision_tree', tree.DecisionTreeRegressor()),
+                  ('kNN_uniform', KNeighborsRegressor()),
+                  ('kNN_distance', KNeighborsRegressor(weights="distance"))]
     
     
     input_files = os.listdir(input_dir)
@@ -113,13 +118,13 @@ if __name__ == "__main__":
         out_city = cityiograph.City(open(output_dir + output_files[i]).read())
         features = get_features(in_city)
         results = get_results(out_city)
-        """
+        
         if not verify_samecity(in_city, out_city):
             print input_files[i], output_files[i]
             print features
             print get_features(out_city)
             raise RuntimeError("Mismatched input and output files!")
-        """
+        
         cities.append((input_files[i], in_city))
         input_vectors.append(features)
         output_vectors.append(results)
