@@ -26,7 +26,7 @@ ROAD_ID = 6
 def cell_features(cell):
     feats = []
     feats.append(cell.population)
-    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    #feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
     return feats
 
 def cell_results(cell):
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                   #('polynomial_2deg', make_pipeline(PolynomialFeatures(degree=2), 
                   #                             LinearRegression())),
                   ('decision_tree', tree.DecisionTreeRegressor()),
-                  ('kNN_uniform', KNeighborsRegressor()),
+                  #('kNN_uniform', KNeighborsRegressor()),
                   ('kNN_distance', KNeighborsRegressor(weights="distance"))]
     
     
@@ -132,6 +132,8 @@ if __name__ == "__main__":
     input_vectors = np.array(input_vectors)
     output_vectors = np.array(output_vectors)
     
+    log.append("Input size:" + str(input_vectors.shape))
+    print log[-1]  
     log.append("Output size:" + str(output_vectors.shape))
     print log[-1]  
     
