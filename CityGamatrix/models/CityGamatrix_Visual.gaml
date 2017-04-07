@@ -12,7 +12,7 @@ import "CityGamatrix.gaml"
 
 global {
 	
-	string dir <- '../includes/test/'; // Directory with output JSON files. Must have trailing /.
+	string dir <- '../includes/small_output/'; // Directory with output JSON files. Must have trailing /.
 	list<string> files <- folder(dir) select (string(each) contains "json");
 	int index <- 0;
 	string raw_file;
