@@ -54,7 +54,8 @@ test_y = data['test_y'].reshape((-1, 16, 16, 2))
 print('Compiling Model ... ')
 
 inp = Input(shape=(16, 16, 2), name='input_layer')
-x = Conv2D(64, (4, 4), activation='relu', input_shape=(16, 16, 2))(inp)
+x = Conv2D(128, (2, 2), activation='relu', input_shape=(16, 16, 2))(inp)
+# x = Conv2D(32, (3, 3), activation='relu', input_shape=(12, 12, 128))(x)
 x = Flatten()(x)
 x = Dense(512, activation='relu')(x)
 x = Reshape((16, 16, 2))(x)
@@ -105,7 +106,7 @@ model.compile(loss=custom_loss, optimizer='adam', metrics=[custom_accuracy])
 
 # 4. Train the network.
 
-# model.fit(train_x, train_y, epochs=20, batch_size=96, verbose=1)
+model.fit(train_x, train_y, epochs=20, batch_size=96, verbose=1)
 
 # Serialize model to JSON
 # Taken from http://machinelearningmastery.com/save-load-keras-deep-learning-models/
@@ -121,6 +122,8 @@ print("Saved model to disk.")
 
 '''
 
+'''
+
 # Load model from JSON
 
 json_file = open('model.json', 'r')
@@ -133,7 +136,7 @@ print("Loaded model from disk.")
 
 model = loaded_model
 
-
+'''
 
 # 5. Test network on train data. Check that everything is okay. ***
 
