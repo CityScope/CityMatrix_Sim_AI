@@ -5,7 +5,6 @@ Created on Wed Feb 15 23:13:35 2017
 @author: Alex
 """
 import json
-import pyqtgraph as pg
 import numpy as np
 import collections
 
