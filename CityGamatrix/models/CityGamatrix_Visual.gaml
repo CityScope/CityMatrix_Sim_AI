@@ -12,7 +12,7 @@ import "CityGamatrix.gaml"
 
 global {
 	
-	string dir <- '../includes/general_output/'; // Directory with output JSON files. Must have trailing /.
+	string dir <- '../includes/small_output/'; // Directory with output JSON files. Must have trailing /.
 	list<string> files <- folder(dir) select (string(each) contains "json");
 	int index <- 0;
 	string raw_file;
@@ -133,7 +133,7 @@ global {
 }
 
 experiment PNGDisplay type: gui {
-	float minimum_cycle_duration <- 1.0 #ms;
+	// float minimum_cycle_duration <- 1.0 #ms;
 	output {
 		
 		display cityMatrixView2 autosave: true refresh:every(4000 #cycles) type:opengl background: # black autosave: true camera_pos: {500,234234,12423000} camera_look_pos: {250.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	

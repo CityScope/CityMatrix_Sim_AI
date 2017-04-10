@@ -66,7 +66,7 @@ global {
 			raw_filename <- replace(filename, '.json', '');
 			filename <- input_dir + filename;
 		} else {
-			filename <- 'city_0.json';
+			filename <- 'city_great.json';
 			raw_filename <- replace(filename, '.json', '');
 			filename <- input_dir + filename;
 		}

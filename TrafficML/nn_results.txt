@@ -1,0 +1,20 @@
+Convolutional Neural Network Results
+
+FORMAT:
+
+Architecture - Real Accuracy (%) - R^2 (Traffic, Wait)
+
+All with 20 training iterations - the accuracy becomes generally asympotitic at this point.
+
+Single Convolutions
+
+64 4x4 filters - 84.5, -1.02078487044, -4.08379627221
+64 5x5 filters - 84.21, -0.89271727915, -3.00734428451
+128 5x5 filters - 86.18, -0.492448179227, -2.53739212948
+128 3x3 filters - 85.73, -0.61838202549, -2.57345515091
+128 2x2 filters - 85.5, -0.788859801282, -2.63906393985
+
+Double Convolutions
+
+64 5x5 + 32 3x3 - 85.54, -0.592094206756, -8.46545086364
+128 5x5 + 32 3x3 - 86.33, -0.543821759049, -9.56013105161
