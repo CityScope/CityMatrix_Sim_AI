@@ -32,7 +32,7 @@ class City(object):
         """True iff all of this city's cells are equal to their corresponding 
         cells in other and densities, width, and height are the same.
         """
-        cells_equal = all([c.equals(other.cells.get(pos)) for pos, c in self.cells.iteritems()])
+        cells_equal = all([c.equals(other.cells.get(pos)) for pos, c in self.cells.items()])
         return cells_equal and (self.densities == other.densities) \
             and (self.width == other.width) and (self.height == other.height)
         
@@ -77,7 +77,7 @@ class City(object):
                 
     def get_road_nearby_population_map(self):
         pop_map = {}
-        for pos, cell in self.cells.iteritems():
+        for pos, cell in self.cells.items():
             if cell.type_id == ROAD_ID:
                 pop_map[pos] = 0
                 for n in [self.cells[p] for p in self.nesw(pos)]:
@@ -87,10 +87,10 @@ class City(object):
     
     def get_road_graph(self):
         road_graph = {}
-        for (pos, edges) in self.get_graph().iteritems():
+        for (pos, edges) in self.get_graph().items():
             if self.cells[pos].type_id == ROAD_ID:
                 new_edges = {}
-                for (other_pos, cost) in edges.iteritems():
+                for (other_pos, cost) in edges.items():
                     if self.cells[other_pos].type_id == ROAD_ID:
                         new_edges[other_pos] = cost
                 road_graph[pos] = new_edges
@@ -140,7 +140,7 @@ def update_dict(d, u):
     http://stackoverflow.com/questions/3232943
     /update-value-of-a-nested-dictionary-of-varying-depth
     """
-    for k, v in u.iteritems():
+    for k, v in u.items():
         if isinstance(v, collections.Mapping):
             r = update_dict(d.get(k, {}), v)
             d[k] = r

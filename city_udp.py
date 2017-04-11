@@ -30,10 +30,11 @@ DEFAULT_BUFFER_SIZE = 1024 * 100
 
 class City_UDP(socket.socket):
 
-    def __init__(self, send_ip=DEFAULT_SEND_IP, send_port=DEFAULT_SEND_PORT, \
+    def __init__(self, name, send_ip=DEFAULT_SEND_IP, send_port=DEFAULT_SEND_PORT, \
                  receive_ip=DEFAULT_RECEIVE_IP, \
                  receive_port=DEFAULT_RECEIVE_PORT, \
                  buffer_size=DEFAULT_BUFFER_SIZE):
+        self.name = name
         self.send_ip = send_ip
         self.send_port = send_port
         self.receive_ip = receive_ip
@@ -43,12 +44,15 @@ class City_UDP(socket.socket):
         self.bind((self.receive_ip, self.receive_port))
 
     def send_city(self, city):
-        packet_dict = {
+        packet_dict = city.to_dict()
+        """
+        {
             "sender": self.name,
             "city": city.to_dict()
         }
+        """
         json_message = json.dumps(packet_dict)
-        self.sendto(bytes(json_message), (self.ip, self.port))
+        self.sendto(json_message.encode(), (self.send_ip, self.send_port))
 
     def receive_city(self):
         data, addr = self.recvfrom(self.buffer_size)
