@@ -1,6 +1,6 @@
 # 0. Load output JSON files.
 
-import glob, json, time, numpy as np , matplotlib.pyplot as plt
+import glob, json, time, numpy as np, matplotlib.pyplot as plt
 from sklearn.kernel_ridge import KernelRidge
 import pickle
 # Utils
@@ -51,36 +51,26 @@ def extract_data(directory):
 
 	return (inp, out)
 
-def plot_data(feature):
-    n = len(feature)
-    m = len(feature[0])
-    matrix = np.zeros((n,m))
-    maxV = feature.max()
-    for i in range(n):
-    	for j in range(m):
-    		matrix[i][j] = feature[i][j][0]/float(maxV) if feature[i][j][1] == 0 else -1
-    print(matrix)
-    fig, ax = plt.subplots()
-    im = ax.imshow(matrix,interpolation='nearest')
-    fig.colorbar(im)
+# Data manager...
 
-# print('Extracting data...')
+print('Extracting data...')
 
-# train_x, train_y = extract_data('../../../data/train/*.json')
-# test_x, test_y = extract_data('../../../data/test/*.json')
+train_x, train_y = extract_data('../../../data/train/*.json')
+test_x, test_y = extract_data('../../../data/test/*.json')
 
-# variables = {'train_x':train_x,'train_y':train_y,'test_x':test_x,'test_y':test_y}
-# pickle.dump(variables,open('data.p','wb'))
+train_x = np.vstack((train_x, test_x))
+train_y = np.vstack((train_y, test_y))
 
-data = pickle.load(open('data.p', 'rb'))
+variables = {'train_x':train_x,'train_y':train_y,'test_x':test_x,'test_y':test_y}
+pickle.dump(variables, open('neural_data.p','wb'))
+
+data = pickle.load(open('neural_data.p', 'rb'))
 train_x = data['train_x'].reshape((-1, 16, 16, 2))
 train_y = data['train_y'].reshape((-1, 16, 16, 2))
 test_x = data['test_x'].reshape((-1, 16, 16, 2))
 test_y = data['test_y'].reshape((-1, 16, 16, 2))
 
-# #  
-
-# print('Successfully extracted data.')
+print('Successfully extracted data.')
 
 # # 2. Create ridge regression model and train on training data.
 

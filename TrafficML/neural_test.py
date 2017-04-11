@@ -7,6 +7,10 @@ from keras.layers.merge import Concatenate
 from keras.layers.convolutional import Conv2D
 import keras.backend as K
 
+from neural_server import serialize_model
+
+DATA_FILENAME = './neural_data.p'
+
 """
 Statistical extraction functions.
 
@@ -43,18 +47,21 @@ def R_squared(expectedVals, predictedVals):
 
 # 1. Load data from pickle file.
 
-data = pickle.load(open('data.p', 'rb'))
+data = pickle.load(open(DATA_FILENAME, 'rb'))
 train_x = data['train_x'].reshape((-1, 16, 16, 2))
 train_y = data['train_y'].reshape((-1, 16, 16, 2))
 test_x = data['test_x'].reshape((-1, 16, 16, 2))
 test_y = data['test_y'].reshape((-1, 16, 16, 2))
+
+print(train_x.shape)
+print(train_y.shape)
 
 # 2. Create model. Convolutional neural network.
 
 print('Compiling Model ... ')
 
 inp = Input(shape=(16, 16, 2), name='input_layer')
-x = Conv2D(128, (2, 2), activation='relu', input_shape=(16, 16, 2))(inp)
+x = Conv2D(128, (5, 5), activation='relu', input_shape=(16, 16, 2))(inp)
 # x = Conv2D(32, (3, 3), activation='relu', input_shape=(12, 12, 128))(x)
 x = Flatten()(x)
 x = Dense(512, activation='relu')(x)
@@ -62,7 +69,7 @@ x = Reshape((16, 16, 2))(x)
 y = Concatenate()([x, inp])
 
 model = Model(inputs=inp, outputs=y)
-# print(model.summary())
+print(model.summary())
 
 # 3. Compile model.
 
@@ -102,47 +109,29 @@ def custom_accuracy(y_true, y_pred):
 	errors = tf.divide(diff, denom)
 	return 1 - tf.reduce_mean(errors)
 
+print("Compiling model.")
+
 model.compile(loss=custom_loss, optimizer='adam', metrics=[custom_accuracy])
 
 # 4. Train the network.
 
-model.fit(train_x, train_y, epochs=20, batch_size=96, verbose=1)
+print("Fitting model.")
 
-# Serialize model to JSON
-# Taken from http://machinelearningmastery.com/save-load-keras-deep-learning-models/
+model.fit(train_x, train_y, epochs=10, batch_size=128, verbose=1)
 
-'''
+# pickle.dump(model, open('./neural_model.pkl', 'wb'))
 
-model_json = model.to_json()
-with open("model.json", "w") as json_file:
-    json_file.write(model_json)
-# Serialize weights to HDF5
-model.save_weights("model.h5")
-print("Saved model to disk.")
+# Write the model to a local file.
 
-'''
+serialize_model(model)
 
-'''
-
-# Load model from JSON
-
-json_file = open('model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json)
-# load weights into new model
-loaded_model.load_weights("model.h5")
-print("Loaded model from disk.")
-
-model = loaded_model
-
-'''
+print("Serialized!!!")
 
 # 5. Test network on train data. Check that everything is okay. ***
 
 index = 256
 
-predicted_first_city = model.predict(train_x[index].reshape(-1, 16, 16, 2))[0]
+# predicted_first_city = model.predict(train_x[index].reshape(-1, 16, 16, 2))[0]
 
 def compare(inp, one, two):
 	# Get R^2 between two cities, only based on road cells...
@@ -160,9 +149,9 @@ def compare(inp, one, two):
 				second_wait.append(two[row][col][1])
 	return (R_squared(first_traffic, second_traffic), R_squared(first_wait, second_wait))
 
-a, b = compare(train_x[0], train_y[0], predicted_first_city)
+# a, b = compare(train_x[0], train_y[0], predicted_first_city)
 
-print(a, b)
+# print(a, b)
 
 def plot_results(inp, train, predicted):
 
@@ -198,9 +187,9 @@ def plot_results(inp, train, predicted):
 	_, three = plt.subplots()
 	three.imshow(p_matrix, interpolation='nearest')
 
-plot_results(train_x[index], np.delete(train_y[index], 0, 2), np.delete(predicted_first_city, 0, 2))
+# plot_results(train_x[index], np.delete(train_y[index], 0, 2), np.delete(predicted_first_city, 0, 2))
 
-plt.show('hold')
+# plt.show('hold')
 
 # score = model.evaluate(X_test, y_test, batch_size=16)
 
