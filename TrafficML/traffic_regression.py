@@ -26,7 +26,7 @@ ROAD_ID = 6
 def cell_features(cell):
     feats = []
     feats.append(cell.population)
-    #feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
     return feats
 
 def cell_results(cell):

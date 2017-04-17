@@ -87,59 +87,59 @@ def cities_R_squared(expected_cities, predicted_cities):
     return R_squared(expected_vals, predicted_vals)
 
 
-if __name__ == "__main__":
-    expected_dir = "./data/expected/"
-    predicted_dir = "./data/predicted/"
+# if __name__ == "__main__":
+#     expected_dir = "./TrafficML/neural_predictions/"
+#     predicted_dir = "../../test_good/"
 
-    expected_vals = []
+#     expected_vals = []
 
-    print "Parsing expected citites"
-    for filename in os.listdir(expected_dir):
-        if filename.endswith(".json"):
-            city = cityiograph.City(open(expected_dir + filename).read())
-            expected_vals.append(get_data(city))
-    expected_vals = np.array(expected_vals)
+#     print "Parsing expected citites"
+#     for filename in os.listdir(expected_dir):
+#         if filename.endswith(".json"):
+#             city = cityiograph.City(open(expected_dir + filename).read())
+#             expected_vals.append(get_data(city))
+#     expected_vals = np.array(expected_vals)
 
-    print "Traversing predicted directory"
-    for dirname, dirs, files in os.walk(predicted_dir):
-        print "Parsing " + dirname
-        predicted_vals = []
-        for filename in files:
-            if filename.endswith(".json"):
-                city = cityiograph.City(open(dirname + "/" + filename).read())
-                predicted_vals.append(get_data(city))
-        predicted_vals = np.array(predicted_vals)
-        if len(predicted_vals) == 0:
-            continue
+#     print "Traversing predicted directory"
+#     for dirname, dirs, files in os.walk(predicted_dir):
+#         print "Parsing " + dirname
+#         predicted_vals = []
+#         for filename in files:
+#             if filename.endswith(".json"):
+#                 city = cityiograph.City(open(dirname + "/" + filename).read())
+#                 predicted_vals.append(get_data(city))
+#         predicted_vals = np.array(predicted_vals)
+#         if len(predicted_vals) == 0:
+#             continue
 
-        r_sqrd = R_squared(expected_vals, predicted_vals)
-        res = np.array(
-            [residuals(e, p) for e, p in zip(expected_vals, predicted_vals)])
-        norm_res = np.array([
-            normalized_residuals(e, p)
-            for e, p in zip(expected_vals, predicted_vals)
-        ])
-        norm_res = norm_res[~np.isnan(norm_res).any(axis=1)]
+#         r_sqrd = R_squared(expected_vals, predicted_vals)
+#         res = np.array(
+#             [residuals(e, p) for e, p in zip(expected_vals, predicted_vals)])
+#         norm_res = np.array([
+#             normalized_residuals(e, p)
+#             for e, p in zip(expected_vals, predicted_vals)
+#         ])
+#         norm_res = norm_res[~np.isnan(norm_res).any(axis=1)]
 
-        lines = [
-            "R Squared:" + str(R_squared(expected_vals, predicted_vals)),
-            "Residuals:", "\tMean: " + str(np.average(res)),
-            "\tCity Sum Mean: " + str(np.mean([np.sum(c) for c in res])),
-            "\tMax: " + str(np.max(res)), "\tMin: " + str(np.min(res)),
-            "\tSum: " + str(np.sum(res)),
-            "\tStandard Deviation: " + str(np.std(res)),
-            "Normalized Residuals:", "\tMean: " + str(np.average(norm_res)),
-            "\tCity Sum Mean: " + str(np.mean([np.sum(c) for c in norm_res])),
-            "\tMax: " + str(np.max(norm_res)),
-            "\tMin: " + str(np.min(norm_res)),
-            "\tSum: " + str(np.sum(norm_res)),
-            "\tStandard Deviation: " + str(np.std(norm_res))
-        ]
-        print '\n'.join(lines)
+#         lines = [
+#             "R Squared:" + str(R_squared(expected_vals, predicted_vals)),
+#             "Residuals:", "\tMean: " + str(np.average(res)),
+#             "\tCity Sum Mean: " + str(np.mean([np.sum(c) for c in res])),
+#             "\tMax: " + str(np.max(res)), "\tMin: " + str(np.min(res)),
+#             "\tSum: " + str(np.sum(res)),
+#             "\tStandard Deviation: " + str(np.std(res)),
+#             "Normalized Residuals:", "\tMean: " + str(np.average(norm_res)),
+#             "\tCity Sum Mean: " + str(np.mean([np.sum(c) for c in norm_res])),
+#             "\tMax: " + str(np.max(norm_res)),
+#             "\tMin: " + str(np.min(norm_res)),
+#             "\tSum: " + str(np.sum(norm_res)),
+#             "\tStandard Deviation: " + str(np.std(norm_res))
+#         ]
+#         print '\n'.join(lines)
 
-        log_name = dirname.replace('\\', '/').split('/')
-        log_name = log_name[-2] + '_' + log_name[-1]
-        log_name = log_name + "_analysis.txt"
-        log = open(predicted_dir + "analysis/" + log_name, 'w')
-        log.write('\n'.join(lines))
-        log.close()
+#         log_name = dirname.replace('\\', '/').split('/')
+#         log_name = log_name[-2] + '_' + log_name[-1]
+#         log_name = log_name + "_analysis.txt"
+#         log = open(predicted_dir + "analysis/" + log_name, 'w')
+#         log.write('\n'.join(lines))
+#         log.close()

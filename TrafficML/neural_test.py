@@ -1,60 +1,37 @@
-# 0. Load output JSON files.
+import glob, json, numpy as np, pickle, os, matplotlib.pyplot as plt, tensorflow as tf, sys
 
-import glob, json, numpy as np, pickle, os, matplotlib.pyplot as plt, tensorflow as tf
+# Keras imports
+
 from keras.models import Model, model_from_json
 from keras.layers import Input, Dense, Flatten, Reshape
 from keras.layers.merge import Concatenate
 from keras.layers.convolutional import Conv2D
 import keras.backend as K
 
-from neural_server import serialize_model
+# Custom local imports
 
-DATA_FILENAME = './neural_data.p'
+from neural_server import serialize_model, deserialize_model
+from traffic_regression import output_to_city
 
-"""
-Statistical extraction functions.
+# Variable declarations
 
-Each expect raw data, nothing to do with the city structure
-"""
-def normalize(data):
-    return np.array(data) / max(np.max(data), np.abs(np.min(data)))
+TRAIN_DATA_FILENAME = 'latest_data_train.p'
+TEST_DATA_FILENAME = 'latest_data_test.p'
+PREDICTION_OUTPUT_DIR = 'neural_predictions/'
 
-def residuals(expected, predicted):
-    return expected - predicted
-    
-def normalized_residuals(expected, predicted):
-    return residuals(normalize(expected), normalize(predicted))
-    
-def total_sum_squares(expectedVals):
-    mean = np.mean(expectedVals)
-    
-    diffSum = [np.sum(expected - mean)**2 for expected in expectedVals]
-    return np.sum(diffSum)
-    
-def residual_sum_squares(expectedVals, predictedVals):
-    assert len(expectedVals) == len(predictedVals)
-    
-    res = []
-    for i in range(len(expectedVals)):
-        res.append(residuals(expectedVals[i], predictedVals[i]))
-    return np.sum(np.array(res)**2)
-    
-def R_squared(expectedVals, predictedVals):
-    sumRes = residual_sum_squares(expectedVals, predictedVals)
-    sumTot = total_sum_squares(predictedVals)
-    
-    return 1 - (sumRes / sumTot)
+# 1. Load data from pickle files.
 
-# 1. Load data from pickle file.
+print("Loading data...")
 
-data = pickle.load(open(DATA_FILENAME, 'rb'))
-train_x = data['train_x'].reshape((-1, 16, 16, 2))
-train_y = data['train_y'].reshape((-1, 16, 16, 2))
-test_x = data['test_x'].reshape((-1, 16, 16, 2))
-test_y = data['test_y'].reshape((-1, 16, 16, 2))
+# train_cities, train_filenames, train_x, train_y = pickle.load(open(TRAIN_DATA_FILENAME, 'rb'))
+test_cities, test_filenames, test_x, test_y = pickle.load(open(TEST_DATA_FILENAME, 'rb'))
 
-print(train_x.shape)
-print(train_y.shape)
+# train_x = train_x.reshape((-1, 16, 16, 2))
+# train_y = train_y.reshape((-1, 16, 16, 2))
+test_x = test_x.reshape((-1, 16, 16, 2))
+test_y = test_y.reshape((-1, 16, 16, 2))
+
+print("Successfully loaded data.")
 
 # 2. Create model. Convolutional neural network.
 
@@ -66,10 +43,10 @@ x = Conv2D(128, (5, 5), activation='relu', input_shape=(16, 16, 2))(inp)
 x = Flatten()(x)
 x = Dense(512, activation='relu')(x)
 x = Reshape((16, 16, 2))(x)
-y = Concatenate()([x, inp])
+# y = Concatenate()([x, inp])
 
-model = Model(inputs=inp, outputs=y)
-print(model.summary())
+model = Model(inputs=inp, outputs=x)
+# print(model.summary())
 
 # 3. Compile model.
 
@@ -111,88 +88,55 @@ def custom_accuracy(y_true, y_pred):
 
 print("Compiling model.")
 
-model.compile(loss=custom_loss, optimizer='adam', metrics=[custom_accuracy])
+# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
 # 4. Train the network.
 
 print("Fitting model.")
 
-model.fit(train_x, train_y, epochs=10, batch_size=128, verbose=1)
+# model.fit(train_x, train_y, epochs=5, batch_size=128, verbose=1)
 
-# pickle.dump(model, open('./neural_model.pkl', 'wb'))
+# Serialize model to file
 
-# Write the model to a local file.
+# serialize_model(model)
 
-serialize_model(model)
+# print("Serialized!!!")
 
-print("Serialized!!!")
+# Deserialize model from file
 
-# 5. Test network on train data. Check that everything is okay. ***
+model = deserialize_model()
 
-index = 256
+model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
-# predicted_first_city = model.predict(train_x[index].reshape(-1, 16, 16, 2))[0]
+print("Deserialized!!!")
 
-def compare(inp, one, two):
-	# Get R^2 between two cities, only based on road cells...
-	first_traffic = []
-	second_traffic = []
-	first_wait = []
-	second_wait = []
-	for row in range(inp.shape[0]):
-		for col in range(inp.shape[1]):
-			if inp[row][col][1] == 1:
-				# Is a road.
-				first_traffic.append(one[row][col][0])
-				second_traffic.append(two[row][col][0])
-				first_wait.append(one[row][col][1])
-				second_wait.append(two[row][col][1])
-	return (R_squared(first_traffic, second_traffic), R_squared(first_wait, second_wait))
+score = model.evaluate(test_x, test_y, batch_size=16)
 
-# a, b = compare(train_x[0], train_y[0], predicted_first_city)
+print("Network's test score [loss, accuracy]: {0}".format(score))
 
-# print(a, b)
+print("Predicting test cities...")
 
-def plot_results(inp, train, predicted):
+predictions = model.predict(test_x)
 
-	# Goal - compare the traffic scores of train data and predicted data...
+# Write predictions to new JSON files in PREDICTION_OUTPUT_DIR
 
-	pop_matrix = np.zeros((16, 16))
-	train_matrix = np.zeros((16, 16))
-	p_matrix = np.zeros((16, 16))
+# for i, city in enumerate(test_cities):
+# 	output_filename = PREDICTION_OUTPUT_DIR + test_filenames[i] + '_prediction.json' # Filename formatting
+# 	output_list = predictions[i].reshape(512).tolist() # Convert matrix to list
+# 	output_to_city(city, output_list) # Update city with these values
+# 	json_string = city.to_json() # Convert to JSON string
+# 	with open(output_filename, 'w') as f: # Write new JSON prediction to file
+# 		f.write(json_string)
 
-	maxPop = float(inp.max())
-	maxTraffic_train = float(train.max())
-	maxTraffic_predicted = float(predicted.max())
+print("Wrote all predictions to {}.".format(PREDICTION_OUTPUT_DIR))
 
-	print(predicted.shape)
+# Compare results with R^2 analysis
 
-	for i in range(16):
-		for j in range(16):
-			if inp[i][j][1] == 1:
-				# Road cell - we want to plot traffic data here
-				pop_matrix[i][j] = -1
-				train_matrix[i][j] = train[i][j][0] / maxTraffic_train
-				p_matrix[i][j] = predicted[i][j][0] / maxTraffic_predicted
-			else:
-				pop_matrix[i][j] = inp[i][j][0] / maxPop
-				train_matrix[i][j], p_matrix[i][j] = -1, -1
+from neural_compare import *
 
-	_, one = plt.subplots()
-	one.imshow(pop_matrix, interpolation='nearest')
+sim = test_y.reshape((-1, 512))
+pred = predictions.reshape((-1, 512))
 
-	_, two = plt.subplots()
-	two.imshow(train_matrix, interpolation='nearest')
-
-	_, three = plt.subplots()
-	three.imshow(p_matrix, interpolation='nearest')
-
-# plot_results(train_x[index], np.delete(train_y[index], 0, 2), np.delete(predicted_first_city, 0, 2))
-
-# plt.show('hold')
-
-# score = model.evaluate(X_test, y_test, batch_size=16)
-
-# print("Network's test score [loss, accuracy]: {0}".format(score))
+compare_outputs(sim, pred)
 
 print("Process complete!")

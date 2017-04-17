@@ -1,5 +1,7 @@
 import sys, time, traffic_regression
 
+from keras.models import model_from_json
+
 sys.path.insert(0, '../TrafficTreeSim/')
 import cityiograph
 
