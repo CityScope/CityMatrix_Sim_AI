@@ -23,7 +23,7 @@ global {
 	list<float> density_array;
 	float max_density;
 	
-	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
+	bool onlineGrid <- true parameter: "Online Grid:" category: "Grid";
 	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
 	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
@@ -39,7 +39,7 @@ global {
 	
 	action initGrid{
 		if(onlineGrid = true){
-		  matrixData <- json_file("http://45.55.73.103/table/citymatrix_ml").contents;
+		  matrixData <- json_file("https://cityio.media.mit.edu/table/citymatrix").contents;
 	    }
 	    else{
 	      matrixData <- json_file(filename).contents;
@@ -145,7 +145,6 @@ grid cityMatrix width:matrix_size height:matrix_size {
 experiment Display  type: gui {
 	output {
 		display cityMatrixView  type:opengl fullscreen:0 
-		keystone: [{-0.03448275862068967,0.14245810055865915,0.0},{0.0235109717868337,1.0265363128491622,0.0},{0.9858934169278997,1.027932960893855,0.0},{1.0415360501567386,0.14804469273743026,0.0}]
 		background:#black {
 			species cityMatrix aspect:base;
 		}
