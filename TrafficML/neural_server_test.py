@@ -28,20 +28,13 @@ server.send_city(city)
 
 print("Sent city!!!")
 
-while True:
+print("Waiting to receive city...")
 
-	print("Waiting to receive city...")
+# Wait to receive the response from the server
 
-	# Breifly sleep
-	time.sleep(0.1)
+incoming_city = server.receive_city()
+print("City response received!")
 
-	# Constantly wait for new cities to be received via UDP
-	# Taken directly from Alex's code for regression_server.py
-	# Updated for neural network standards
-
-	incoming_city = server.receive_city()
-	print("City received!")
-
-	print(incoming_city.to_dict())
+print(incoming_city.to_dict())
 
 print("Process complete.")
