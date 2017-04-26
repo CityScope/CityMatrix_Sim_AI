@@ -2,12 +2,12 @@
     File name: data_manager.py
     Author: Kevin Lyons
     Date created: 4/14/2017
-    Date last modified: 4/24/2017
+    Date last modified: 4/26/2017
     Python Version: 3.5
-    Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis.
+    Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis. Uses histogram for analysis.
 '''
 
-import glob, json, time, numpy as np, sys, os, pickle
+import glob, json, time, numpy as np, sys, os, pickle, matplotlib.pyplot as plt
 
 # Custom imports
 sys.path.insert(0, '../TrafficTreeSim/')
@@ -63,7 +63,11 @@ def extract_data(directory, return_endpoints=False):
 	out = [] # Output feature matrix
 
 	# Create dictionary mapping of bounds for both traffic and wait
-	bounds = { 'low_traffic' : 0 , 'high_traffic' : 0 , 'low_wait' : 0 , 'high_wait' : 0 }
+	# bounds = { 'low_traffic' : 0 , 'high_traffic' : 0 , 'low_wait' : 0 , 'high_wait' : 0 }
+
+	# Create np array objects for traffic and wait values
+	traffic = []
+	wait = []
 
 	for name in files:
 		with open(name, 'r') as f:
@@ -79,11 +83,8 @@ def extract_data(directory, return_endpoints=False):
 			max_wait = max([cell['data']['wait'] for cell in d['grid'] if 'data' in cell])
 			# Check bounds if needed
 			if return_endpoints:
-				if max_traffic > bounds['high_traffic']:
-					bounds['high_traffic'] = max_traffic
-				if max_wait > bounds['high_wait']:
-					bounds['high_wait'] = max_wait
-				continue
+				traffic.append(max_traffic)
+				wait.append(max_wait)
 			# Ignore zero cities - suprisingly high percentage
 			if max_traffic == 0 or max_wait == 0:
 				continue
@@ -100,7 +101,7 @@ def extract_data(directory, return_endpoints=False):
 
 	# Return correct data based on return_endpoints parameter
 	if return_endpoints:
-		return bounds
+		return np.array(traffic), np.array(wait)
 
 	# Construct feature matrices and return
 	inp = np.array(inp).astype(int)
@@ -110,7 +111,7 @@ def extract_data(directory, return_endpoints=False):
 
 # Data manager...
 
-print('Extracting data...')
+# print('Extracting data...')
 
 # train_data = extract_data(TRAIN_GOOD_DIR)
 # test_data = extract_data(TEST_GOOD_DIR)
@@ -118,14 +119,55 @@ print('Extracting data...')
 # pickle.dump(train_data, open('latest_data_train.p', 'wb'))
 # pickle.dump(test_data, open('latest_data_test.p', 'wb'))
 
+# Determining bounds on data
+
 # train_bounds = extract_data(TRAIN_GOOD_DIR, return_endpoints = True)
 # test_bounds = extract_data(TEST_GOOD_DIR, return_endpoints = True)
 
 # print("Training bounds on raw data = {}.".format(train_bounds))
 # print("Testing bounds on raw data = {}.".format(test_bounds))
 
-pred_bounds = extract_data(PREDICTIONS_DIR, return_endpoints = True)
+# pred_bounds = extract_data(PREDICTIONS_DIR, return_endpoints = True)
 
-print("Prediction bounds (2000 cities) = {}.".format(pred_bounds))
+# print("Prediction bounds (2000 cities) = {}.".format(pred_bounds))
 
-print('Successfully extracted test data. Wrote to local pickle files. Process complete.')
+# Get bounds
+
+# traffic, wait = extract_data(PREDICTIONS_DIR, return_endpoints = True)
+
+# Write to local pickle files
+
+TRAIN_BOUNDS_NAME = './bounds/train.p'
+TEST_BOUNDS_NAME = './bounds/test.p'
+PRED_BOUNDS_NAME = './bounds/pred.p'
+
+# pickle.dump((traffic, wait), open(PRED_BOUNDS_NAME, 'wb'))
+
+# Load from pickle file
+
+traffic, wait = pickle.load(open(PRED_BOUNDS_NAME, 'rb'))
+
+# Compute metrics from this data
+
+# traffic_mean = np.mean(traffic); print("Traffic mean =", traffic_mean);
+# traffic_std = np.std(traffic); print("Traffic std =", traffic_std);
+# traffic_max = np.max(traffic); print("Traffic max =", traffic_max);
+# traffic_min = np.min(traffic); print("Traffic min =", traffic_min);
+# wait_mean = np.mean(wait); print("Wait mean =", wait_mean);
+# wait_std = np.std(wait); print("Wait std =", wait_std);
+# wait_max = np.max(wait); print("Wait max =", wait_max);
+# wait_min = np.min(wait); print("Wait min =", wait_min);
+
+# print(traffic_mean, traffic_std, traffic_max, traffic_min, wait_mean, wait_std, wait_max, wait_min)
+
+# Now, take action with these metrics...
+
+# Plot histogram
+
+plt.hist(wait, bins='auto')
+plt.title('Predicted Wait (CNN)')
+plt.show()
+
+# print('Successfully extracted test data. Wrote to local pickle files.')
+
+print("Process complete.")

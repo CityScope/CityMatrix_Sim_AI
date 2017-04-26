@@ -4,3 +4,4 @@ data/
 *.pkl
 *.h5
 neural_predictions/
+bounds/
