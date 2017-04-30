@@ -93,16 +93,16 @@ if __name__ == "__main__":
 
     expected_vals = []
 
-    print "Parsing expected citites"
+    print("Parsing expected citites")
     for filename in os.listdir(expected_dir):
         if filename.endswith(".json"):
             city = cityiograph.City(open(expected_dir + filename).read())
             expected_vals.append(get_data(city))
     expected_vals = np.array(expected_vals)
 
-    print "Traversing predicted directory"
+    print("Traversing predicted directory")
     for dirname, dirs, files in os.walk(predicted_dir):
-        print "Parsing " + dirname
+        print("Parsing " + dirname)
         predicted_vals = []
         for filename in files:
             if filename.endswith(".json"):
@@ -135,7 +135,7 @@ if __name__ == "__main__":
             "\tSum: " + str(np.sum(norm_res)),
             "\tStandard Deviation: " + str(np.std(norm_res))
         ]
-        print '\n'.join(lines)
+        print('\n'.join(lines))
 
         log_name = dirname.replace('\\', '/').split('/')
         log_name = log_name[-2] + '_' + log_name[-1]
