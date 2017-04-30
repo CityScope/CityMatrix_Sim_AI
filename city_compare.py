@@ -143,3 +143,5 @@ if __name__ == "__main__":
         log = open(predicted_dir + "analysis/" + log_name, 'w')
         log.write('\n'.join(lines))
         log.close()
+
+
