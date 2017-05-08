@@ -2,7 +2,7 @@
     File name: data_manager.py
     Author: Kevin Lyons
     Date created: 4/14/2017
-    Date last modified: 4/26/2017
+    Date last modified: 5/8/2017
     Python Version: 3.5
     Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis. Uses histogram for analysis.
 '''
@@ -21,6 +21,7 @@ POP_ARR = [5, 8, 16, 16, 23, 59]
 TRAIN_GOOD_DIR = '../../../data/train_good/*.json'
 TEST_GOOD_DIR = '../../../data/test_good/*.json'
 PREDICTIONS_DIR = './neural_predictions/*.json'
+PREDICTIONS_PICKLE_FILE = './pred.p'
 
 # REGION: Util methods
 
@@ -137,15 +138,15 @@ def extract_data(directory, return_endpoints=False):
 
 # Write to local pickle files
 
-TRAIN_BOUNDS_NAME = './bounds/train.p'
-TEST_BOUNDS_NAME = './bounds/test.p'
-PRED_BOUNDS_NAME = './bounds/pred.p'
+# TRAIN_BOUNDS_NAME = './bounds/train.p'
+# TEST_BOUNDS_NAME = './bounds/test.p'
+# PRED_BOUNDS_NAME = './bounds/pred.p'
 
 # pickle.dump((traffic, wait), open(PRED_BOUNDS_NAME, 'wb'))
 
 # Load from pickle file
 
-traffic, wait = pickle.load(open(PRED_BOUNDS_NAME, 'rb'))
+# traffic, wait = pickle.load(open(PRED_BOUNDS_NAME, 'rb'))
 
 # Compute metrics from this data
 
@@ -164,10 +165,16 @@ traffic, wait = pickle.load(open(PRED_BOUNDS_NAME, 'rb'))
 
 # Plot histogram
 
-plt.hist(wait, bins='auto')
-plt.title('Predicted Wait (CNN)')
-plt.show()
+# plt.hist(wait, bins='auto')
+# plt.title('Predicted Wait (CNN)')
+# plt.show()
 
 # print('Successfully extracted test data. Wrote to local pickle files.')
+
+# 5/9/2017 - Extracting predicted data to pickle file
+# pred_data = extract_data(PREDICTIONS_DIR)
+
+# Write to pickle file
+# pickle.dump(pred_data, open(PREDICTIONS_PICKLE_FILE, 'wb'))
 
 print("Process complete.")
