@@ -9,6 +9,7 @@
 
 # Global import statements
 import glob, pickle, sys
+from tqdm import tqdm
 
 # Learning imports
 from sklearn import linear_model
@@ -20,12 +21,16 @@ from keras.layers import Dense, Activation
 sys.path.insert(0, '../TrafficTreeSim/')
 import cityiograph
 
+from traffic_regression import output_to_city
+
 # Gobal latent parameters
 NB_EPOCH = 50
 BATCH_SIZE = 32
 VERBOSE = 1
-MODEL_TYPE = 'neural_normalizer_pos' # simple_linear, lasso, neural_normalizer, neural_normalizer_pos
-LOAD_MODEL = False
+MODEL_TYPE = 'simple_linear' # simple_linear, lasso, neural_normalizer, neural_normalizer_pos
+LOAD_MODEL = True
+OUTPUT_PATH = './normalized_outputs/'
+MAX_OUTPUT_NUM = 200
 
 # First, load train and test data from saved pickle files
 X_TRAIN_PICKLE_FILE = './pred.p'
@@ -63,7 +68,26 @@ if MODEL_TYPE == 'neural_normalizer' or MODEL_TYPE == 'neural_normalizer_pos':
 	pred = model.predict(X)
 	score = r2_score(pred, Y)
 else:
+	# We are going with regression for this normalization
 	score = model.score(X, Y)
+	pred = model.predict(X)
+	# pred object is n x 512 np matrix
+	# Now, need to write to JSON
+	train_cities = X_train[0]
+	filenames = Y_train[1]
+	# Need to write this data to train_cities
+	for i, city in tqdm(enumerate(train_cities)):
+		# Get new data and filename to write
+		new_data, filename = list(pred[i]), filenames[i]
+		# Add normalized data to the city structure itself
+		output_to_city(city, new_data)
+		# Write to JSON
+		j = city.to_json()
+		# Write this to new filename and output
+		with open(OUTPUT_PATH + filename + '_normalized.json', 'w') as f:
+			f.write(j)
+		if i == MAX_OUTPUT_NUM: # Just to keep things small
+			break
 print(score)
 
 # Simple lin reg = 0.521035143549
