@@ -8,11 +8,12 @@ import sys
 import os
 
 import numpy as np
+from sklearn.metrics import r2_score
 
-sys.path.insert(0, 'TrafficTreeSim/')
+sys.path.insert(0, './TrafficTreeSim/')
 import cityiograph
 
-sys.path.insert(0, 'TrafficML/')
+sys.path.insert(0, './TrafficML/')
 import traffic_regression as TR
 """
 Statistical extraction functions.
@@ -50,10 +51,11 @@ def residual_sum_squares(expectedVals, predictedVals):
 
 
 def R_squared(expectedVals, predictedVals):
-    sumRes = residual_sum_squares(expectedVals, predictedVals)
-    sumTot = total_sum_squares(predictedVals)
+    #sumRes = residual_sum_squares(expectedVals, predictedVals)
+    #sumTot = total_sum_squares(expectedVals)
 
-    return 1 - (sumRes / sumTot)
+    #return 1 - (sumRes / sumTot)
+    return r2_score(expectedVals, predictedVals)
 
 
 """
@@ -88,8 +90,8 @@ def cities_R_squared(expected_cities, predicted_cities):
 
 
 if __name__ == "__main__":
-    expected_dir = "./data/expected/"
-    predicted_dir = "./data/predicted/"
+    expected_dir = "./TrafficML/data/test/"
+    predicted_dir = "./TrafficML/data/prediction-population-isroad-treesim/prediction/"
 
     expected_vals = []
 
