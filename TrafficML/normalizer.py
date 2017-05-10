@@ -1,8 +1,8 @@
 '''
     File name: normalizer.py
-    Author: Kevin Lyons, Alex Aubuchon
+    Author: Kevin Lyons
     Date created: 5/8/2017
-    Date last modified: 5/8/2017
+    Date last modified: 5/10/2017
     Python Version: 3.5
     Purpose: Developing a simple linear regression model that can re-normalize all ouputs of the CityMatrix TrafficML CNN to more closely match those of actual simulation outputs. The overall structure will be quite  simple. We will take in predicted cities as X, actual cities as Y, and learn a scalar mapping X -> Y. I will use sklearn framework here for its simplicity and functionality.
 '''
@@ -12,6 +12,9 @@ import glob, pickle, sys
 
 # Learning imports
 from sklearn import linear_model
+from sklearn.metrics import r2_score # From https://iwatobipen.wordpress.com/2016/12/13/build-regression-model-in-keras/
+from keras.models import Sequential
+from keras.layers import Dense, Activation
 
 # Custom imports
 sys.path.insert(0, '../TrafficTreeSim/')
@@ -21,6 +24,8 @@ import cityiograph
 NB_EPOCH = 50
 BATCH_SIZE = 32
 VERBOSE = 1
+MODEL_TYPE = 'neural_normalizer_pos' # simple_linear, lasso, neural_normalizer, neural_normalizer_pos
+LOAD_MODEL = False
 
 # First, load train and test data from saved pickle files
 X_TRAIN_PICKLE_FILE = './pred.p'
@@ -41,20 +46,34 @@ Y = Y_train[3]
 # http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
 # http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html#sklearn.linear_model.Lasso
 print("Creating model.")
-regressor = linear_model.Lasso(positive = True) # Force all coefficients to be positive
+if LOAD_MODEL and MODEL_TYPE != 'neural_normalizer' and MODEL_TYPE != 'neural_normalizer_pos':
+	model = pickle.load(open(MODEL_TYPE + '.p', 'rb'))
+else:
+	model = Sequential()
+	model.add(Dense(512, input_shape = (512, ), activation = 'linear', kernel_constraint = 'non_neg'))
+	model.compile(loss = 'mean_squared_error', optimizer = 'adam', metrics = ['accuracy'])
 
-# Now, fit the model to our X and Y data
-print("Fitting model to our dataset.")
-regressor.fit(X, Y)
+	# Now, fit the model to our X and Y data
+	print("Fitting model to our dataset.")
+	model.fit(X, Y, epochs = NB_EPOCH, batch_size = BATCH_SIZE, verbose = VERBOSE)
 
-# Analyze results
-weights = regressor.coef_
-print(weights)
-print(weights.shape)
-test = regressor.predict(X[1])
-print(test)
-print(test.shape)
+# Evaluate again on train data
+print("Scoring model for validation.")
+if MODEL_TYPE == 'neural_normalizer' or MODEL_TYPE == 'neural_normalizer_pos':
+	pred = model.predict(X)
+	score = r2_score(pred, Y)
+else:
+	score = model.score(X, Y)
+print(score)
 
-# Original results are not great, but promising. I am getting some negative weights, which we do not want for our application. I am looking for solutions to this *constrained* linear regression problem, one of which is the linear_model.Lasso option from sklearn. Consulting with Alex on this.
+# Simple lin reg = 0.521035143549
+# Lasso = 0.295294099448
+# 1 layer neural normalizer = -0.449191600532
+# 1 layer with positive weights = -1.47146662043
+
+# Write to pickle file for later retreival
+print("Saving model locally.")
+if MODEL_TYPE != 'neural_normalizer' and MODEL_TYPE != 'neural_normalizer_pos':
+	pickle.dump(model, open(MODEL_TYPE + '.p', 'wb'))
 
 print("Process complete.")
