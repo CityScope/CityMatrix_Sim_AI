@@ -5,4 +5,4 @@ data/
 *.h5
 neural_predictions/
 bounds/
-normalized_outputs/
+normalized_outputs*/
