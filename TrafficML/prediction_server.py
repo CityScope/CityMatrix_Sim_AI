@@ -7,19 +7,15 @@
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features.
     TO DO:
    	- Get linear model pickle file and specs from Alex.
+   	- Implement logging functionality.
 '''
 
 # Generic import statements
 import sys, time, pickle, numpy as np
 
 # Import local scripts for city/model functionality
-sys.path.insert(0, '../TrafficTreeSim/')
-import cityiograph
-
-sys.path.insert(0, '../')
-import city_udp
-
-import utils, traffic_regression
+sys.path.extend(['../TrafficTreeSim/', '../'])
+import cityiograph, city_udp, utils, traffic_regression
 
 # Global instance variables
 LINEAR_MODEL_FILENAME = '' # Pickle file for traffic predictor
@@ -48,7 +44,6 @@ while LISTENING:
 
 	# Constantly wait for new cities to be received via UDP
 	# Taken directly from Alex's code for regression_server.py
-
 	print("Waiting to receive city...")
 	incoming_city = server.receive_city()
 	print("City received!")
