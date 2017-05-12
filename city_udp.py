@@ -29,10 +29,8 @@ DEFAULT_BUFFER_SIZE = 1024 * 128
 
 # Set max buffer size to prevent byte issues
 # Taken from http://stackoverflow.com/questions/22819214/udp-message-too-long
-
-import subprocess
-
-test = subprocess.Popen(["sudo", "sysctl", "-w", "net.inet.udp.maxdgram=65535"], stdout=subprocess.PIPE)
+# import subprocess
+# test = subprocess.Popen(["sudo", "sysctl", "-w", "net.inet.udp.maxdgram=65535"], stdout=subprocess.PIPE)
 
 class City_UDP(socket.socket):
 

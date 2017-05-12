@@ -46,7 +46,7 @@ def serialize_model(model, root_filename=ROOT_FILENAME):
 # Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
 def deserialize_model(root_filename=ROOT_FILENAME):
 
-	# Read JSON string 
+	# Read JSON string
 	json_file = open(root_filename + '.json', 'r')
 	model_in_json = json_file.read()
 	json_file.close()

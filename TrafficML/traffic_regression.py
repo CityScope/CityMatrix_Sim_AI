@@ -54,12 +54,12 @@ def get_features(city):
     #return get_features_treesim(city)
 
     features = []
-    treesim_features = get_features_treesim(city)
+    # treesim_features = get_features_treesim(city)
     for i in range(city.width):
         for j in range(city.height):
             cell = city.cells.get((i, j))
-            #features += cell_features(cell)
-            features.append(treesim_features[i * city.height + j])
+            features += cell_features(cell)
+            # features.append(treesim_features[i * city.height + j])
     features += city_features(city)
     return np.array(features)
 
