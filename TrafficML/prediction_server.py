@@ -25,8 +25,8 @@ RECEIVE_IP = "127.0.0.1"
 RECEIVE_PORT = 9000
 SEND_IP = "127.0.0.1"
 SEND_PORT = 9001
-NUM_FEATURES = 512
-MATRIX_SHAPE = (-1, 16, 16, 2)
+NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
+MATRIX_SHAPE = (-1, 16, 16, 2) # 3D matrix representation of our city grid as "image" for CNN
 
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
