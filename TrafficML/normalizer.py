@@ -19,7 +19,7 @@ from keras.layers import Dense, Activation
 
 # Custom imports
 sys.path.insert(0, '../TrafficTreeSim/')
-import cityiograph
+import cityiograph, utils
 
 from traffic_regression import output_to_city
 
@@ -27,12 +27,12 @@ from traffic_regression import output_to_city
 NB_EPOCH = 50 # Number of training iterations for NN
 BATCH_SIZE = 32
 VERBOSE = 1 # Logging setting
-MODEL_TYPE = 'matrix' # simple_linear, lasso, neural_normalizer, neural_normalizer_pos, global, matrix
-LOAD_MODEL = False # Do load model from pickle files
+MODEL_TYPE = 'global' # simple_linear, lasso, neural_normalizer, neural_normalizer_pos, global, matrix
 OUTPUT_PATH = './normalized_outputs_' + MODEL_TYPE + '/' # For renormalizing test cities
 MAX_OUTPUT_NUM = 200 # Limiting for Ryan's analysis
 DO_LEARN = True # Actually recompute city values
-GLOBAL_FACTOR = 1.30702488557 # Taken directly from numpy sum average
+WRITE_FILES = False # Overwrite JSON
+TRAFFIC_SCALE, WAIT_SCALE = 1.34227926669, 4.297754804071 # Taken directly from numpy sum averages
 SCALE_MATRIX_FILENAME = './matrix.p'
 
 # Create output directory if needed
@@ -62,10 +62,17 @@ if DO_LEARN:
 	# General structure for lin reg taken from the following sources:
 	# http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
 	# http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html#sklearn.linear_model.Lasso
-	print("Creating model.")
-	if LOAD_MODEL and MODEL_TYPE != 'neural_normalizer' and MODEL_TYPE != 'neural_normalizer_pos':
-		model = pickle.load(open(MODEL_TYPE + '.p', 'rb'))
-	elif MODEL_TYPE == 'neural_normalizer' or MODEL_TYPE == 'neural_normalizer_pos':
+	print("Creating model for type {}.".format(MODEL_TYPE))
+	if MODEL_TYPE != 'neural_normalizer' and MODEL_TYPE != 'neural_normalizer_pos':
+		# Load from pickle file to save training time
+		try:
+			model = pickle.load(open(MODEL_TYPE + '.p', 'rb'))
+		except:
+			# No model needed here - continue
+			pass
+
+	else:
+		# Create neural network, simple one layer
 		model = Sequential()
 		model.add(Dense(512, input_shape = (512, ), activation = 'linear', kernel_constraint = 'non_neg'))
 		model.compile(loss = 'mean_squared_error', optimizer = 'adam', metrics = ['accuracy'])
@@ -79,16 +86,27 @@ if DO_LEARN:
 	if MODEL_TYPE == 'neural_normalizer' or MODEL_TYPE == 'neural_normalizer_pos':
 		pred = model.predict(X)
 		score = r2_score(pred, Y)
+
 	elif MODEL_TYPE == 'simple_linear' or MODEL_TYPE == 'lasso':
 		# We are going with regression for this normalization
 		score = model.score(X, Y)
 		pred = model.predict(X)
+
 		# Trim all negative values for our purposes here
 		pred[pred < 0] = 0
+
 	elif MODEL_TYPE == 'global':
-		# Apply single global scalar scale factor to matrix
-		pred = GLOBAL_FACTOR * X
+		# Apply traffic and wait scale factors to matrix
+		# First, create this alternating factor matrix
+		matrix = np.tile(np.array([TRAFFIC_SCALE, WAIT_SCALE]), d // 2)
+
+		# Need to repeat for multiplication
+		matrix = np.repeat(matrix, n, axis = 0).reshape((n, d))
+
+		# Run our prediction
+		pred = np.multiply(matrix, X)
 		score = r2_score(pred, Y)
+
 	elif MODEL_TYPE == 'matrix':
 		# Load matrix from local pickle file
 		matrix = pickle.load(open(SCALE_MATRIX_FILENAME, 'rb'))
@@ -100,45 +118,48 @@ if DO_LEARN:
 		pred = np.multiply(matrix, X)
 		score = r2_score(pred, Y)
 
-	print(score)
-	# pred object is n x 512 np matrix
-	# Now, need to write to JSON
-	train_cities = X_train[0]
-	filenames = Y_train[1]
-	# Need to write this data to train_cities
-	for i, city in tqdm(enumerate(train_cities)):
-		# Get new data and filename to write
-		new_data, filename = list(pred[i]), filenames[i]
-		# Add normalized data to the city structure itself
-		output_to_city(city, new_data)
-		# Write to JSON
-		j = city.to_json()
-		# Write this to new filename and output
-		with open(OUTPUT_PATH + filename + '_normalized.json', 'w') as f:
-			f.write(j)
-		if i == MAX_OUTPUT_NUM: # Just to keep things small
-			break
+	# Show R^2 and accuracy values
+	accuracy = utils.compute_accuracy(Y, pred)
+	print("R^2 score:", score)
+	print("Percent accuracy:", accuracy)
 
-	# R^2 scores...
-	# Simple lin reg = 0.521035143549
-	# Lasso = 0.295294099448
-	# 1 layer neural normalizer = -0.449191600532
-	# 1 layer with positive weights = -1.47146662043
-	# Global normal factor = -0.362126279001
-	# Matrix mult = -0.00317328901165
+	if WRITE_FILES:
+		# pred object is n x 512 np matrix
+		# Now, need to write to JSON
+		train_cities = X_train[0]
+		filenames = Y_train[1]
+		# Need to write this data to train_cities
+		for i, city in tqdm(enumerate(train_cities)):
+			# Get new data and filename to write
+			new_data, filename = list(pred[i]), filenames[i]
+			# Add normalized data to the city structure itself
+			output_to_city(city, new_data)
+			# Write to JSON
+			j = city.to_json()
+			# Write this to new filename and output
+			with open(OUTPUT_PATH + filename + '_normalized.json', 'w') as f:
+				f.write(j)
+			if i == MAX_OUTPUT_NUM: # Just to keep things small
+				break
 
 	# Write to pickle file for later retreival
 	# print("Saving model locally.")
 	# if MODEL_TYPE != 'neural_normalizer' and MODEL_TYPE != 'neural_normalizer_pos':
 	# 	pickle.dump(model, open(MODEL_TYPE + '.p', 'wb'))
 else:
-	# Calculate sums of predicted an simulation data
-	pred_sum = X.sum()
-	sim_sum = Y.sum()
+	# Calculate sums of predicted and simulation data
+	# But, need traffic and wait sums separately
+	# Use np array splicing here
+	pred_traffic = X[:, ::2].sum()
+	pred_wait = X[:, 1::2].sum()
+	sim_traffic = Y[:, ::2].sum()
+	sim_wait = Y[:, ::2].sum()
 
-	# Calculate scale factor
-	scale = sim_sum / pred_sum
-	print("Global scale factor:", scale)
+	# Calculate scale factors for traffic and wait
+	traffic_scale = sim_traffic / pred_traffic
+	wait_scale = sim_wait / pred_wait
+	print("Traffic scale factor:", traffic_scale)
+	print("Wait scale factor:", wait_scale)
 
 	# Testing with more complex one...
 	# Try to get 1 x 512 sum vector for each component
@@ -149,7 +170,7 @@ else:
 	scale_new = sim_sum_new / pred_sum_new
 	scale_new[pred_sum_new == 0] = 1 # Replace 0 values to prevent division errors
 	scale_print = np.around(scale_new, 3) # Round to 3 decimal places for clarity purposes in printing
-	print(scale_print)
+	# print(scale_print)
 
 	# Write scale_matrix to pickle file
 	print("Writing to pickle file.")

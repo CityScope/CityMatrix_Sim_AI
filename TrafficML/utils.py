@@ -4,8 +4,11 @@
     Date created: 5/12/2017
     Date last modified: 5/12/2017
     Python Version: 3.5
-    Purpose: Simple utils script to be used alongside prediction_server. Various tasks, including model serialization.
+    Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
 '''
+
+# General import statements
+import numpy as np
 
 # Keras import for JSON functionality
 from keras.models import model_from_json
@@ -43,3 +46,13 @@ def deserialize_model(root_filename):
 	# Return the final model
 	print("Successfully deserialized our model.")
 	return model
+
+# Compute percent accuracy between 2 input matrices (true and predicted values)
+def compute_accuracy(true, pred):
+	'''
+	Input: a, b - np array n x ( )
+	Output: accuracy - scalar that represents (1 - percent error) between a and b, in range [0, 1]
+	'''
+
+	# Simple solution taken from http://stackoverflow.com/questions/20402109/calculating-percentage-error-by-comparing-two-arrays
+	return 1 - np.mean(true != pred)
