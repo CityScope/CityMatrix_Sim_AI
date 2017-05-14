@@ -22,7 +22,6 @@ from keras.layers import Dense, Activation
 # Custom imports
 sys.path.insert(0, '../TrafficTreeSim/')
 import cityiograph, utils
-
 from traffic_regression import output_to_city
 
 # Gobal latent parameters
@@ -36,6 +35,8 @@ DO_LEARN = True # Actually recompute city values
 WRITE_FILES = False # Overwrite JSON
 TRAFFIC_SCALE, WAIT_SCALE = 1.34227926669, 4.297754804071 # Taken directly from numpy sum averages
 SCALE_MATRIX_FILENAME = './matrix.p'
+X_TRAIN_PICKLE_FILE = './pred.p'
+Y_TRAIN_PICKLE_FILE = './latest_data_test.p'
 
 # Create output directory if needed
 # Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
@@ -43,9 +44,6 @@ if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
 
 # First, load train and test data from saved pickle files
-X_TRAIN_PICKLE_FILE = './pred.p'
-Y_TRAIN_PICKLE_FILE = './latest_data_test.p'
-
 print("Loading data from pickle files.")
 X_train = pickle.load(open(X_TRAIN_PICKLE_FILE, 'rb'))
 Y_train = pickle.load(open(Y_TRAIN_PICKLE_FILE, 'rb'))
@@ -133,15 +131,14 @@ if DO_LEARN:
 		# Need to write this data to train_cities
 		for i, city in tqdm(enumerate(train_cities)):
 			# Get new data and filename to write
-			new_data, filename = list(pred[i]), filenames[i]
+			new_data, filename = pred[i], filenames[i]
 			# Add normalized data to the city structure itself
 			output_to_city(city, new_data)
-			# Write to JSON
 			j = city.to_json()
-			# Write this to new filename and output
+			# Write this JSON to new filename and output
 			with open(OUTPUT_PATH + filename + '_normalized.json', 'w') as f:
 				f.write(j)
-			if i == MAX_OUTPUT_NUM: # Just to keep things small
+			if i == MAX_OUTPUT_NUM:
 				break
 
 	# Write to pickle file for later retreival
@@ -171,8 +168,6 @@ else:
 	# Divide two (512, ) matrices to get multiplicative factor
 	scale_new = sim_sum_new / pred_sum_new
 	scale_new[pred_sum_new == 0] = 1 # Replace 0 values to prevent division errors
-	scale_print = np.around(scale_new, 3) # Round to 3 decimal places for clarity purposes in printing
-	# print(scale_print)
 
 	# Write scale_matrix to pickle file
 	print("Writing to pickle file.")
