@@ -2,7 +2,7 @@
     File name: utils.py
     Author(s): Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/12/2017
+    Date last modified: 5/13/2017
     Python Version: 3.5
     Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
 '''

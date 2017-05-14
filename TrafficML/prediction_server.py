@@ -2,7 +2,7 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/12/2017
+    Date last modified: 5/13/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
@@ -36,21 +36,20 @@ linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 neural_model = utils.deserialize_model(ROOT_NN_FILENAME)
 
 # Constantly loop and wait for new city packets to reach the UDP server
+# Taken directly from Alex's code for regression_server.py
 while LISTENING:
 
 	print("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
 
 	# Breifly sleep
 	time.sleep(0.1)
-
-	# Constantly wait for new cities to be received via UDP
-	# Taken directly from Alex's code for regression_server.py
+	
 	print("Waiting to receive city...")
-	incoming_city = server.receive_city()
+	city = server.receive_city()
 	print("City received!")
 
 	# Extract feature matrix from this city
-	features = traffic_regression.get_features(incoming_city)
+	features = traffic_regression.get_features(city)
 
 	# Separate into input for linear and neural models
 	linear_input = [features]
@@ -74,9 +73,8 @@ while LISTENING:
 	result[1::2] = wait_list
 
 	# Write prediction back to the cityiograph.City structure
-	outgoing_city = incoming_city
-	traffic_regression.output_to_city(outgoing_city, result)
+	traffic_regression.output_to_city(city, result)
 
 	# Send the city object directly back to Grasshopper script via UDP server
-	server.send_city(outgoing_city)
+	server.send_city(city)
 	print("Predicted city sent!")
