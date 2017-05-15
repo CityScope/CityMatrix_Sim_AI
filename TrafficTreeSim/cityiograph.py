@@ -104,7 +104,7 @@ class Cell(object):
         self.x = jcell['x']
         self.y = jcell['y']
         self.rot = jcell['rot']
-        self.magnitude = jcell['magnitude']
+        self.magnitude = 0 #jcell['magnitude']
         self.data = jcell.get('data', {'traffic': 0, "wait": 0})
 
         if self.type_id == ROAD_ID:
