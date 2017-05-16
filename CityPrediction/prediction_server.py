@@ -6,7 +6,7 @@
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-   		- None at this time.
+   		- Need filename convention here as well.
 '''
 
 # Generic import statements
@@ -14,7 +14,7 @@ import sys, time, pickle, numpy as np
 
 # Import local scripts for city/model functionality
 sys.path.append('../global/')
-import cityiograph, city_udp, utils
+import cityiograph, city_udp, utils, sim as simulator
 
 # Global instance variables
 
@@ -36,11 +36,17 @@ SEND_PORT = 9001
 LOGGER_NAME = 'CityLog'
 LOGGER_DIRECTORY = './log/'
 
+# Simulator variables
+SIM_NAME = 'PythonSim'
+
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
 
 # Create instance of our custom logger class
 log = utils.CityLogger(LOGGER_NAME, LOGGER_DIRECTORY)
+
+# Create instance of our simulator
+sim = simulator.CitySimulator(SIM_NAME, log)
 
 # Load linear and neural models, respectively
 linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
@@ -60,7 +66,8 @@ while LISTENING:
 	print("City received!")
 
 	# Write city to local file
-	log.write_city(city, "test")
+	filename = log.get_full_name("test")
+	log.write_city(city, filename)
 
 	# Extract feature matrix from this city
 	features = utils.get_features(city)
@@ -92,3 +99,6 @@ while LISTENING:
 	# Send the city object directly back to Grasshopper script via UDP server
 	server.send_city(city)
 	print("Predicted city sent!")
+
+	# Now, run the GAMA simulation on this city and save the resulting JSON for later use
+	sim.simulate(city, filename)

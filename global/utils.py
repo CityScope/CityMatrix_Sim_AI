@@ -8,6 +8,7 @@
     TODO:
     	- Determine filename format.
     	- Determine JSON output format.
+    	- Create global configurations file???
 '''
 
 # General imports
@@ -135,15 +136,14 @@ class CityLogger:
 		d['objects']['timestamp'] = int(time.time())
 
 		# Write dictionary to JSON
-		full_name = self.output_dir + self.format(filename) + ".json"
-		with open(full_name, 'w') as f:
+		with open(filename, 'w') as f:
 			f.write(json.dumps(d))
 
-		print("Successfully wrote city to file {}.".format(full_name))
+		print("Successfully wrote city to file {}.".format(filename))
 
-	def format(self, filename):
+	def get_full_name(self, filename, mode = ".json"): # Default JSON extension mode
 		'''
 		Input: filename - raw prefix string of filename - need to format
 		Output: formatted_filename - properly updated to reflect filename format for later ML prediction
 		'''
-		return filename
+		return self.output_dir + filename + mode
