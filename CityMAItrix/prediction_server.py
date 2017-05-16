@@ -13,8 +13,8 @@
 import sys, time, pickle, numpy as np
 
 # Import local scripts for city/model functionality
-sys.path.extend(['../TrafficTreeSim/', '../'])
-import cityiograph, city_udp, utils, traffic_regression
+sys.path.append('../global/')
+import cityiograph, city_udp, utils
 
 # Global instance variables
 
@@ -63,7 +63,7 @@ while LISTENING:
 	log.write_city(city, "test")
 
 	# Extract feature matrix from this city
-	features = traffic_regression.get_features(city)
+	features = utils.get_features(city)
 
 	# Separate into input for linear and neural models
 	linear_input = [features]
@@ -87,7 +87,7 @@ while LISTENING:
 	result[1::2] = wait_list
 
 	# Write prediction back to the cityiograph.City structure
-	traffic_regression.output_to_city(city, result)
+	utils.output_to_city(city, result)
 
 	# Send the city object directly back to Grasshopper script via UDP server
 	server.send_city(city)

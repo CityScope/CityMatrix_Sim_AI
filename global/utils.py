@@ -1,6 +1,6 @@
 '''
     File name: utils.py
-    Author(s): Kevin Lyons
+    Author(s): Kevin Lyons, Alex Aubuchon
     Date created: 5/12/2017
     Date last modified: 5/16/2017
     Python Version: 3.5
@@ -17,8 +17,10 @@ import sys, json, time, os, numpy as np
 from keras.models import model_from_json
 
 # Custom imports
-sys.path.insert(0, '../TrafficTreeSim/')
 import cityiograph
+
+# Global variables
+ROAD_ID = 6
 
 # Serializes a Keras model to a JSON and h5 data file
 def serialize_model(model, root_filename):
@@ -63,6 +65,50 @@ def compute_accuracy(true, pred):
 
 	# Simple solution taken from http://stackoverflow.com/questions/20402109/calculating-percentage-error-by-comparing-two-arrays
 	return 1 - np.mean(true != pred)
+
+# Get the 2 input features for a given cell
+# Currently using population and is road
+def cell_features(cell):
+    feats = []
+    feats.append(cell.population)
+    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    return feats
+
+# Get the 2 input features for a given cell
+# Currently using traffic and wait time
+def cell_results(cell):
+    results = []
+    results.append(cell.data["traffic"])
+    results.append(cell.data["wait"])
+    return results
+
+# Get the input feature vector for a given city
+def get_features(city):
+    features = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            features += cell_features(cell)
+    return np.array(features)
+
+# Get the output feature vector for a given city
+def get_results(city):
+    results = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            results += cell_results(cell)
+    return np.array(results)
+
+# Custom method to write new data to city object for later serialization
+def output_to_city(city, output):
+    i = 0
+    for x in range(city.width):
+        for y in range(city.height):
+            cell = city.cells.get((x, y))
+            cell.data["traffic"] = int(round(output[i]))
+            cell.data["wait"] = int(round(output[i + 1]))
+            i += 2	
 
 # Create custom logging class for file I/O
 class CityLogger:

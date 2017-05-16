@@ -20,9 +20,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 
 # Custom imports
-sys.path.insert(0, '../TrafficTreeSim/')
+sys.path.insert(0, '../global/')
 import cityiograph, utils
-from traffic_regression import output_to_city
 
 # Gobal latent parameters
 NB_EPOCH = 50 # Number of training iterations for NN
@@ -133,7 +132,7 @@ if DO_LEARN:
 			# Get new data and filename to write
 			new_data, filename = pred[i], filenames[i]
 			# Add normalized data to the city structure itself
-			output_to_city(city, new_data)
+			utils.output_to_city(city, new_data)
 			j = city.to_json()
 			# Write this JSON to new filename and output
 			with open(OUTPUT_PATH + filename + '_normalized.json', 'w') as f:

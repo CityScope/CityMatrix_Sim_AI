@@ -10,11 +10,7 @@ import os
 import numpy as np
 from sklearn.metrics import r2_score
 
-sys.path.insert(0, './TrafficTreeSim/')
-import cityiograph
-
-sys.path.insert(0, './TrafficML/')
-import traffic_regression as TR
+import cityiograph, utils
 """
 Statistical extraction functions.
 
@@ -68,7 +64,7 @@ CITY_STATS = [("residuals", residuals), ("norm_residuals",
 
 
 def get_data(city):
-    return np.array(TR.get_results(city)).astype(float)
+    return np.array(utils.get_results(city)).astype(float)
 
 
 def city_stats(expectedCity, predictedCity):

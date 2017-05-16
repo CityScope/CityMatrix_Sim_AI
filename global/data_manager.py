@@ -2,7 +2,7 @@
     File name: data_manager.py
     Author: Kevin Lyons
     Date created: 4/14/2017
-    Date last modified: 5/8/2017
+    Date last modified: 5/16/2017
     Python Version: 3.5
     Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis. Uses histogram for analysis.
 '''
@@ -10,13 +10,12 @@
 import glob, json, time, numpy as np, sys, os, pickle, matplotlib.pyplot as plt
 
 # Custom imports
-sys.path.insert(0, '../TrafficTreeSim/')
-
+sys.path.insert(0, '../globals/')
 import cityiograph
-
-from traffic_regression import get_features, get_results
+from utils import get_features, get_results
 
 # REGION: Global instance variable declarations
+# Note - these directories may be incorrect - Kevin, 5/16/2017
 POP_ARR = [5, 8, 16, 16, 23, 59]
 TRAIN_GOOD_DIR = '../../../data/train_good/*.json'
 TEST_GOOD_DIR = '../../../data/test_good/*.json'

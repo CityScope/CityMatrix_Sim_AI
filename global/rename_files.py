@@ -8,7 +8,7 @@ Created on Mon Mar 13 00:07:29 2017
 import os
 import numpy as np
 
-file_dir = "./data/output/"
+file_dir = "./data/output/" # No longer a correct path - Kevin, 05/26/2017
 
 zfill_val = int(np.ceil(np.log10(len(os.listdir(file_dir)))))
 

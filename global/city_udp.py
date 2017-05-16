@@ -14,11 +14,8 @@ Sends cities as byte-encoded strings of the following json format:
 Author: Alex Aubuchon
 """
 
-import socket
-import json
+import socket, json, sys
 
-import sys
-sys.path.insert(0, 'TrafficTreeSim/')
 import cityiograph
 
 DEFAULT_SEND_IP = "127.0.0.1"
@@ -26,11 +23,6 @@ DEFAULT_SEND_PORT = 7985
 DEFAULT_RECEIVE_IP = "127.0.0.1"
 DEFAULT_RECEIVE_PORT = 7986
 DEFAULT_BUFFER_SIZE = 1024 * 128
-
-# Set max buffer size to prevent byte issues
-# Taken from http://stackoverflow.com/questions/22819214/udp-message-too-long
-# import subprocess
-# test = subprocess.Popen(["sudo", "sysctl", "-w", "net.inet.udp.maxdgram=65535"], stdout=subprocess.PIPE)
 
 class City_UDP(socket.socket):
 
