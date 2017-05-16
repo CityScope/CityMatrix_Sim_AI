@@ -6,3 +6,4 @@ data/
 neural_predictions/
 bounds/
 normalized_outputs*/
+log/

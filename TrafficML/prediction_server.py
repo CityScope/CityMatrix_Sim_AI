@@ -2,11 +2,11 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/13/2017
+    Date last modified: 5/16/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-   	- Implement general/scalable logging functionality.
+   		- None at this time.
 '''
 
 # Generic import statements
@@ -17,19 +17,30 @@ sys.path.extend(['../TrafficTreeSim/', '../'])
 import cityiograph, city_udp, utils, traffic_regression
 
 # Global instance variables
+
+# ML variables
 LINEAR_MODEL_FILENAME = './model_files/linear_model.pkl' # Pickle file for traffic predictor
 ROOT_NN_FILENAME = './model_files/neural_model' # Root name for neural network JSON/H5
+NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
+MATRIX_SHAPE = (-1, 16, 16, 2) # 3D matrix representation of our city grid as "image" for CNN
+
+# Server variables
 LISTENING = True # Bool to say whether or not we want our server to be "on" and listening
 SERVER_NAME = 'Prediction_Server'
 RECEIVE_IP = "127.0.0.1"
 RECEIVE_PORT = 9000
 SEND_IP = "127.0.0.1"
 SEND_PORT = 9001
-NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
-MATRIX_SHAPE = (-1, 16, 16, 2) # 3D matrix representation of our city grid as "image" for CNN
+
+# Log variables
+LOGGER_NAME = 'CityLog'
+LOGGER_DIRECTORY = './log/'
 
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
+
+# Create instance of our custom logger class
+log = utils.CityLogger(LOGGER_NAME, LOGGER_DIRECTORY)
 
 # Load linear and neural models, respectively
 linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
@@ -47,6 +58,9 @@ while LISTENING:
 	print("Waiting to receive city...")
 	city = server.receive_city()
 	print("City received!")
+
+	# Write city to local file
+	log.write_city(city, "test")
 
 	# Extract feature matrix from this city
 	features = traffic_regression.get_features(city)
