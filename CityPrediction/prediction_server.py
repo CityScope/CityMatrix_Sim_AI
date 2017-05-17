@@ -100,5 +100,5 @@ while LISTENING:
 	server.send_city(city)
 	print("Predicted city sent!")
 
-	# Now, run the GAMA simulation on this city and save the resulting JSON for later use
+	# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
 	sim.simulate(city, filename)

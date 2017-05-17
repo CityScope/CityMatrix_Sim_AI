@@ -146,4 +146,4 @@ class CityLogger:
 		Input: filename - raw prefix string of filename - need to format
 		Output: formatted_filename - properly updated to reflect filename format for later ML prediction
 		'''
-		return self.output_dir + filename + mode
+		return os.path.abspath(self.output_dir + filename + mode)
