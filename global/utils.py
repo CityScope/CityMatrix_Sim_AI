@@ -8,7 +8,7 @@
     TODO:
     	- Determine filename format.
     	- Determine JSON output format.
-    	- Create global configurations file???
+    	- Create global configurations file!!!
 '''
 
 # General imports
@@ -144,6 +144,6 @@ class CityLogger:
 	def get_full_name(self, filename, mode = ".json"): # Default JSON extension mode
 		'''
 		Input: filename - raw prefix string of filename - need to format
-		Output: formatted_filename - properly updated to reflect filename format for later ML prediction
+		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
 		'''
 		return os.path.abspath(self.output_dir + filename + mode)

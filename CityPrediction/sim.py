@@ -7,6 +7,7 @@
     Purpose: Python script that should call GAMA simulator in "headless mode" to run a particular JSON file. Should return the results of that simulation to be saved later on.
     TODO:
     	- Implement XML schema for GAMA headless mode. May need module import here. -> pip3.5 install xmltodict
+    	- Need to get OUTPUT of GAMA simulation as well... then, update network later. Filename matching is key!
 '''
 
 # Global imports
@@ -36,7 +37,6 @@ class CitySimulator:
 
 		# Using subprocess to run command and check progress
 		# Taken from http://stackoverflow.com/questions/636561/how-can-i-run-an-external-command-asynchronously-from-python
-
 		# Write filename to our experiment file
 		self.update_filename(filename)
 
