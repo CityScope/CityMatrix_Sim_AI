@@ -1,6 +1,6 @@
 '''
     File name: sim.py
-    Author(s): Kevin Lyons, Alex Aubuchon
+    Author(s): Kevin Lyons
     Date created: 5/16/2017
     Date last modified: 5/16/2017
     Python Version: 3.5
