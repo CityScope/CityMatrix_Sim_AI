@@ -6,4 +6,5 @@ data/
 neural_predictions/
 bounds/
 normalized_outputs*/
-log/
+*.log
+input_cities/

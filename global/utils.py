@@ -2,26 +2,22 @@
     File name: utils.py
     Author(s): Kevin Lyons, Alex Aubuchon
     Date created: 5/12/2017
-    Date last modified: 5/16/2017
+    Date last modified: 5/17/2017
     Python Version: 3.5
     Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
     TODO:
-    	- Determine filename format.
-    	- Determine JSON output format.
-    	- Create global configurations file!!!
+    	- None at this time.
 '''
 
 # General imports
-import sys, json, time, os, numpy as np
+import sys, json, os, logging, numpy as np
 
 # Keras import for JSON functionality
 from keras.models import model_from_json
 
 # Custom imports
 import cityiograph
-
-# Global variables
-ROAD_ID = 6
+from config import *
 
 # Serializes a Keras model to a JSON and h5 data file
 def serialize_model(model, root_filename):
@@ -35,8 +31,6 @@ def serialize_model(model, root_filename):
 
     # Save weights
 	model.save_weights(root_filename + ".h5")
-
-	print("Successfully serialized model to local files {}.".format(root_filename))
 
 # Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
 def deserialize_model(root_filename):
@@ -54,7 +48,6 @@ def deserialize_model(root_filename):
 	model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
 	# Return the final model
-	print("Successfully deserialized our model.")
 	return model
 
 # Compute percent accuracy between 2 input matrices (true and predicted values)
@@ -113,19 +106,40 @@ def output_to_city(city, output):
 
 # Create custom logging class for file I/O
 class CityLogger:
-	def __init__(self, name, output_dir = None):
-		self.name = name
-		self.output_dir = output_dir
+	def __init__(self, name, log_filename):
+		self.name = name # Name of our logger for ID purposes
 
-		# Create output directory if needed
-		# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
-		if not os.path.exists(self.output_dir):
-			os.makedirs(self.output_dir)
+		# First time log file initialized
+		# Taken from http://stackoverflow.com/questions/82831/how-do-i-check-whether-a-file-exists-using-python
+		if not os.path.isfile(log_filename):
+			first = True
+		else:
+			first = False
 
-	def write_city(self, city, filename):
+		# Set up logger to file and console
+		# Taken from multiple sources
+		# http://stackoverflow.com/questions/13733552/logger-configuration-to-log-to-file-and-print-to-stdout
+		# https://docs.python.org/2/howto/logging.html
+		logFormatter = logging.Formatter("%(asctime)s [%(threadName)s] [%(levelname)s] %(message)s", '%m/%d/%Y %I:%M:%S %p')
+		self.logger = logging.getLogger(self.name)
+		self.logger.setLevel(logging.DEBUG)
+
+		fileHandler = logging.FileHandler(log_filename)
+		fileHandler.setFormatter(logFormatter)
+		self.logger.addHandler(fileHandler)
+
+		consoleHandler = logging.StreamHandler(sys.stdout)
+		consoleHandler.setFormatter(logFormatter)
+		self.logger.addHandler(consoleHandler)
+
+		if first:
+			self.info("Successfully initialized log file at {}.".format(log_filename))
+
+	def write_city(self, city, filename, timestamp):
 		'''
 		Input: city - instance of cityiograph.City - city to be logged
 			   filename - raw prefix string of filename - need to format
+			   timestamp - UNIX timestamp when file was requested to be written to server
 		Output: None - write city as JSON to specified filename for later ML purposes
 		'''
 		# Convert to dictionary object for editing
@@ -133,17 +147,36 @@ class CityLogger:
 
 		# Add UNIX timestamp to JSON
 		# Taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
-		d['objects']['timestamp'] = int(time.time())
+		d['objects']['timestamp'] = timestamp
 
 		# Write dictionary to JSON
 		with open(filename, 'w') as f:
 			f.write(json.dumps(d))
 
-		print("Successfully wrote city to file {}.".format(filename))
+		self.info("Successfully wrote city to file {}.".format(filename))
 
-	def get_full_name(self, filename, mode = ".json"): # Default JSON extension mode
+	def get_full_name(self, directory, filename, mode = ".json"): # Default JSON extension mode
 		'''
 		Input: filename - raw prefix string of filename - need to format
 		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
 		'''
-		return os.path.abspath(self.output_dir + filename + mode)
+
+		# Create output directory if needed
+		# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+
+		return os.path.abspath(directory + filename + mode)
+
+	# Simple log methods to avoid having to write log.logger.info - a bit counterintuitive
+	def info(self, message):
+		self.logger.info(message)
+
+	def debug(self, message):
+		self.logger.debug(message)
+
+	def warn(self, message):
+		self.logger.warning(message)
+
+	def error(self, message):
+		self.logger.error(message)

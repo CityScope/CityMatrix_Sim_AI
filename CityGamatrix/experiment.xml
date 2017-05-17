@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Experiment_plan>
-	<Simulation experiment="Run" id="1" finalStep="8642" sourcePath="./models/CityGamatrix.gaml">
+	<Simulation finalStep="8642" id="1" sourcePath="./models/CityGamatrix.gaml" experiment="Run">
 		<Parameters>
-			<Parameter name="filename" value="/Users/Kevin/Documents/mit/urop/code/CityMatrixSim/CityPrediction/log/test.json" type="STRING"></Parameter>
+			<Parameter name="filename" value="/Users/Kevin/Documents/mit/urop/code/CityMatrixSim/CityPrediction/input_cities/city_1495056861.json" type="STRING"></Parameter>
 		</Parameters>
 	</Simulation>
 </Experiment_plan>

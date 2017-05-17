@@ -2,11 +2,10 @@
     File name: sim.py
     Author(s): Kevin Lyons
     Date created: 5/16/2017
-    Date last modified: 5/16/2017
+    Date last modified: 5/17/2017
     Python Version: 3.5
     Purpose: Python script that should call GAMA simulator in "headless mode" to run a particular JSON file. Should return the results of that simulation to be saved later on.
     TODO:
-    	- Implement XML schema for GAMA headless mode. May need module import here. -> pip3.5 install xmltodict
     	- Need to get OUTPUT of GAMA simulation as well... then, update network later. Filename matching is key!
 '''
 
@@ -17,21 +16,19 @@ from subprocess import Popen
 # Custom imports
 sys.path.append('../global/')
 import utils
-
-# Global instance variables
-GAMA_PATH = '/Applications/Gama.app/Contents/headless/gama-headless.sh'
-XML_PATH = '../CityGamatrix/experiment.xml'
+from config import *
 
 # Class method for our simulator
 class CitySimulator:
 	def __init__(self, name, log):
 		self.name = name # Name to help us ID the sim
-		self.log = log # Instance of utils.CityLogger so we can write to JSON
+		self.log = log # Existing instance of utils.CityLogger so we can write to JSON
 
-	def simulate(self, city, filename):
+	def simulate(self, city, filename, prefix):
 		'''
 		Input: city - instance of cityiograph.City - city to be simulated in GAMA
 			   filename - full string of input JSON
+			   prefix - raw name of file with timestamp, to be used for output later on
 		Output: None - write simulation output to specific file through GAMA
 		'''
 
@@ -44,7 +41,7 @@ class CitySimulator:
 		commands = ['sh', GAMA_PATH, '-c', '-v', XML_PATH]
 		p = Popen(commands)
 		
-		print("Simulation complete for file {}.".format(filename))
+		self.log.info("Simulation complete for file {}.".format(filename))
 
 	def update_filename(self, filename):
 		'''

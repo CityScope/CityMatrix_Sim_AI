@@ -2,7 +2,7 @@
     File name: data_manager.py
     Author: Kevin Lyons
     Date created: 4/14/2017
-    Date last modified: 5/16/2017
+    Date last modified: 5/17/2017
     Python Version: 3.5
     Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis. Uses histogram for analysis.
 '''

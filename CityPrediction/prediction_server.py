@@ -2,48 +2,40 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/16/2017
+    Date last modified: 5/17/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-   		- Need filename convention here as well.
+    	- None at this time.
 '''
 
 # Generic import statements
-import sys, time, pickle, numpy as np
+import sys, time, pickle, time, atexit, traceback, numpy as np
 
-# Import local scripts for city/model functionality
+# Import local scripts for city/model functionality, as well as configuration variables
 sys.path.append('../global/')
 import cityiograph, city_udp, utils, sim as simulator
-
-# Global instance variables
-
-# ML variables
-LINEAR_MODEL_FILENAME = './model_files/linear_model.pkl' # Pickle file for traffic predictor
-ROOT_NN_FILENAME = './model_files/neural_model' # Root name for neural network JSON/H5
-NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
-MATRIX_SHAPE = (-1, 16, 16, 2) # 3D matrix representation of our city grid as "image" for CNN
-
-# Server variables
-LISTENING = True # Bool to say whether or not we want our server to be "on" and listening
-SERVER_NAME = 'Prediction_Server'
-RECEIVE_IP = "127.0.0.1"
-RECEIVE_PORT = 9000
-SEND_IP = "127.0.0.1"
-SEND_PORT = 9001
-
-# Log variables
-LOGGER_NAME = 'CityLog'
-LOGGER_DIRECTORY = './log/'
-
-# Simulator variables
-SIM_NAME = 'PythonSim'
+from config import *
 
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
 
 # Create instance of our custom logger class
-log = utils.CityLogger(LOGGER_NAME, LOGGER_DIRECTORY)
+log = utils.CityLogger(LOGGER_NAME, LOGGER_FILENAME)
+
+# Need to log when server stopped
+# Taken from https://docs.python.org/2/library/atexit.html
+@atexit.register
+def end():
+    log.warn(SERVER_NAME + " has been stopped.")
+
+# Configure log to handle all uncaught exceptions
+# Taken from http://stackoverflow.com/questions/8050775/using-pythons-logging-module-to-log-all-exceptions-and-errors
+# Also from http://stackoverflow.com/questions/4564559/get-exception-description-and-stack-trace-which-caused-an-exception-all-as-a-st
+def handler(type, value, tb):
+	log.error(str(value) + "\n" + "\n".join(traceback.format_tb(tb)))
+
+sys.excepthook = handler
 
 # Create instance of our simulator
 sim = simulator.CitySimulator(SIM_NAME, log)
@@ -52,22 +44,24 @@ sim = simulator.CitySimulator(SIM_NAME, log)
 linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 neural_model = utils.deserialize_model(ROOT_NN_FILENAME)
 
+log.info("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
+
 # Constantly loop and wait for new city packets to reach the UDP server
 # Taken directly from Alex's code for regression_server.py
-while LISTENING:
-
-	print("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
+while LISTENING:	
 
 	# Breifly sleep
 	time.sleep(0.1)
 	
-	print("Waiting to receive city...")
+	log.info("Waiting to receive city...")
 	city = server.receive_city()
-	print("City received!")
+	log.info("City received!")
 
 	# Write city to local file
-	filename = log.get_full_name("test")
-	log.write_city(city, filename)
+	timestamp = str(int(time.time()))
+	prefix = "city_" + timestamp
+	filename = log.get_full_name(INPUT_CITIES_DIRECTORY, prefix)
+	log.write_city(city, filename, timestamp)
 
 	# Extract feature matrix from this city
 	features = utils.get_features(city)
@@ -98,7 +92,7 @@ while LISTENING:
 
 	# Send the city object directly back to Grasshopper script via UDP server
 	server.send_city(city)
-	print("Predicted city sent!")
+	log.info("Predicted city sent back to client!")
 
 	# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
-	sim.simulate(city, filename)
+	sim.simulate(city, filename, prefix)
