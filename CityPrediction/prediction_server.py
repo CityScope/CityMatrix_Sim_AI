@@ -82,7 +82,7 @@ while LISTENING:
 	wait_list = neural_output[: , : , 1].reshape(NUM_FEATURES // 2).tolist() # List of size 256
 
 	# Need to combine traffic and wait output values into a final list of length 512
-	# See http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion for clever combination trick
+	# Taken from http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion for clever combination trick
 	result = np.zeros(NUM_FEATURES)
 	result[::2] = traffic_list
 	result[1::2] = wait_list

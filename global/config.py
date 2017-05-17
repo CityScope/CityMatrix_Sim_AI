@@ -31,6 +31,7 @@ LOGGER_FILENAME = './log.log'
 SIM_NAME = 'PythonSim'
 GAMA_PATH = '/Applications/Gama.app/Contents/headless/gama-headless.sh'
 XML_PATH = '../CityGamatrix/experiment.xml'
+GAMA_COMMANDS = ['sh', GAMA_PATH, '-c', '-v', XML_PATH]
 
 # City variables
 ROAD_ID = 6

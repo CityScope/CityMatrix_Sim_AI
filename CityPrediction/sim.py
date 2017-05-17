@@ -32,14 +32,13 @@ class CitySimulator:
 		Output: None - write simulation output to specific file through GAMA
 		'''
 
-		# Using subprocess to run command and check progress
-		# Taken from http://stackoverflow.com/questions/636561/how-can-i-run-an-external-command-asynchronously-from-python
-		# Write filename to our experiment file
+		# First, write filename to our experiment file
 		self.update_filename(filename)
 
-		# Begin process
-		commands = ['sh', GAMA_PATH, '-c', '-v', XML_PATH]
-		p = Popen(commands)
+		# Using subprocess to run command and check progress
+		# Taken from http://stackoverflow.com/questions/636561/how-can-i-run-an-external-command-asynchronously-from-python
+		# Begin process on new thread
+		p = Popen(GAMA_COMMANDS)
 		
 		self.log.info("Simulation complete for file {}.".format(filename))
 
@@ -58,7 +57,7 @@ class CitySimulator:
 			d = json.loads(json.dumps(xmltodict.parse(f.read())))
 
 			# d is of the form: {'Experiment_plan': {'Simulation': {'@experiment': 'Run', '@finalStep': '8642', '@sourcePath': './models/CityGamatrix.gaml', 'Parameters': {'Parameter': {'@value': 'TEMP_VALUE', '@name': 'filename', '@type': 'STRING'}}, '@id': '1'}}}
-			# Now, pdate value in d to correct filename
+			# Now, update value in d to correct filename
 			d['Experiment_plan']['Simulation']['Parameters']['Parameter']['@value'] = filename
 
 		# Convert dict back to XML and write to file
