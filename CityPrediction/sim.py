@@ -2,15 +2,16 @@
     File name: sim.py
     Author(s): Kevin Lyons
     Date created: 5/16/2017
-    Date last modified: 5/17/2017
+    Date last modified: 5/18/2017
     Python Version: 3.5
     Purpose: Python script that should call GAMA simulator in "headless mode" to run a particular JSON file. Should return the results of that simulation to be saved later on.
     TODO:
     	- Need to get OUTPUT of GAMA simulation as well... then, update network later. Filename matching is key!
+    	- Passing data dictionary through calls.
 '''
 
 # Global imports
-import sys, xmltodict, json
+import sys, xmltodict, json, time
 from subprocess import Popen
 
 # Custom imports
@@ -38,9 +39,17 @@ class CitySimulator:
 		# Using subprocess to run command and check progress
 		# Taken from http://stackoverflow.com/questions/636561/how-can-i-run-an-external-command-asynchronously-from-python
 		# Begin process on new thread
-		p = Popen(GAMA_COMMANDS)
-		
-		self.log.info("Simulation complete for file {}.".format(filename))
+		utils.async_process(GAMA_COMMANDS, self.complete)
+		self.log.info("Simulation initialized for file {}.".format(filename))
+
+	def complete(self, process):
+		'''
+		Input: process - instance of subprocess.Popen that was run async
+		Output: TBD
+		'''
+
+		# Need to take result from process and act accordingly
+		pass
 
 	def update_filename(self, filename):
 		'''

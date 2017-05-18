@@ -10,7 +10,7 @@
 '''
 
 # General imports
-import sys, json, os, logging, numpy as np
+import sys, json, os, logging, subprocess, threading, numpy as np
 
 # Keras import for JSON functionality
 from keras.models import model_from_json
@@ -180,3 +180,17 @@ class CityLogger:
 
 	def error(self, message):
 		self.logger.error(message)
+
+# Custom method to run process on new thread and notify when returned
+# Taken from http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
+def async_process(commands, hook):
+	def run(commands, hook):
+		p = subprocess.Popen(commands) # Initialize process
+		p.wait() # Wait for command to complete
+		hook(p) # Call our hook with process object
+		return
+
+	# Set up threading functionality
+	thread = threading.Thread(target = run, args = (commands, hook))
+	thread.start()
+	return thread

@@ -2,7 +2,7 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/17/2017
+    Date last modified: 5/18/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
@@ -20,7 +20,7 @@ from config import *
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
 
-# Create instance of our custom logger class
+# Create instance of our custom logger class and connect to output stream
 log = utils.CityLogger(LOGGER_NAME, LOGGER_FILENAME)
 
 # Need to log when server stopped
