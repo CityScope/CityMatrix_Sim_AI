@@ -6,7 +6,7 @@
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-    	- Add diff functionality for cities!!!
+    	- Handle False output from diff function. What do we send back to the server?
 '''
 
 # Generic import statements
@@ -57,6 +57,7 @@ linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 neural_model = utils.deserialize_model(ROOT_NN_FILENAME)
 
 log.info("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
+log.info("Waiting to receive city...")
 
 # Constantly loop and wait for new city packets to reach the UDP server
 # Taken directly from Alex's code for regression_server.py
@@ -66,45 +67,53 @@ while LISTENING:
 	time.sleep(0.1)
 	
 	# Get city from server
-	log.info("Waiting to receive city...")
 	city = server.receive_city()
 
-	# Write city to local file
-	timestamp = str(int(time.time()))
-	simCity = simulator.SimCity(city, timestamp)
-	log.write_city(simCity)
-	log.info("New city received @ timestamp {}.".format(timestamp))
+	# Only consider new city if it is different from most recent
+	if utils.diff_cities(city):
+		# Write city to local file
+		# Taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
+		timestamp = str(int(time.time()))
+		log.info("New city received @ timestamp {}.".format(timestamp))
+		simCity = simulator.SimCity(city, timestamp)
+		log.write_city(simCity)
 
-	# Extract feature matrix from this city
-	features = utils.get_features(city)
+		# Extract feature matrix from this city
+		features = utils.get_features(city)
 
-	# Separate into input for linear and neural models
-	linear_input = [features]
-	neural_input = features.reshape(MATRIX_SHAPE)
+		# Separate into input for linear and neural models
+		linear_input = [features]
+		neural_input = features.reshape(MATRIX_SHAPE)
 
-	# Make traffic prediction using linear model
-	linear_output = linear_model.predict(linear_input)[0] # Type = np array, 1 x 512
-	linear_output[linear_output < 0] = 0. # Trim negative values from regression
+		# Make traffic prediction using linear model
+		linear_output = linear_model.predict(linear_input)[0] # Type = np array, 1 x 512
+		linear_output[linear_output < 0] = 0. # Trim negative values from regression
 
-	# Make wait prediction using neural model
-	neural_output = neural_model.predict(neural_input)[0] # Type = np array, shape = (16, 16, 2)
+		# Make wait prediction using neural model
+		neural_output = neural_model.predict(neural_input)[0] # Type = np array, shape = (16, 16, 2)
 
-	# Split on traffic and wait values
-	traffic_list = linear_output[::2].tolist() # List of size 256
-	wait_list = neural_output[: , : , 1].reshape(NUM_FEATURES // 2).tolist() # List of size 256
+		# Split on traffic and wait values
+		traffic_list = linear_output[::2].tolist() # List of size 256
+		wait_list = neural_output[: , : , 1].reshape(NUM_FEATURES // 2).tolist() # List of size 256
 
-	# Need to combine traffic and wait output values into a final list of length 512
-	# Taken from http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion for clever combination trick
-	result = np.zeros(NUM_FEATURES)
-	result[::2] = traffic_list
-	result[1::2] = wait_list
+		# Need to combine traffic and wait output values into a final list of length 512
+		# Taken from http://stackoverflow.com/questions/3678869/pythonic-way-to-combine-two-lists-in-an-alternating-fashion for clever combination trick
+		result = np.zeros(NUM_FEATURES)
+		result[::2] = traffic_list
+		result[1::2] = wait_list
 
-	# Write prediction back to the cityiograph.City structure
-	utils.output_to_city(city, result)
+		# Write prediction back to the cityiograph.City structure
+		utils.output_to_city(city, result)
 
-	# Send the city object directly back to Grasshopper script via UDP server
-	server.send_city(city)
-	log.info("Predicted city sent back to client!")
+		# Send the city object directly back to Grasshopper script via UDP server
+		server.send_city(city)
+		log.info("Predicted city sent back to client!")
 
-	# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
-	sim.simulate(simCity)
+		# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
+		sim.simulate(simCity)
+
+		log.info("Waiting to receive city...")
+
+	else:
+		# This new city is no different from the previous one
+		# Do not send prediction back to server client

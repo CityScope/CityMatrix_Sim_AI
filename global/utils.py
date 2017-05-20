@@ -10,7 +10,7 @@
 '''
 
 # General imports
-import sys, json, os, logging, subprocess, threading, numpy as np
+import sys, json, os, logging, subprocess, threading, glob, numpy as np
 
 # Keras import for JSON functionality
 from keras.models import model_from_json
@@ -144,7 +144,6 @@ class CityLogger:
 		d = city.cityObject.to_dict()
 
 		# Add UNIX timestamp to JSON
-		# Taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
 		d['objects']['timestamp'] = city.timestamp
 
 		# Write dictionary to JSON
@@ -171,6 +170,29 @@ class CityLogger:
 
 	def flush(self):
 		pass
+
+def diff_cities(current_city):
+	'''
+	Input: city - instance of cityiograph.City object - incoming city to server
+	Output: Return True if we should consider the incoming city and predict/simulate; false otherwise
+	'''
+
+	# First, get the most recent city from our saved set
+	# Taken from http://stackoverflow.com/questions/39327032/how-to-get-the-latest-file-in-a-folder-using-python
+	files = glob.glob(INPUT_CITIES_DIRECTORY + '*')
+
+	# If this is the first city, return True
+	if len(files) == 0:
+		return True
+
+	# Run comparison on this city and most recent one
+	with open(max(files, key = os.path.getctime), 'r') as f:
+		# Load prev_city from JSON
+		j = f.read()
+		prev_city = cityiograph.City(j)
+		
+		# Now, compare directly for densities, size and cells
+		return not prev_city.equals(current_city)
 
 # Set up our exception handler on this new thread
 # Taken from https://bugs.python.org/issue1230540
