@@ -2,9 +2,11 @@
     File name: config.py
     Author(s): Kevin Lyons
     Date created: 5/17/2017
-    Date last modified: 5/17/2017
+    Date last modified: 5/19/2017
     Python Version: 3.5
     Purpose: Configuration file for our project. All filenames are relative to the file in which they are used. May need to change for specific users/machines/operating systems.
+    TODO:
+    	- None at this time.
 '''
 
 # ML variables
@@ -22,16 +24,22 @@ SEND_IP = "127.0.0.1"
 SEND_PORT = 9001
 
 # Log variables
-LOGGER_NAME = 'CityLog'
-INPUT_CITIES_DIRECTORY = './input_cities/'
-OUTPUT_DIRECTORY = './sim_output/'
-LOGGER_FILENAME = './log.log'
+LOGGER_NAME = 'CityLog' # Name of our logger for ID purposes
+INPUT_CITIES_DIRECTORY = './input_cities/' # Directory to save incoming cities, before simulation
+OUTPUT_CITIES_DIRECTORY = './output_cities/' # Directory to save outgoing cities, after simulation
+LOGGER_FILENAME = './output.log' # Log file
 
 # Simulator variables
-SIM_NAME = 'PythonSim'
-GAMA_PATH = '/Applications/Gama.app/Contents/headless/gama-headless.sh'
-XML_PATH = '../CityGamatrix/experiment.xml'
-GAMA_COMMANDS = ['sh', GAMA_PATH, '-c', '-v', XML_PATH]
+SIM_NAME = 'PythonSim' # Name of our simulator for ID purposes
+SIM_SCRIPT_PATH = '../../CityGamatrix/models/CityGamatrix_PEV.gaml' # GAMA simulation script
+GAMA_OUTPUT_DIRECTORY = './sim_output/' # Output directory for misc GAMA needs
+XML_DIRECTORY = './xml/' # Directory to save custom XML configuration files
+DEFAULT_XML = {'Experiment_plan': {'Simulation': {'@finalStep': '8642', '@id': '1', '@experiment': 'Run', 'Parameters': {'Parameter': [{'@value': 'TMP_VALUE', '@name': 'filename', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'output_dir', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'prefix', '@type': 'STRING'}]}, '@sourcePath': SIM_SCRIPT_PATH }}} # Data dictionary that is to be converted into XML
+
+SERVER_OS = 'MAC' # Operating system of the prediction server
+if SERVER_OS == 'MAC':
+	JAR_PATH = '/Applications/Gama.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.3.100.v20150511-1540.jar' # Path to Eclipse JAR file needed for GAMA plugins
+	GAMA_COMMANDS = ['java', '-cp', JAR_PATH, '-Xms512m', '-Xmx2048m', '-Djava.awt.headless=true', 'org.eclipse.core.launcher.Main', '-application', 'msi.gama.headless.id4', 'XML_PATH', GAMA_OUTPUT_DIRECTORY] # Command list for subprocess.Popen
 
 # City variables
-ROAD_ID = 6
+ROAD_ID = 6 # ID of a road cell on our grid matrix

@@ -2,7 +2,7 @@
     File name: utils.py
     Author(s): Kevin Lyons, Alex Aubuchon
     Date created: 5/12/2017
-    Date last modified: 5/17/2017
+    Date last modified: 5/19/2017
     Python Version: 3.5
     Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
     TODO:
@@ -135,38 +135,21 @@ class CityLogger:
 		if first:
 			self.info("Successfully initialized log file at {}.".format(log_filename))
 
-	def write_city(self, city, filename, timestamp):
+	def write_city(self, city):
 		'''
-		Input: city - instance of cityiograph.City - city to be logged
-			   filename - raw prefix string of filename - need to format
-			   timestamp - UNIX timestamp when file was requested to be written to server
+		Input: city - instance of simCity - city to be logged
 		Output: None - write city as JSON to specified filename for later ML purposes
 		'''
 		# Convert to dictionary object for editing
-		d = city.to_dict()
+		d = city.cityObject.to_dict()
 
 		# Add UNIX timestamp to JSON
 		# Taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
-		d['objects']['timestamp'] = timestamp
+		d['objects']['timestamp'] = city.timestamp
 
 		# Write dictionary to JSON
-		with open(filename, 'w') as f:
+		with open(city.filename, 'w') as f:
 			f.write(json.dumps(d))
-
-		self.info("Successfully wrote city to file {}.".format(filename))
-
-	def get_full_name(self, directory, filename, mode = ".json"): # Default JSON extension mode
-		'''
-		Input: filename - raw prefix string of filename - need to format
-		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
-		'''
-
-		# Create output directory if needed
-		# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-
-		return os.path.abspath(directory + filename + mode)
 
 	# Simple log methods to avoid having to write log.logger.info - a bit counterintuitive
 	def info(self, message):
@@ -181,16 +164,46 @@ class CityLogger:
 	def error(self, message):
 		self.logger.error(message)
 
+	# Methods to write to log file AND console
+	# Taken from http://stackoverflow.com/questions/14906764/how-to-redirect-stdout-to-both-file-and-console-with-scripting
+	def write(self, message):
+		self.info(message)
+
+	def flush(self):
+		pass
+
+# Set up our exception handler on this new thread
+# Taken from https://bugs.python.org/issue1230540
+run_old = threading.Thread.run
+def run(*args, **kwargs):
+    try:
+        run_old(*args, **kwargs)
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        sys.excepthook(*sys.exc_info())
+threading.Thread.run = run
+
 # Custom method to run process on new thread and notify when returned
 # Taken from http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
-def async_process(commands, hook):
-	def run(commands, hook):
-		p = subprocess.Popen(commands) # Initialize process
+def async_process(commands, hook, log, city):
+	def run(commands, hook, log, city):
+		p = subprocess.Popen(commands, stdout = subprocess.PIPE, stderr = subprocess.STDOUT) # Initialize process
+		
+		# Taken from http://stackoverflow.com/questions/15535240/python-popen-write-to-stdout-and-log-file-simultaneously
+		# Also, rstrip from http://stackoverflow.com/questions/275018/how-can-i-remove-chomp-a-newline-in-python
+		for line in p.stdout:
+		    log.info(line.decode('utf-8').rstrip())
+		
 		p.wait() # Wait for command to complete
-		hook(p) # Call our hook with process object
+		hook(city) # Call our hook with city object
 		return
 
 	# Set up threading functionality
-	thread = threading.Thread(target = run, args = (commands, hook))
+	thread = threading.Thread(target = run, args = (commands, hook, log, city))
 	thread.start()
 	return thread
+
+# Ignore random Keras error
+# Taken from https://github.com/tensorflow/tensorflow/issues/3388
+import gc; gc.collect();

@@ -110,7 +110,10 @@ class Cell(object):
         if self.type_id == ROAD_ID:
             self.density = 0
         else:
-            self.density = density_arr[self.type_id]
+            try:
+                self.density = density_arr[self.type_id]
+            except:
+                self.density = 0 # Accounting for odd ID case error - Kevin, 5/19/2017
 
         self.population = density_to_pop(self.type_id, self.density)
 

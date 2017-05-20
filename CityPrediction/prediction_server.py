@@ -2,15 +2,18 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/18/2017
+    Date last modified: 5/19/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-    	- None at this time.
+    	- Add diff functionality for cities!!!
 '''
 
 # Generic import statements
-import sys, time, pickle, time, atexit, traceback, numpy as np
+import sys, os, time, pickle, time, atexit, traceback, numpy as np
+
+# Prevent TensorFlow log statements
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Import local scripts for city/model functionality, as well as configuration variables
 sys.path.append('../global/')
@@ -22,6 +25,7 @@ server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port =
 
 # Create instance of our custom logger class and connect to output stream
 log = utils.CityLogger(LOGGER_NAME, LOGGER_FILENAME)
+sys.stdout = log
 
 # Need to log when server stopped
 # Taken from https://docs.python.org/2/library/atexit.html
@@ -37,6 +41,14 @@ def handler(type, value, tb):
 
 sys.excepthook = handler
 
+# First, ensure that all directories exist
+DIRECTORY_LIST = [INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_DIRECTORY, XML_DIRECTORY]
+
+for d in DIRECTORY_LIST:
+	if not os.path.exists(d):
+		log.warn("Creating directory {}.".format(d))
+		os.makedirs(d)
+
 # Create instance of our simulator
 sim = simulator.CitySimulator(SIM_NAME, log)
 
@@ -48,20 +60,20 @@ log.info("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, REC
 
 # Constantly loop and wait for new city packets to reach the UDP server
 # Taken directly from Alex's code for regression_server.py
-while LISTENING:	
+while LISTENING:
 
 	# Breifly sleep
 	time.sleep(0.1)
 	
+	# Get city from server
 	log.info("Waiting to receive city...")
 	city = server.receive_city()
-	log.info("City received!")
 
 	# Write city to local file
 	timestamp = str(int(time.time()))
-	prefix = "city_" + timestamp
-	filename = log.get_full_name(INPUT_CITIES_DIRECTORY, prefix)
-	log.write_city(city, filename, timestamp)
+	simCity = simulator.SimCity(city, timestamp)
+	log.write_city(simCity)
+	log.info("New city received @ timestamp {}.".format(timestamp))
 
 	# Extract feature matrix from this city
 	features = utils.get_features(city)
@@ -95,4 +107,4 @@ while LISTENING:
 	log.info("Predicted city sent back to client!")
 
 	# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
-	sim.simulate(city, filename, prefix)
+	sim.simulate(simCity)

@@ -1,6 +1,6 @@
 /*
 * Name: CityGamatrix_PEV
-* Authosr: Arnaud Grignard, Kevin Lyons
+* Author: Arnaud Grignard, Kevin Lyons
 * Description: Load CityMatrix view and run PEV agent simulation over time. Also has batch run functionality.
 * Tags: pev, cityMatrix, gama
 */
@@ -58,20 +58,16 @@ global {
 	bool day_done <- false;
 	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
 	bool isBatch <- false;
-	string raw_filename;
+	string prefix <- 'city_great'; // Default option - configurable
    
 	init {
 		
 		if (isBatch) {
-			raw_filename <- replace(filename, '.json', '');
+			prefix <- replace(filename, '.json', '');
 			filename <- input_dir + filename;
-		} else {
-			filename <- 'city_great.json';
-			raw_filename <- replace(filename, '.json', '');
-			filename <- input_dir + filename;
+			write filename color: # black;
+			write # now color: # black;
 		}
-		
-		write "Current file: " + filename color: # black;
 		
 		time_string <- "12:00 AM";
 		starting_date <- date([2017,1,1,0,0,0]);
@@ -145,7 +141,7 @@ global {
 	
 	// Accumulate traffic/waiting time on each road cell.
 	reflex data_count {
-		ask pev {
+		ask pev where (each['status'] != 'wander') { // Only count traffic for PEV's in route
 			agent c <- agent_closest_to(self);
 			if (string(c) index_of "cityMatrix" = 0) {
 				cityMatrix cell <- cityMatrix(c);
@@ -242,13 +238,11 @@ global {
 		map<string, unknown> result;
 		result["grid"] <- cells;
 		result["objects"] <- objects;
-		//json_file copy <- json_file(output_dir + raw_filename + '_' + string(# now) + '_output.json', result);
-		json_file copy <- json_file(output_dir + raw_filename + '_output.json', result);
+		json_file copy <- json_file(output_dir + prefix + '_output.json', result);
 		save copy;
 		
 		day_done <- true;
 		write "Day complete." color: # black;
-		write # now color: # black;
 		
 		if (! isBatch) {
 			do pause;
@@ -258,6 +252,7 @@ global {
 	// Manage our trip queue.
 	reflex trip_manage when: every(trip_interval # cycles)
 	{
+		// write time color: # black;
 		// Stop after 1 day.
 		if (time > # day and ! looping) {
 			do completeDay;
@@ -389,5 +384,12 @@ experiment Display  type: gui {
 
 // Experiment for personal day long testing.
 experiment Run type: gui {
+	parameter "filename" var: filename category: "General";
+	parameter "output_dir" var: output_dir category: "General";
+	parameter "prefix" var: prefix category: "General";
 	parameter "Heat Map:" var: visualize <- false category: "Grid";
+	output {
+		// Test monitor for reference.
+		monitor 'Time' value:time_string refresh:every(1 # minute);
+	}
 }

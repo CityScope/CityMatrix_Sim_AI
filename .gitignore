@@ -8,3 +8,6 @@ bounds/
 normalized_outputs*/
 *.log
 input_cities/
+output_cities/
+sim_output/
+xml/

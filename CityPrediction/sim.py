@@ -2,16 +2,15 @@
     File name: sim.py
     Author(s): Kevin Lyons
     Date created: 5/16/2017
-    Date last modified: 5/18/2017
+    Date last modified: 5/19/2017
     Python Version: 3.5
     Purpose: Python script that should call GAMA simulator in "headless mode" to run a particular JSON file. Should return the results of that simulation to be saved later on.
     TODO:
-    	- Need to get OUTPUT of GAMA simulation as well... then, update network later. Filename matching is key!
-    	- Passing data dictionary through calls.
+    	- None at this time.
 '''
 
 # Global imports
-import sys, xmltodict, json, time
+import sys, xmltodict, json, time, os, copy
 from subprocess import Popen
 
 # Custom imports
@@ -25,50 +24,73 @@ class CitySimulator:
 		self.name = name # Name to help us ID the sim
 		self.log = log # Existing instance of utils.CityLogger so we can write to JSON
 
-	def simulate(self, city, filename, prefix):
+	def simulate(self, city):
 		'''
-		Input: city - instance of cityiograph.City - city to be simulated in GAMA
-			   filename - full string of input JSON
-			   prefix - raw name of file with timestamp, to be used for output later on
+		Input: city - instance of SimCity
 		Output: None - write simulation output to specific file through GAMA
 		'''
 
 		# First, write filename to our experiment file
-		self.update_filename(filename)
+		commands = GAMA_COMMANDS[:]
+		commands[-2] = city.xml
+		self.update_parameters(city)
 
 		# Using subprocess to run command and check progress
 		# Taken from http://stackoverflow.com/questions/636561/how-can-i-run-an-external-command-asynchronously-from-python
 		# Begin process on new thread
-		utils.async_process(GAMA_COMMANDS, self.complete)
-		self.log.info("Simulation initialized for file {}.".format(filename))
+		utils.async_process(commands, self.complete, self.log, city)
+		self.log.info("Simulation initialized for file {}.".format(city.filename))
 
-	def complete(self, process):
+	def complete(self, city):
 		'''
-		Input: process - instance of subprocess.Popen that was run async
+		Input: city - instance of SimCity that has just been simulated
 		Output: TBD
 		'''
 
 		# Need to take result from process and act accordingly
-		pass
+		self.log.info("Simulation complete for file {}.".format(city.filename))
 
-	def update_filename(self, filename):
+	def update_parameters(self, city):
 		'''
-		Input: filename - full string of input JSON file
-		Output: None - update XML file to have this filename
+		Input: city - instance of SimCity that has just been simulated
+		Output: None - update XML file to have this city's data
 		'''
 
-		# Load XML file from memory
-		with open(XML_PATH, 'r') as f:
-			# Get dictionary from XML file
-			# Taken from multiple sources
-			# http://stackoverflow.com/questions/20166749/how-to-convert-an-ordereddict-into-a-regular-dict-in-python3
-			# https://github.com/martinblech/xmltodict
-			d = json.loads(json.dumps(xmltodict.parse(f.read())))
-
-			# d is of the form: {'Experiment_plan': {'Simulation': {'@experiment': 'Run', '@finalStep': '8642', '@sourcePath': './models/CityGamatrix.gaml', 'Parameters': {'Parameter': {'@value': 'TEMP_VALUE', '@name': 'filename', '@type': 'STRING'}}, '@id': '1'}}}
-			# Now, update value in d to correct filename
-			d['Experiment_plan']['Simulation']['Parameters']['Parameter']['@value'] = filename
+		# Now, update values in default dictionary to correct data
+		d = copy.deepcopy(DEFAULT_XML)
+		d['Experiment_plan']['Simulation']['Parameters']['Parameter'][0]['@value'] = city.filename # filename
+		d['Experiment_plan']['Simulation']['Parameters']['Parameter'][1]['@value'] = os.path.abspath(OUTPUT_CITIES_DIRECTORY) + '/' # output_dir
+		d['Experiment_plan']['Simulation']['Parameters']['Parameter'][2]['@value'] = city.prefix # prefix
 
 		# Convert dict back to XML and write to file
-		with open(XML_PATH, 'w') as f:
+		with open(city.xml, 'w') as f:
 			f.write(xmltodict.unparse(d, pretty = True))
+
+# Class that represents a city object being passed along to GAMA
+class SimCity:
+	def __init__(self, cityObject, timestamp):
+		self.cityObject = cityObject # Instance of cityiograph.City object
+		self.timestamp = timestamp # UNIX timestamp
+		self.prefix = "city_" + timestamp # Prefix
+		self.filename = self.get_full_filename(INPUT_CITIES_DIRECTORY) # Full filename
+		self.xml = self.get_xml_path() # Path to corresponding XML path
+
+	def get_xml_path(self):
+		'''
+		Output: full XML path for this city
+		'''
+
+		return os.path.abspath(XML_DIRECTORY + 'experiment_' + self.timestamp + '.xml')
+
+	def get_full_filename(self, directory, mode = ".json"): # Default JSON extension mode
+		'''
+		Input: filename - raw prefix string of filename - need to format
+		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
+		'''
+
+		# Create output directory if needed
+		# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+
+		return os.path.abspath(directory + self.prefix + mode)

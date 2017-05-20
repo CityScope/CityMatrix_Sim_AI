@@ -34,6 +34,5 @@ print("Sent city!!!")
 print("Waiting to receive city...")
 incoming_city = server.receive_city()
 print("City response received!")
-print(incoming_city.to_dict())
 
 print("Process complete.")
