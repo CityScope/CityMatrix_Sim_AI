@@ -73,28 +73,5 @@ class SimCity:
 		self.cityObject = cityObject # Instance of cityiograph.City object
 		self.timestamp = timestamp # UNIX timestamp
 		self.prefix = "city_" + timestamp # Prefix
-		self.filename = self.get_full_filename(INPUT_CITIES_DIRECTORY) # Full filename
-		self.xml = self.get_xml_path() # Path to corresponding XML path
-
-	def get_xml_path(self):
-		'''
-		Input: None
-		Output: full XML path for this city
-		'''
-
-		# Experiment filename convention
-		return os.path.abspath(XML_DIRECTORY + 'experiment_' + self.timestamp + '.xml')
-
-	def get_full_filename(self, directory, mode = ".json"): # Default JSON extension mode
-		'''
-		Input: directory - dir where we want to save this file to
-			   mode - extension for this file
-		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
-		'''
-
-		# Create output directory if needed
-		# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
-		if not os.path.exists(directory):
-			os.makedirs(directory)
-
-		return os.path.abspath(directory + self.prefix + mode)
+		self.filename = os.path.abspath(INPUT_CITIES_DIRECTORY + self.prefix + ".json") # Full filename
+		self.xml = os.path.abspath(XML_DIRECTORY + 'experiment_' + self.timestamp + '.xml') # Path to corresponding XML path

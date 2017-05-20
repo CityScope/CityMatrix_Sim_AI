@@ -42,6 +42,7 @@ def handler(type, value, tb):
 sys.excepthook = handler
 
 # First, ensure that all directories exist
+# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
 DIRECTORY_LIST = [INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_DIRECTORY, XML_DIRECTORY]
 
 for d in DIRECTORY_LIST:
@@ -62,7 +63,6 @@ log.info("Waiting to receive city...")
 # Constantly loop and wait for new city packets to reach our UDP server
 # Taken directly from Alex's code for regression_server.py
 while LISTENING:
-	
 	# Get city from server
 	city = server.receive_city()
 
