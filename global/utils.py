@@ -1,12 +1,12 @@
 '''
-    File name: utils.py
-    Author(s): Kevin Lyons, Alex Aubuchon
-    Date created: 5/12/2017
-    Date last modified: 5/19/2017
-    Python Version: 3.5
-    Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
-    TODO:
-    	- None at this time.
+File name: utils.py
+Author(s): Kevin Lyons, Alex Aubuchon
+Date created: 5/12/2017
+Date last modified: 5/20/2017
+Python Version: 3.5
+Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
+TODO:
+- None at this time.
 '''
 
 # General imports
@@ -19,8 +19,13 @@ from keras.models import model_from_json
 import cityiograph
 from config import *
 
-# Serializes a Keras model to a JSON and h5 data file
 def serialize_model(model, root_filename):
+	'''
+	Serializes a Keras model to a JSON and h5 data file
+	Input: 	model - instance of Keras model to be serialized
+	root_filename - string representing root of JSON and h5 data file for model
+	Output:	None - simply write the model to the files
+	'''
 
 	# Convert to JSON
 	model_in_json = model.to_json()
@@ -29,80 +34,99 @@ def serialize_model(model, root_filename):
 	with open(root_filename + ".json", "w") as json_file:
 		json_file.write(model_in_json)
 
-    # Save weights
+	# Save weights
 	model.save_weights(root_filename + ".h5")
 
-# Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
 def deserialize_model(root_filename):
+	'''
+	Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
+	Input: 	root_filename - string representing root of JSON and h5 data file for model
+	Output:	model - instance of Keras model taken from data
+	'''
 
 	# Read JSON string
-	json_file = open(root_filename + '.json', 'r')
-	model_in_json = json_file.read()
-	json_file.close()
+	with open(root_filename + '.json', 'r') as f:
+		model_in_json = f.read()
 
 	# Load model with architecture and weights
 	model = model_from_json(model_in_json)
 	model.load_weights(root_filename + '.h5')
 
-	# Compile the model with loss, optimizer and metrics
-	model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-
-	# Return the final model
+	# Compile the model with loss, optimizer and metrics and return
+	model.compile(loss = LOSS_FUNCTION, optimizer = OPTIMIZER, metrics = KERAS_METRICS)
 	return model
 
-# Compute percent accuracy between 2 input matrices (true and predicted values)
 def compute_accuracy(true, pred):
 	'''
-	Input: a, b - np array n x ( )
+	Compute percent accuracy between 2 input matrices (true and predicted values)
+	Input: 	a, b - np array n x ( )
 	Output: accuracy - scalar that represents (1 - percent error) between a and b, in range [0, 1]
 	'''
 
 	# Simple solution taken from http://stackoverflow.com/questions/20402109/calculating-percentage-error-by-comparing-two-arrays
 	return 1 - np.mean(true != pred)
 
-# Get the 2 input features for a given cell
-# Currently using population and is road
 def cell_features(cell):
-    feats = []
-    feats.append(cell.population)
-    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
-    return feats
+	'''
+	Get the 2 input features for a given cell
+	Currently using population and is road
+	Input: 	cell - instance of cityiograph.Cell
+	Output:	feats - list of input features for this cell
+	'''
+	feats = [ cell.population ]
+	feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+	return feats
 
-# Get the 2 input features for a given cell
-# Currently using traffic and wait time
 def cell_results(cell):
-    results = []
-    results.append(cell.data["traffic"])
-    results.append(cell.data["wait"])
-    return results
+	'''
+	Get the 2 output features for a given cell
+	Currently using traffic score and wait time
+	Input: 	cell - instance of cityiograph.Cell
+	Output:	feats - list of output features for this cell
+	'''
+	return [ cell.data["traffic"], cell.data["wait"] ]
 
-# Get the input feature vector for a given city
 def get_features(city):
-    features = []
-    for i in range(city.width):
-        for j in range(city.height):
-            cell = city.cells.get((i, j))
-            features += cell_features(cell)
-    return np.array(features)
+	'''
+	Get the input feature vector for a given city
+	Input: 	city - instance of cityiograph.City
+	Output:	feats - np array of input features for this city
+	'''
+	features = []
+	for i in range(city.width):
+		for j in range(city.height):
+			cell = city.cells.get((i, j))
+			features += cell_features(cell)
+	return np.array(features)
 
-# Get the output feature vector for a given city
 def get_results(city):
-    results = []
-    for i in range(city.width):
-        for j in range(city.height):
-            cell = city.cells.get((i, j))
-            results += cell_results(cell)
-    return np.array(results)
+	'''
+	Get the output feature vector for a given city
+	Input: 	city - instance of cityiograph.City
+	Output:	feats - np array of output features for this city
+	'''
+	results = []
+	for i in range(city.width):
+		for j in range(city.height):
+			cell = city.cells.get((i, j))
+			results += cell_results(cell)
+	return np.array(results)
 
-# Custom method to write new data to city object for later serialization
 def output_to_city(city, output):
-    i = 0
-    for x in range(city.width):
-        for y in range(city.height):
-            cell = city.cells.get((x, y))
-            cell.data["traffic"] = int(round(output[i]))
-            cell.data["wait"] = int(round(output[i + 1]))
-            i += 2	
+	'''
+	Custom method to write new data to city object for later serialization
+	Input:	city - instance of cityiograph.City
+	output - list of traffic and wait scores, alternating
+	Output:	city - simply write this data to the existing city object and return
+	'''
+	i = 0
+	for x in range(city.width):
+		for y in range(city.height):
+			cell = city.cells.get((x, y))
+			cell.data["traffic"] = int(round(output[i]))
+			cell.data["wait"] = int(round(output[i + 1]))
+			i += 2	
+	return city
 
 # Create custom logging class for file I/O
 class CityLogger:
@@ -116,7 +140,7 @@ class CityLogger:
 		else:
 			first = False
 
-		# Set up logger to file and console
+		# Set up logger to file AND console
 		# Taken from multiple sources
 		# http://stackoverflow.com/questions/13733552/logger-configuration-to-log-to-file-and-print-to-stdout
 		# https://docs.python.org/2/howto/logging.html
@@ -137,7 +161,8 @@ class CityLogger:
 
 	def write_city(self, city):
 		'''
-		Input: city - instance of simCity - city to be logged
+		Write a city to a JSON file
+		Input: 	city - instance of simCity - city to be logged
 		Output: None - write city as JSON to specified filename for later ML purposes
 		'''
 		# Convert to dictionary object for editing
@@ -169,11 +194,12 @@ class CityLogger:
 		self.info(message)
 
 	def flush(self):
-		pass
+		pass # Nothing to do here
 
 def diff_cities(current_city):
 	'''
-	Input: city - instance of cityiograph.City object - incoming city to server
+	Determine if a new city is different from the existing one in memory
+	Input: 	city - instance of cityiograph.City object - incoming city to server
 	Output: Return True if we should consider the incoming city and predict/simulate; false otherwise
 	'''
 
@@ -198,30 +224,36 @@ def diff_cities(current_city):
 # Taken from https://bugs.python.org/issue1230540
 run_old = threading.Thread.run
 def run(*args, **kwargs):
-    try:
-        run_old(*args, **kwargs)
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
-        sys.excepthook(*sys.exc_info())
-threading.Thread.run = run
+	try:
+		run_old(*args, **kwargs)
+	except (KeyboardInterrupt, SystemExit):
+		raise
+	except:
+		sys.excepthook(*sys.exc_info())
+		threading.Thread.run = run
 
-# Custom method to run process on new thread and notify when returned
-# Taken from http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
 def async_process(commands, hook, log, city):
+	'''
+	Custom method to run process on new thread and notify with hook when returned
+	Taken from http://stackoverflow.com/questions/2581817/python-subprocess-callback-when-cmd-exits
+	Input: 	commands - list of strings of commands to be send to subprocess module
+	hook - function to be called once simulation is complete
+	log - instance of CityLogger that we can write to on new thread
+	city - instance of sim.SimCity that we are simulating
+	Output:	None - simply run the process and notify when complete
+	'''
 	def run(commands, hook, log, city):
-		p = subprocess.Popen(commands, stdout = subprocess.PIPE, stderr = subprocess.STDOUT) # Initialize process
+		# Run process with commands and streams
+		p = subprocess.Popen(commands, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
 		
 		# Taken from http://stackoverflow.com/questions/15535240/python-popen-write-to-stdout-and-log-file-simultaneously
 		# Also, rstrip from http://stackoverflow.com/questions/275018/how-can-i-remove-chomp-a-newline-in-python
-		for line in p.stdout:
-		    log.info(line.decode('utf-8').rstrip())
+		for line in p.stdout: log.info(line.decode('utf-8').rstrip())
 		
-		p.wait() # Wait for command to complete
-		hook(city) # Call our hook with city object
+		status = p.wait() # Wait for command to complete
+		hook(city, status) # Call our hook with city object
 		return
 
 	# Set up threading functionality
 	thread = threading.Thread(target = run, args = (commands, hook, log, city))
 	thread.start()
-	return thread

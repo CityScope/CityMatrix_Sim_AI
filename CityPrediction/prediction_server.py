@@ -2,17 +2,18 @@
     File name: predictin_server.py
     Author: Alex Aubuchon, Kevin Lyons
     Date created: 5/12/2017
-    Date last modified: 5/19/2017
+    Date last modified: 5/20/2017
     Python Version: 3.5
     Purpose: Developing a simple UDP server that can send and receive City objects and run machine learning prediction algorithms. We will combine linear regression on traffic features with a CNN prediction on wait time features. Implements the base city_udp class and applies custom logic in loop format to make predictions.
     TO DO:
-    	- Handle False output from diff function. What do we send back to the server?
+    	- Handle False output from diff function. What do we send back to the server? Need to send sim output.
 '''
 
 # Generic import statements
 import sys, os, time, pickle, time, atexit, traceback, numpy as np
 
 # Prevent TensorFlow log statements
+# Taken from https://github.com/tensorflow/tensorflow/issues/8340
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Import local scripts for city/model functionality, as well as configuration variables
@@ -47,7 +48,7 @@ DIRECTORY_LIST = [INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_D
 
 for d in DIRECTORY_LIST:
 	if not os.path.exists(d):
-		log.warn("Creating directory {}.".format(d))
+		log.warn("Creating new directory {}.".format(d))
 		os.makedirs(d)
 
 # Create instance of our simulator
@@ -58,7 +59,7 @@ linear_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 neural_model = utils.deserialize_model(ROOT_NN_FILENAME)
 
 log.info("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
-log.info("Waiting to receive city...")
+log.info("Waiting to receive new city...")
 
 # Constantly loop and wait for new city packets to reach our UDP server
 # Taken directly from Alex's code for regression_server.py
@@ -67,9 +68,9 @@ while LISTENING:
 	city = server.receive_city()
 
 	# Only consider new city if it is different from most recent
-	if utils.diff_cities(city):
+	if FORCE_PREDICTION or utils.diff_cities(city):
 		# Write city to local file
-		# Taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
+		# UNIX logic taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
 		timestamp = str(int(time.time()))
 		log.info("New city received @ timestamp {}.".format(timestamp))
 		simCity = simulator.SimCity(city, timestamp)
@@ -100,16 +101,16 @@ while LISTENING:
 		result[1::2] = wait_list
 
 		# Write prediction back to the cityiograph.City structure
-		utils.output_to_city(city, result)
+		new_city = utils.output_to_city(city, result)
 
 		# Send the city object directly back to Grasshopper script via UDP server
-		server.send_city(city)
+		server.send_city(new_city)
 		log.info("Predicted city sent back to client!")
 
 		# Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
 		sim.simulate(simCity)
 
-		log.info("Waiting to receive city...")
+		log.info("Waiting to receive new city...")
 
 	else:
 		# This new city is no different from the previous one

@@ -8,11 +8,7 @@ import json
 import numpy as np
 import collections
 
-POP_ARR = [5, 8, 16, 16, 23, 59]
-
-EDGE_COST = 1
-ROAD_ID = 6
-
+from config import * # Kevin, 5/20/2017
 
 class City(object):
     def __init__(self, json_string):

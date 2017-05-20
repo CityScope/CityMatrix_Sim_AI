@@ -2,7 +2,7 @@
     File name: sim.py
     Author(s): Kevin Lyons
     Date created: 5/16/2017
-    Date last modified: 5/19/2017
+    Date last modified: 5/20/2017
     Python Version: 3.5
     Purpose: Python script that should call GAMA simulator in "headless mode" to run a particular JSON file. Should return the results of that simulation to be saved later on.
     TODO:
@@ -18,15 +18,18 @@ sys.path.append('../global/')
 import utils
 from config import *
 
-# Class method for our simulator
 class CitySimulator:
+	'''
+	Class method for our simulator
+	'''
 	def __init__(self, name, log):
 		self.name = name # Name to help us ID the sim
 		self.log = log # Existing instance of utils.CityLogger so we can write to JSON
 
 	def simulate(self, city):
 		'''
-		Input: city - instance of SimCity
+		Simulate a SimCity with GAMA and handle result
+		Input: 	city - instance of SimCity
 		Output: None - write simulation output to specific file through GAMA
 		'''
 
@@ -41,18 +44,26 @@ class CitySimulator:
 		utils.async_process(commands, self.complete, self.log, city)
 		self.log.info("Simulation initialized for file {}.".format(city.filename))
 
-	def complete(self, city):
+	def complete(self, city, status):
 		'''
-		Input: city - instance of SimCity that has just been simulated
+		Hook method to be called when a city is completed simulating.
+		Input: 	city - instance of SimCity that has just been simulated
+				status - int representing status of simulation. 0 = complete, else not
 		Output: None - simply log that we are done
 		'''
 
-		# Need to take result from process and act accordingly
-		self.log.info("Simulation complete for file {}.".format(city.filename))
+		if status == 0:
+			# Successful sim
+			# Need to take result from process and act accordingly
+			self.log.info("Simulation complete for file {}.".format(city.filename))
+		else:
+			self.log.warn("Simulation killed prematurely for file {}.".format(city.filename))
+			self.log.warn("Exit status = {}.".format(status))
 
 	def update_parameters(self, city):
 		'''
-		Input: city - instance of SimCity that has just been simulated
+		Helper method to write city data to XML.
+		Input: 	city - instance of SimCity that has just been simulated
 		Output: None - update XML file to have this city's data
 		'''
 
@@ -66,9 +77,11 @@ class CitySimulator:
 		with open(city.xml, 'w') as f:
 			f.write(xmltodict.unparse(d, pretty = True))
 
-# Class that represents a city object being passed along to GAMA
-# Different from cityiograph.City object
 class SimCity:
+	'''
+	Class that represents a city object being passed along to GAMA
+	Different from cityiograph.City object
+	'''
 	def __init__(self, cityObject, timestamp):
 		self.cityObject = cityObject # Instance of cityiograph.City object
 		self.timestamp = timestamp # UNIX timestamp
