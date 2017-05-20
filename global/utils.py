@@ -225,7 +225,3 @@ def async_process(commands, hook, log, city):
 	thread = threading.Thread(target = run, args = (commands, hook, log, city))
 	thread.start()
 	return thread
-
-# Ignore random Keras error
-# Taken from https://github.com/tensorflow/tensorflow/issues/3388
-import gc; gc.collect();

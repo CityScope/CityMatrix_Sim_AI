@@ -59,12 +59,9 @@ neural_model = utils.deserialize_model(ROOT_NN_FILENAME)
 log.info("{} listening on ip: {}, port: {}.".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
 log.info("Waiting to receive city...")
 
-# Constantly loop and wait for new city packets to reach the UDP server
+# Constantly loop and wait for new city packets to reach our UDP server
 # Taken directly from Alex's code for regression_server.py
 while LISTENING:
-
-	# Breifly sleep
-	time.sleep(0.1)
 	
 	# Get city from server
 	city = server.receive_city()
@@ -117,3 +114,4 @@ while LISTENING:
 	else:
 		# This new city is no different from the previous one
 		# Do not send prediction back to server client
+		continue

@@ -44,7 +44,7 @@ class CitySimulator:
 	def complete(self, city):
 		'''
 		Input: city - instance of SimCity that has just been simulated
-		Output: TBD
+		Output: None - simply log that we are done
 		'''
 
 		# Need to take result from process and act accordingly
@@ -67,6 +67,7 @@ class CitySimulator:
 			f.write(xmltodict.unparse(d, pretty = True))
 
 # Class that represents a city object being passed along to GAMA
+# Different from cityiograph.City object
 class SimCity:
 	def __init__(self, cityObject, timestamp):
 		self.cityObject = cityObject # Instance of cityiograph.City object
@@ -77,14 +78,17 @@ class SimCity:
 
 	def get_xml_path(self):
 		'''
+		Input: None
 		Output: full XML path for this city
 		'''
 
+		# Experiment filename convention
 		return os.path.abspath(XML_DIRECTORY + 'experiment_' + self.timestamp + '.xml')
 
 	def get_full_filename(self, directory, mode = ".json"): # Default JSON extension mode
 		'''
-		Input: filename - raw prefix string of filename - need to format
+		Input: directory - dir where we want to save this file to
+			   mode - extension for this file
 		Output: formatted_filename - properly updated to reflect filename format for later ML prediction, full path
 		'''
 
