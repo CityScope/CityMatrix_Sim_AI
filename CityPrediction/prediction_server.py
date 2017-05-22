@@ -44,7 +44,7 @@ sys.excepthook = handler
 
 # First, ensure that all directories exist
 # Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
-DIRECTORY_LIST = [INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_DIRECTORY, XML_DIRECTORY]
+DIRECTORY_LIST = [ INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_DIRECTORY, XML_DIRECTORY ]
 
 for d in DIRECTORY_LIST:
 	if not os.path.exists(d):
