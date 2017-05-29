@@ -7,13 +7,11 @@ Created on Tue Feb 28 23:03:34 2017
 import os
 import shutil
 import pickle
-
 import sys
-sys.path.insert(0, '../TrafficTreeSim/')
-import cityiograph
-import traffictreesim
-sys.path.insert(0, '../')
-import city_compare
+from tqdm import tqdm
+
+sys.path.insert(0, '../global/')
+import cityiograph, city_compare # Changes made by Kevin, 5/28/2017
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -24,7 +22,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.neighbors import KNeighborsRegressor
 
 ROAD_ID = 6
-
 
 def cell_features(cell):
     feats = []
@@ -106,10 +103,9 @@ if __name__ == "__main__":
     test_features = []
     test_results = []
 
-
-    train_dir = "./data/train/"
-    test_dir = "./data/test/"
-    prediction_dir = "./data/prediction/"
+    train_dir = "../../../data/train/"
+    test_dir = "../../../data/test/"
+    # prediction_dir = "../../../data/prediction/"
 
     estimators = [
         ('linear', LinearRegression()),
@@ -120,38 +116,47 @@ if __name__ == "__main__":
         #('kNN_distance', KNeighborsRegressor(weights="distance"))
     ]
 
-    train_files = os.listdir(train_dir)
-    test_files = os.listdir(test_dir)
+    TRAIN_DATA_FILENAME = '../../../data/no_wandering_data_train.p'
+    TEST_DATA_FILENAME = '../../../data/no_wandering_data_test.p'
+    prediction_dir = './no_wandering_linear_predictions/'
 
-    log.append("Preparing training features/results")
-    print(log[-1])
+    # Create prediction dir if does not already exist
+    if not os.path.exists(prediction_dir):
+        os.makedirs(prediction_dir)
 
-    for train_file in train_files:
-        city = cityiograph.City(open(train_dir + train_file).read())
-        features = get_features(city)
-        results = get_results(city)
+    # train_files = os.listdir(train_dir)
+    # test_files = os.listdir(test_dir)
 
-        cities.append((train_dir + train_file, city))
-        train_features.append(features)
-        train_results.append(results)
+    # log.append("Preparing training features/results")
+    # print(log[-1])
+
+    # for train_file in train_files:
+    #     city = cityiograph.City(open(train_dir + train_file).read())
+    #     features = get_features(city)
+    #     results = get_results(city)
+
+    #     cities.append((train_dir + train_file, city))
+    #     train_features.append(features)
+    #     train_results.append(results)
 
 
-    log.append("Preparing testing features/results")
-    print(log[-1])
+    # log.append("Preparing testing features/results")
+    # print(log[-1])
 
-    for test_file in test_files:
-        city = cityiograph.City(open(test_dir + test_file).read())
-        features = get_features(city)
-        results = get_results(city)
+    # for test_file in test_files:
+    #     city = cityiograph.City(open(test_dir + test_file).read())
+    #     features = get_features(city)
+    #     results = get_results(city)
 
-        cities.append((test_dir + test_file, city))
-        test_features.append(features)
-        test_results.append(results)
+    #     cities.append((test_dir + test_file, city))
+    #     test_features.append(features)
+    #     test_results.append(results)
 
-    train_features = np.array(train_features)
-    train_results = np.array(train_results)
-    test_features = np.array(test_features)
-    test_results = np.array(test_results)
+    cities, filenames, train_features, train_results = pickle.load(open(TRAIN_DATA_FILENAME, 'rb'))
+    test_cities, test_filenames, test_features, test_results = pickle.load(open(TEST_DATA_FILENAME, 'rb'))
+
+    cities.extend(test_cities)
+    filenames.extend(test_filenames)
 
     log.append("Training features size:" + str(train_features.shape))
     print(log[-1])
@@ -182,12 +187,11 @@ if __name__ == "__main__":
         print(train_prediction.shape, test_prediction.shape)
         all_predictions = np.concatenate((train_prediction, test_prediction))
 
-        for filename, city in cities:
+        # Minor changes made by Kevin to write to files.
+        for i, city in tqdm(enumerate(cities)):
             output_to_city(city, all_predictions[i])
-            f = open(prediction_dir + name + "/" + ('/').join(filename.split('/')[2:]), 'w')
-            f.write(city.to_json())
-            f.close()
-            i += 1
+            with open(prediction_dir + name + "/" + filenames[i] + "_prediction.json", 'w') as f:
+                f.write(city.to_json())
 
     f = open(prediction_dir + "log.txt", 'w')
     f.write("\n".join(log))
@@ -195,5 +199,3 @@ if __name__ == "__main__":
 
     for name, estimator in estimators:
         pickle.dump(estimator, open(prediction_dir + name + ".pkl", 'wb'))
-
-

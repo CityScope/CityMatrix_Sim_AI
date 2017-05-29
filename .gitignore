@@ -4,6 +4,8 @@ data/
 *.pkl
 *.h5
 neural_predictions/
+no_wandering_neural_predictions/
+no_wandering_linear_predictions/
 bounds/
 normalized_outputs*/
 *.log
