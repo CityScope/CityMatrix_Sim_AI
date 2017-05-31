@@ -1,49 +1,27 @@
 class ObjectiveFunction(object):
     def __init__(self):
-        self.metrics - []
+        self.metrics = []
 
-    def add_metric(self, metric, weight):
-        this.metrics.append((metric, weight))
+    def predict(self, city):
+        outputs = [weight * fun(city) for name, fun, weight in self.metrics]
+        return sum(outputs)
 
-    def get_function(self):
-        return lambda (city): self.objective_function(self.metrics, city)  #TODO check if this copies self.metrics, or references it
+    def get_metrics(self, city):
+        return [(name, fun(city), weight) for name, fun, weight in self.metrics]
 
-    def objective_function(metrics, city):
-        scores = []
-        for m, w in metrics:
-            scores.append(m(city) * w)
-            total_weight += w
-        return scores.sum() / total_weight
+    def add_metric(self, name, metric, weight):
+        self.metrics.append((name, metric, weight))
 
-    def score(self, city):
-        return self.objective_function(self.metrics, city)
+from metrics import citymatrix_stats as Metrics
 
-
-class Metric(object):
-    def __init__(self, f):
-        pass
-
-    def set_function(self, f):
-        self.func = f
-
-    def set_normalizer(self, n):
-        self.norm = n
-
-
-def feature_scale_normalizer(xMin, xMax):
-    def normalizer(x):
-        return (x - xMin) / (xMax - xMin)
-
-    return normalizer
-
-
-def z_scorer(xMean, xStdev):
-    def z_score(x):
-        return (x - xMean) / xStdev
-
-    return z_score
-
-
-if __name__ == "__main__":
-    import os
-    os.
+objective = ObjectiveFunction()
+objective.add_metric("Population Density Performance",
+                     Metrics.pop_density_perf, 1)
+objective.add_metric("Population Diversity Performance",
+                     Metrics.pop_diversity_perf, 1)
+objective.add_metric("Energy & Cost Performance",
+                     Metrics.energy_perf, 1)
+objective.add_metric("Traffic Performance",
+                     Metrics.traffic_perf, 1)
+objective.add_metric("Solar Access Performace",
+                     Metrics.solar_perf, 1)

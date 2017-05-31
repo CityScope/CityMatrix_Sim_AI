@@ -24,6 +24,9 @@ class City(object):
         for c in self.cells.values():
             self.population += c.population
 
+    def copy(self):
+        return City(self.to_json())
+
     def equals(self, other):
         """True iff all of this city's cells are equal to their corresponding
         cells in other and densities, width, and height are the same.
@@ -93,6 +96,28 @@ class City(object):
         return road_graph
 
 
+    def change_density(self, idx, new_density):
+        for cell in self.cells.values():
+            if cell.type_id == idx:
+                cell.density = new_density
+
+        self.densities[idx] = new_density
+
+    def change_cell(self, x, y, new_id):
+        cell = self.cells[(x, y)]
+        cell.type_id = new_id
+
+        if cell.type_id == ROAD_ID:
+            cell.density = 0
+        else:
+            cell.density = self.densities[cell.type_id]
+
+        cell.population = density_to_pop(cell.type_id, cell.density)
+
+
+
+
+
 class Cell(object):
     def __init__(self, jcell, density_arr):
         self.json_obj = jcell
@@ -115,6 +140,9 @@ class Cell(object):
 
     def get_pos(self):
         return (self.x, self.y)
+
+    def get_height(self):
+        return round(4 * self.density / 15)
 
     def equals(self, other):
         """True if type, x, y, rot and mag are the same

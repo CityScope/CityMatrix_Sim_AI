@@ -1,5 +1,5 @@
-import pickle as pkl
 import numpy as np
+import pickle as pkl
 
 model = None
 with open("./models/solar_model.pkl", "rb") as f:
