@@ -49,5 +49,10 @@ def move(city, mov):
     return city
 
 def score(city, mov):
-    city = move(city, mov)
-    return objective.predict(city)
+    new_city = move(city, mov)
+    update(new_city, city)
+    return objective.predict(new_city)
+
+def update(city, prev_city):
+    # Put regression logic here!
+    return city
