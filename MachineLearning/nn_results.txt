@@ -44,3 +44,7 @@ Total params: 9,444,224.0
 Trainable params: 9,444,224.0
 Non-trainable params: 0.0
 _________________________________________________________________
+
+Applied on no wandering data...
+
+90.8 % accuracy!!!

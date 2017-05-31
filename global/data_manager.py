@@ -2,31 +2,34 @@
     File name: data_manager.py
     Author: Kevin Lyons
     Date created: 4/14/2017
-    Date last modified: 5/17/2017
+    Date last modified: 5/29/2017
     Python Version: 3.5
     Purpose: Create util functions to load data into pickle files. Also need to be able to extract min/max of data points for normalization analysis. Uses histogram for analysis.
 '''
 
 import glob, json, time, numpy as np, sys, os, pickle, matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # Custom imports
 sys.path.insert(0, '../globals/')
 import cityiograph
 from utils import get_features, get_results
+from config import *
 
 # REGION: Global instance variable declarations
 # Note - these directories may be incorrect - Kevin, 5/16/2017
 POP_ARR = [5, 8, 16, 16, 23, 59]
-TRAIN_GOOD_DIR = '../../../data/train_good/*.json'
-TEST_GOOD_DIR = '../../../data/test_good/*.json'
-PREDICTIONS_DIR = './neural_predictions/*.json'
-PREDICTIONS_PICKLE_FILE = './pred.p'
+DATA_DIR = '../../../data/no_wandering_generated_cities/**/*.json'
+TRAIN_SIZE = 8000
+# TEST_GOOD_DIR = '../../../data/test_good/*.json'
+# PREDICTIONS_DIR = './neural_predictions/*.json'
+# PREDICTIONS_PICKLE_FILE = './pred.p'
 
 # REGION: Util methods
 
 # Get population given an index in an array. Population array is constant
 def get_population(t, density_array):
-	if t not in range(0, 6):
+	if t not in range(min(len(POP_ARR), len(density_array))):
 		return 0
 	return density_array[t] * POP_ARR[t]
 
@@ -53,9 +56,13 @@ def extract_features(directory):
 
 	# This funciton has been giving me some trouble when it comes to training the neural model - sticking with my custom extract_data functin below...
 
-def extract_data(directory, return_endpoints=False):
+def extract_data(directory, return_endpoints = False):
 
-	files = glob.glob(directory) # Load list of filenames from the directory
+	print("Extracting data for directory {}.".format(directory))
+
+	# Get all JSON files
+	# Recursive feature taken from https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
+	files = glob.glob(directory, recursive = True) # Load list of filenames from the directory
 
 	cities = [] # City objects list
 	filenames = [] # List of raw filenames
@@ -69,15 +76,13 @@ def extract_data(directory, return_endpoints=False):
 	traffic = []
 	wait = []
 
-	for name in files:
+	for name in tqdm(files): # Using tqdm for loop analysis
 		with open(name, 'r') as f:
 			current_input = []
 			current_output = []
 			s = f.read()
 			city = cityiograph.City(s)
-			cities.append(city) # Append city structure
 			raw = os.path.splitext(os.path.basename(name))[0]
-			filenames.append(raw) # Append raw filename for later reference
 			d = json.loads(s)
 			max_traffic = max([cell['data']['traffic'] for cell in d['grid'] if 'data' in cell])
 			max_wait = max([cell['data']['wait'] for cell in d['grid'] if 'data' in cell])
@@ -96,6 +101,8 @@ def extract_data(directory, return_endpoints=False):
 					current_input.append(0) if (cell.type_id == 6) else current_input.append(1)
 					current_output.append(cell.data["traffic"])
 					current_output.append(cell.data["wait"])
+			cities.append(city) # Append city structure
+			filenames.append(raw) # Append raw filename for later reference
 			inp.append(np.array(current_input))
 			out.append(np.array(current_output))
 
@@ -111,13 +118,21 @@ def extract_data(directory, return_endpoints=False):
 
 # Data manager...
 
-# print('Extracting data...')
+print('Extracting data...')
 
-# train_data = extract_data(TRAIN_GOOD_DIR)
-# test_data = extract_data(TEST_GOOD_DIR)
+cities, filenames, inp, out = extract_data(DATA_DIR)
+train = cities[ : TRAIN_SIZE ], filenames[ : TRAIN_SIZE ], inp[ : TRAIN_SIZE ], out[ : TRAIN_SIZE ]
+test = cities[ TRAIN_SIZE : ], filenames[ TRAIN_SIZE : ], inp[ TRAIN_SIZE : ], out[ TRAIN_SIZE : ]
 
-# pickle.dump(train_data, open('latest_data_train.p', 'wb'))
-# pickle.dump(test_data, open('latest_data_test.p', 'wb'))
+pickle.dump(train, open('../../../data/no_wandering_data_train.p', 'wb'))
+pickle.dump(test, open('../../../data/no_wandering_data_test.p', 'wb'))
+
+# Testing data
+
+train = pickle.load(open('../../../data/no_wandering_data_train.p', 'rb'))[2]
+test = pickle.load(open('../../../data/no_wandering_data_test.p', 'rb'))[2]
+
+print(train.shape, test.shape)
 
 # Determining bounds on data
 

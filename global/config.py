@@ -30,7 +30,7 @@ RECEIVE_IP = "127.0.0.1"
 RECEIVE_PORT = 9000
 SEND_IP = "127.0.0.1"
 SEND_PORT = 9001
-FORCE_PREDICTION = False # If we want to ignore diff feature and always predict for debugging purposes
+FORCE_PREDICTION = True # If we want to ignore diff feature and always predict for debugging purposes
 
 # Log variables
 LOGGER_NAME = 'CityLog' # Name of our logger for ID purposes
@@ -39,6 +39,7 @@ OUTPUT_CITIES_DIRECTORY = './output_cities/' # Directory to save outgoing cities
 LOGGER_FILENAME = './output.log' # Log file
 
 # Simulator variables
+DO_SIMULATE = False # Bool to say if we run the GAMA simulator on the file or not
 SIM_NAME = 'PythonSim' # Name of our simulator for ID purposes
 SIM_SCRIPT_PATH = '../../CityGamatrix/models/CityGamatrix_PEV.gaml' # GAMA simulation script
 GAMA_OUTPUT_DIRECTORY = './sim_output/' # Output directory for misc GAMA needs
