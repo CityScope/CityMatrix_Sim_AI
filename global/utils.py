@@ -2,15 +2,21 @@
 	File name: utils.py
 	Author(s): Kevin Lyons, Alex Aubuchon
 	Date created: 5/12/2017
-	Date last modified: 5/29/2017
+	Date last modified: 6/1/2017
 	Python Version: 3.5
-	Purpose: Simple utils script to be used alongside prediction_server, among other files. Various tasks, including model serialization and math operations.
+	Purpose: Simple utils script to be used alongside our server, among other files. Various \
+		tasks, including model serialization and math operations.
 	TODO:
 	- None at this time.
 '''
 
 # General imports
-import sys, json, os, logging, subprocess, threading, glob, numpy as np
+import sys, json, os, time, pickle, atexit, traceback, logging, subprocess, threading, copy, glob, numpy as np
+from enum import Enum
+
+# Prevent TensorFlow log statements
+# Taken from https://github.com/tensorflow/tensorflow/issues/8340
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Keras import for JSON functionality
 from keras.models import model_from_json
@@ -196,20 +202,43 @@ class CityLogger:
 	def flush(self):
 		pass # Nothing to do here
 
+# Create instance of our custom logger class and connect to output stream
+log = CityLogger(LOGGER_NAME, LOGGER_FILENAME)
+sys.stdout = log
+
+# Need to log when server stopped
+# Taken from https://docs.python.org/2/library/atexit.html
+@atexit.register
+def end():
+    log.warn(SERVER_NAME + " has been stopped.")
+
+# Configure log to handle all uncaught exceptions
+# Taken from http://stackoverflow.com/questions/8050775/using-pythons-logging-module-to-log-all-exceptions-and-errors
+# Also from http://stackoverflow.com/questions/4564559/get-exception-description-and-stack-trace-which-caused-an-exception-all-as-a-st
+def handler(type, value, tb):
+	log.error(str(value) + "\n" + "\n".join(traceback.format_tb(tb)))
+
+sys.excepthook = handler
+
+class CityChange(Enum):
+	NO = -1,
+	FIRST = 0,
+	DENSITY = 1,
+	CELL = 2
+
 def diff_cities(current_city):
 	'''
-	Determine if a new city is different from the existing one in memory
+	Determine if a new city is different from the existing one in memory, and if so, how?
 	Input: 	city - instance of cityiograph.City object - incoming city to server
-	Output: Return True if we should consider the incoming city and predict/simulate; false otherwise
+	Output: Return the difference between current city and previouly saved one
 	'''
 
 	# First, get the most recent city from our saved set
 	# Taken from http://stackoverflow.com/questions/39327032/how-to-get-the-latest-file-in-a-folder-using-python
 	files = glob.glob(INPUT_CITIES_DIRECTORY + '*')
 
-	# If this is the first city, return True
-	if len(files) == 0:
-		return True
+	# If this is the first city, return need for prediction
+	if len(files) == 0: return ( CityChange.FIRST , True )
 
 	# Run comparison on this city and most recent one
 	with open(max(files, key = os.path.getctime), 'r') as f:
@@ -218,7 +247,23 @@ def diff_cities(current_city):
 		prev_city = cityiograph.City(j)
 		
 		# Now, compare directly for densities, size and cells
-		return not prev_city.equals(current_city)
+		if prev_city.equals(current_city): return ( CityChange.NO, False )
+		else: # Yes, we have a difference, let's explore
+			result = []
+			if prev_city.densities != current_city.densities:
+				for i, d in enumerate(prev_city.densities):
+					if current_city.densities[i] != d:
+						result.append(i)
+				return ( CityChange.DENSITY , [ result, prev_city ] )
+			else:
+				# We likely have some cell mismatch(es) - need to find
+				for x in range(prev_city.width):
+					for y in range(prev_city.height):
+						old = prev_city.cells.get((x, y))
+						new = current_city.cells.get((x, y))
+						if not old.equals(new):
+							result.append( (x, y) )
+				return ( CityChange.CELL , [ result, prev_city ] )
 
 # Set up our exception handler on this new thread
 # Taken from https://bugs.python.org/issue1230540

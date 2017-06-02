@@ -32,6 +32,8 @@ print("Loading data...")
 train_cities, train_filenames, train_x, train_y = pickle.load(open(TRAIN_DATA_FILENAME, 'rb'))
 test_cities, test_filenames, test_x, test_y = pickle.load(open(TEST_DATA_FILENAME, 'rb'))
 
+print(len(test_cities), len(test_filenames), len(test_x), len(test_y))
+
 train_x = train_x.reshape((-1, 16, 16, 2))
 train_y = train_y.reshape((-1, 16, 16, 2))
 test_x = test_x.reshape((-1, 16, 16, 2))
@@ -101,11 +103,11 @@ if DO_RUN:
 	# Serialize model to file
 	# utils.serialize_model(model, ROOT_FILENAME)
 	# print("Serialized!!!")
-
-# Or, deserialize model from file
-# model = utils.deserialize_model(ROOT_FILENAME)
-# model.compile(loss = LOSS_FUNCTION, optimizer = OPTIMIZER, metrics = KERAS_METRICS)
-# print("Deserialized!!!")
+else:
+	# Or, deserialize model from file
+	model = utils.deserialize_model(ROOT_FILENAME)
+	model.compile(loss = LOSS_FUNCTION, optimizer = OPTIMIZER, metrics = KERAS_METRICS)
+	print("Deserialized!!!")
 
 # score = model.evaluate(test_x, test_y, batch_size = 16)
 # print("Network's test score [loss, accuracy]: {0}".format(score))
@@ -113,6 +115,8 @@ if DO_RUN:
 print("Predicting test cities...")
 
 predictions = model.predict(test_x)
+
+print(predictions.shape)
 
 # Write predictions to new JSON files in PREDICTION_OUTPUT_DIR
 

@@ -149,7 +149,8 @@ class Cell(object):
         """
         return (self.type_id == other.type_id) \
             and (self.x == other.x) and (self.y == other.y) \
-            and (self.rot == other.rot) and (self.magnitude == other.magnitude)
+            and (self.rot == other.rot) and (self.magnitude == other.magnitude) \
+            and (self.data == other.data)
 
     def to_dict(self):
         changes = {

@@ -2,13 +2,14 @@
     File name: server_test.py
     Author: Kevin Lyons
     Date created: 4/11/2017
-    Date last modified: 5/16/2017
+    Date last modified: 6/1/2017
     Python Version: 3.5
-    Purpose: Quick script to test the functionality of our prediciton server.
+    Purpose: Quick script to test the functionality of our prediciton server. Make minor tweaks to cities \
+     to test our code.
 '''
 
 # Global imports
-import sys, time
+import sys, time, random
 
 # Custom imports
 sys.path.insert(0, '../global/')
@@ -25,6 +26,9 @@ with open(FILENAME, 'r') as f:
 	json_string = f.read()
 city = cityiograph.City(json_string)
 print("Successfully loaded city.")
+
+# city.cells[(random.randint(0, 16), random.randint(0, 16))].data['traffic'] = random.randint(0, 1000)
+city.densities[random.randint(0, 6)] = random.randint(0, 30)
 
 # Send that city to our UDP server
 server.send_city(city)
