@@ -17,7 +17,7 @@ EDGE_COST = 1 # Used in graph creation
 
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'
-LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_model.pkl' # Pickle file for traffic predictor
+LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear.pkl' # Pickle file for traffic predictor
 ROOT_NN_FILENAME = MODEL_DIR + 'neural_model' # Root name for neural network JSON/H5
 SOLAR_MODEL_FILENAME = MODEL_DIR + 'solar_model.pkl'
 NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
@@ -30,9 +30,9 @@ KERAS_METRICS = ['accuracy'] # Percent accuracy metric
 LISTENING = True # Bool to say whether or not we want our server to be "on" and listening
 SERVER_NAME = 'CityMatrixServer'
 RECEIVE_IP = "127.0.0.1"
-RECEIVE_PORT = 9000
+RECEIVE_PORT = 7000
 SEND_IP = "127.0.0.1"
-SEND_PORT = 9001
+SEND_PORT = 7002
 FORCE_PREDICTION = False # If we want to ignore diff feature and always predict for debugging purposes
 
 # Log variables

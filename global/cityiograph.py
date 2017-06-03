@@ -15,6 +15,8 @@ class City(object):
         self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
         self.densities = self.meta['density']
+        self.AIStep = self.meta['AIStep'] #RZ
+        print ('AIStep in received JSON: ' + str(self.AIStep)) #RZ
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
@@ -39,6 +41,7 @@ class City(object):
     def to_dict(self):
         self.meta["density"] = self.densities
         self.meta["population"] = self.population
+        self.meta["AIStep"] = self.AIStep #RZ
         changes = {
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]
@@ -122,6 +125,11 @@ class Cell(object):
     def __init__(self, jcell, density_arr):
         self.json_obj = jcell
         self.type_id = jcell['type']
+
+        if self.type_id > 6: #RZ
+            #print("type_id>6! change to -1") #RZ
+            self.type_id = -1 #RZ
+            
         self.x = jcell['x']
         self.y = jcell['y']
         self.rot = jcell['rot']

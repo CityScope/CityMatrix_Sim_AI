@@ -53,4 +53,9 @@ class City_UDP(socket.socket):
     def receive_city(self):
         data, addr = self.recvfrom(self.buffer_size)
         json_string = data.decode("utf-8")
-        return cityiograph.City(json_string)
+        #RZ
+        try:
+            return cityiograph.City(json_string)
+        except:
+            print('error when loading json_string to json_obj')
+            return None

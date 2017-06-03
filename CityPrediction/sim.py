@@ -10,7 +10,7 @@
 '''
 
 # Global imports
-import sys, xmltodict, json, time, os, copy
+import sys, json, time, os, copy #xmltodict
 from subprocess import Popen
 
 # Custom imports
