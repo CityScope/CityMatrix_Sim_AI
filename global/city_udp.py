@@ -14,10 +14,14 @@ Sends cities as byte-encoded strings of the following json format:
 Author: Alex Aubuchon
 """
 
-import socket, json, sys
+# Global imports
+import socket, json, sys, logging
 
-import cityiograph
+# Local imports
+from utils import *
+log = logging.getLogger('__main__')
 
+# Default values
 DEFAULT_SEND_IP = "127.0.0.1"
 DEFAULT_SEND_PORT = 7985
 DEFAULT_RECEIVE_IP = "127.0.0.1"
@@ -43,19 +47,33 @@ class City_UDP(socket.socket):
         packet_dict = city.to_dict()
         """
         {
-            "sender": self.name,
+            "sender": self.name, # Deprecated <-
             "city": city.to_dict()
         }
         """
         json_message = json.dumps(packet_dict)
         self.sendto(json_message.encode(), (self.send_ip, self.send_port))
 
+    def send_data(self, data):
+        # data is a dictionary object we would like to send along
+        json_message = json.dumps(data)
+        self.sendto(json_message.encode(), (self.send_ip, self.send_port))
+
     def receive_city(self):
         data, addr = self.recvfrom(self.buffer_size)
         json_string = data.decode("utf-8")
-        #RZ
         try:
-            return cityiograph.City(json_string)
+            return City(json_string)
         except:
-            print('error when loading json_string to json_obj')
+            log.exception("Invalid city JSON received.")
+            return None
+
+    def receive_data(self):
+        # Handles generic data dictionary input, not just a city object
+        data, addr = self.recvfrom(self.buffer_size)
+        json_string = data.decode("utf-8")
+        try:
+            return json.loads(json_string)
+        except:
+            log.exception("Invalid JSON object received.")
             return None

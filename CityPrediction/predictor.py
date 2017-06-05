@@ -1,22 +1,21 @@
 '''
-Filename:   		predictor.py
-Author: 	        Kevin <mailto:kalyons@mit.edu>
-Created:       		2017-06-01 20:17:36
+Filename: predictor.py
+Author: Kevin <mailto:kalyons@mit.edu>
+Created: 2017-06-01 20:17:36
 Last modified by:   kalyons11 
-Last modified time: 2017-06-01 21:39:33
+Last modified time: 2017-06-04 20:18:22
 Description:
 	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for \
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
 TODO:
-	- Get solar model working, with support of Alex. Try to keep as much of his code intact as possible.
-	- Once this is all working, optimize. Fix weird import statement dependencies.
+	- Get solar model working, with support of Alex. Try to keep as much of his code intact as possible!
 '''
 
 # Get our key utils script
-import sys
-sys.path.extend(['../global/', '../MachineLearning/'])
+import sys; sys.path.extend(['../global/', '../MachineLearning/'])
 from utils import *
 # import solar_regression as solar
+log = logging.getLogger('__main__')
 
 # Load 2 model files
 traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
@@ -40,8 +39,7 @@ def traffic_predict(city):
 	result = features; result[::2] = traffic_output[::2]
 
 	# Write prediction back to the cityiograph.City structure and return
-	out_city = output_to_city(city, result)
-	return out_city
+	return output_to_city(city, result)
 
 def solar_predict(city, prev, locations):
 	'''
@@ -62,14 +60,19 @@ def solar_predict(city, prev, locations):
 
 	return result
 
-def predict(city, change_key, change_data):
+def predict(city, change_key, change_data, force_predict = False):
 	'''
 	Black box predictor function for our machine learning.
 	Input: 	city - instance of cityiograph.City to be predicted
 			change_key - instance of utils.CityChange - descibes the change made
 			change_value - arguments telling us what makes this new city unique from the previous
+			force_predict - default False value; used for AI predictor
 	Output: result_city - instance of cityiograph.City, with updated cell data values
 	'''
+
+	if change_data == False and force_predict == True:
+		# Same city, just want traffic update
+		return traffic_predict(city)
 
 	# Parse our change data
 	l, prev = tuple(change_data)
@@ -90,6 +93,3 @@ def predict(city, change_key, change_data):
 		locations = l # Already have changed locations from data
 
 	return solar_predict(current, prev, locations)
-
-if __name__ == '__main__':
-	log.debug("We made it.")

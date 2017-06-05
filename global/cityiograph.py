@@ -8,15 +8,15 @@ import json
 import numpy as np
 import collections
 
-from config import * # Kevin, 5/20/2017
+from config import *
 
 class City(object):
     def __init__(self, json_string):
         self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
         self.densities = self.meta['density']
-        self.AIStep = self.meta['AIStep'] #RZ
-        print ('AIStep in received JSON: ' + str(self.AIStep)) #RZ
+        try: self.AIStep = self.meta['AIStep']
+        except: self.AIStep = -1
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
@@ -41,7 +41,7 @@ class City(object):
     def to_dict(self):
         self.meta["density"] = self.densities
         self.meta["population"] = self.population
-        self.meta["AIStep"] = self.AIStep #RZ
+        self.meta["AIStep"] = self.AIStep
         changes = {
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]
@@ -125,16 +125,12 @@ class Cell(object):
     def __init__(self, jcell, density_arr):
         self.json_obj = jcell
         self.type_id = jcell['type']
-
-        if self.type_id > 6: #RZ
-            #print("type_id>6! change to -1") #RZ
-            self.type_id = -1 #RZ
-            
+        if self.type_id > 6: self.type_id = -1
         self.x = jcell['x']
         self.y = jcell['y']
         self.rot = jcell['rot']
-        self.magnitude = 0 #jcell['magnitude']
-        self.data = jcell.get('data', {'traffic': 0, "wait": 0})
+        self.magnitude = 0 # jcell['magnitude']
+        self.data = jcell.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding soalr
 
         if self.type_id == ROAD_ID:
             self.density = 0

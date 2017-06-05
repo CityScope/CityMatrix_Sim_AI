@@ -1,7 +1,9 @@
 import sys
-sys.path.insert(0, "../")
+sys.path.extend(['../', '../../CityPrediction/'])
 from objective import objective
 from random import *
+from CityPrediction import predictor as ML
+import utils
 
 density_change_chance = 0.5
 density_range = (0, 15)
@@ -36,7 +38,7 @@ def search(city):
             best_move = mov
 
     suggested_city = move(city, best_move)
-    return (suggested_city, move, objective.get_metrics(suggested_city))
+    return (suggested_city, mov, objective.get_metrics(suggested_city))
 
 def move(city, mov):
     city = city.copy()
@@ -54,5 +56,7 @@ def score(city, mov):
     return objective.predict(new_city)
 
 def update(city, prev_city):
-    # Put regression logic here!
-    return city
+    # Need to run our ML prediction here
+    # Run our black box predictor on this city with given changes
+    key, data = utils.diff_cities(city, prev_city)
+    return ML.predict(city, key, data, force_predict = True)
