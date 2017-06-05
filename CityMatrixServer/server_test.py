@@ -21,7 +21,7 @@ log = logging.getLogger('__main__')
 FILENAME = '../../../data/cities/city_9000.json'
 
 # Initialize server
-server = city_udp.City_UDP("Neural_Network_Model_Server_Test", receive_port=9001, send_port=9000)
+server = city_udp.City_UDP("CityMatrixSimTestServer", receive_port = 9001, send_port = 9000)
 
 # Load some test file into a city
 with open(FILENAME, 'r') as f:

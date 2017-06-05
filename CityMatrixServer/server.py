@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by:   kalyons11 
-Last modified time: 2017-06-04 20:18:49
+Last modified time: 2017-06-04 20:25:06
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and \
         provides output to Grasshopper.
@@ -31,15 +31,6 @@ def register():
     server.close()
     log.warning("Closing all ports for {}.".format(SERVER_NAME))
 
-# First, ensure that all directories exist
-# Taken from http://stackoverflow.com/questions/273192/how-to-check-if-a-directory-exists-and-create-it-if-necessary
-DIRECTORY_LIST = [ INPUT_CITIES_DIRECTORY, OUTPUT_CITIES_DIRECTORY, GAMA_OUTPUT_DIRECTORY, XML_DIRECTORY ]
-
-for d in DIRECTORY_LIST:
-    if not os.path.exists(d):
-        log.warn("Creating new directory {}.".format(d))
-        os.makedirs(d)
-
 # Create instance of our simulator, if needed
 if DO_SIMULATE:
     sim = simulator.CitySimulator(SIM_NAME, log)
@@ -59,7 +50,6 @@ while LISTENING:
         key, data = utils.diff_cities(city)
         if FORCE_PREDICTION or key is not CityChange.NO:
             # First, write new city to local file
-            # UNIX logic taken from https://timanovsky.wordpress.com/2009/04/09/get-unix-timestamp-in-java-python-erlang/
             log.info("New city received @ timestamp {}.".format(timestamp))
             simCity = simulator.SimCity(city, timestamp)
             utils.write_city(simCity)
@@ -72,9 +62,6 @@ while LISTENING:
 
             # Now, we need to send 2 cities back to Grasshopper
             result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
-
-            # city.AIStep = int((math.sin(time.time() * 0.2) * 0.5 + 0.5) * 30) #RZ test changing the AIStep with server
-            # log.info('AIStep changed to and send: ' + str(city.AIStep)) #RZ
             server.send_data(result)
             log.info("Predicted city sent!\n")
 
