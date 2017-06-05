@@ -6,11 +6,14 @@ def population(cell):
 
 
 def id_pop_dict(city):
-    pop = {}
+    #pop = {}
+    pop = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, -1: 0} #RZ - fix the error if no certain type_id in the input city. 
     for cell in city.cells.values():
+        #print(cell.type_id)
         if cell.type_id not in pop:
             pop[cell.type_id] = 0
         pop[cell.type_id] += population(cell)
+    #print(pop)
     return pop
 
 def normalize(x, min, max):
@@ -20,10 +23,12 @@ pdp_min = 0
 pdp_max = 958464
 def pop_density_perf(city):
     pop_dict = id_pop_dict(city)
+    #print(pop_dict)
     pop = sum(pop_dict.values())
     return normalize(pop, pdp_min, pdp_max)
 
 def LUM(populations):
+    #print(populations)
     tot = sum(populations)
     probs = map(lambda x: (x / tot) * np.log10(x / tot) if x != 0 else 0, populations)
     return -sum(probs) / np.log10(len(populations))
