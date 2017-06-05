@@ -130,7 +130,8 @@ class Cell(object):
         self.y = jcell['y']
         self.rot = jcell['rot']
         self.magnitude = 0 # jcell['magnitude']
-        self.data = jcell.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding soalr
+        self.data = jcell.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding solar
+        if 'solar' not in self.data: self.data['solar'] = 0 # Changed by Kevin - solar bug
 
         if self.type_id == ROAD_ID:
             self.density = 0
