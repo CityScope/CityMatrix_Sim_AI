@@ -26,7 +26,8 @@ DEFAULT_SEND_IP = "127.0.0.1"
 DEFAULT_SEND_PORT = 7985
 DEFAULT_RECEIVE_IP = "127.0.0.1"
 DEFAULT_RECEIVE_PORT = 7986
-DEFAULT_BUFFER_SIZE = 1024 * 128
+#DEFAULT_BUFFER_SIZE = 1024 * 128
+DEFAULT_BUFFER_SIZE = 1024 * 128 * 4 #RZ
 
 class City_UDP(socket.socket):
 
@@ -60,14 +61,19 @@ class City_UDP(socket.socket):
         self.sendto(json_message.encode(), (self.send_ip, self.send_port))
 
     def receive_city(self):
-        data, addr = self.recvfrom(self.buffer_size)
-        json_string = data.decode("utf-8")
         try:
-            return City(json_string)
+            data, addr = self.recvfrom(self.buffer_size)
         except:
-            log.exception("Invalid city JSON received.")
+            log.exception("Error at try: data, addr = self.recvfrom(self.buffer_size)")
             return None
-
+        else:
+            json_string = data.decode("utf-8")
+            try:
+                return City(json_string)
+            except:
+                log.exception("Invalid city JSON received.")
+                return None
+        
     def receive_data(self):
         # Handles generic data dictionary input, not just a city object
         data, addr = self.recvfrom(self.buffer_size)
