@@ -18,10 +18,10 @@ from cityiograph import City
 log = logging.getLogger('__main__')
 
 # Set parameters. Testing with same file path
-FILENAME = '../../../data/cities/city_9000.json'
+FILENAME = 'C:/RH_GH/_verification/170510_ML_Validation_003/02_kevin_prediction_linear_normalized/city_8000_output_normalized.json'
 
 # Initialize server
-server = city_udp.City_UDP("CityMatrixSimTestServer", receive_port = 9001, send_port = 9000)
+server = city_udp.City_UDP("CityMatrixSimTestServer", receive_port = 7002, send_port = 7000)
 
 # Load some test file into a city
 with open(FILENAME, 'r') as f:
