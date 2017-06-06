@@ -2,7 +2,7 @@
     File name: config.py
     Author(s): Kevin Lyons
     Date created: 5/17/2017
-    Date last modified: 6/4/2017
+    Date last modified: 6/5/2017
     Python Version: 3.5
     Purpose: Configuration file for our project. All filenames are relative to the file in which they \
         are used.
