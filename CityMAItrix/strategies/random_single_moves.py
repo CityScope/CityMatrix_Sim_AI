@@ -6,7 +6,6 @@ from CityPrediction import predictor as ML
 import utils
 
 density_change_chance = 0.5
-density_range = (0, 15)
 id_range = (0, 6)
 iterations = 30
 
