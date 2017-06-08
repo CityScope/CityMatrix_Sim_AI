@@ -8,7 +8,7 @@ import utils
 density_change_chance = 0.5
 density_range = (1, 30)
 id_range = (0, 6)
-iterations = 30
+iterations = 1000 #RZ speed: about 150 iterations per second
 
 def search(city):
     visited = []
@@ -18,18 +18,24 @@ def search(city):
         r = random()
         if r <= density_change_chance:
             idx = dens = -1
-            while (dens == -1 or idx == -1)  \
-                or ("DENSITY", idx, dens) in visited:
-                idx = randint(id_range[0], id_range[1] - 1) #TOTO maginc number here?
+            lmt = 0 #RZ limit the while loop, it will cause dead loop when density_change_chance is high
+            while ((dens == -1 or idx == -1)  \
+                or ("DENSITY", idx, dens) in visited)  \
+                and lmt < 6 * 30 : #RZ possible moves
+                idx = randint(id_range[0], id_range[1] - 1) #TOTO magic number here?
                 dens = randint(density_range[0], density_range[1])
+                lmt = lmt + 1 #RZ
             mov = ("DENSITY", idx, dens)
         else:
             x = y = newid = -1
-            while (x == -1 or y == -1 or newid == -1) \
-                or ("CELL", x, y, newid) in visited:
+            lmt = 0 #RZ limit the while loop
+            while ((x == -1 or y == -1 or newid == -1) \
+                or ("CELL", x, y, newid) in visited)  \
+                and lmt < 256 * 6 : #RZ possible moves
                 x = randint(0, city.width - 1)
                 y = randint(0, city.height - 1)
                 newid = randint(id_range[0], id_range[1])
+                lmt = lmt + 1 #RZ
             mov = ("CELL", x, y, newid)
         visited.append(mov)
         scr = score(city, mov)
@@ -38,6 +44,8 @@ def search(city):
             best_move = mov
 
     suggested_city = move(city, best_move)
+    print('best_score: ' + str(best_score))
+    print('best_move: ' + str(best_move))
     return (suggested_city, mov, objective.get_metrics(suggested_city))
 
 def move(city, mov):
