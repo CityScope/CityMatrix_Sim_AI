@@ -18,6 +18,7 @@ from utils import *
 import utils, city_udp, simulator, predictor as ML
 from strategies import random_single_moves as Strategy
 log = logging.getLogger('__main__')
+result = None
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
@@ -74,6 +75,10 @@ while LISTENING:
             # This new city is no different from the previous one
             # Do not send prediction back to server client, just continue
             log.info("Same city received. Waiting to receive new city...")
+            #RZ for same city, still need to send the result to activate AI suggestion animation tick
+            if not result is None: 
+                server.send_data(result)
+                log.info("Same predicted city sent!\n")
 
     else:
         # Invalid city, just continue and wait
