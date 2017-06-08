@@ -77,6 +77,10 @@ while LISTENING:
             log.info("Same city received. Waiting to receive new city...")
             #RZ for same city, still need to send the result to activate AI suggestion animation tick
             if not result is None: 
+                #RZ Now, we need to update only the meta data of the 2 cities
+                ml_city.updateMeta(city)
+                ai_city.updateMeta(city)
+                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
                 server.send_data(result)
                 log.info("Same predicted city sent!\n")
 
