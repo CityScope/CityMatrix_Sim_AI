@@ -14,9 +14,12 @@ class City(object):
     def __init__(self, json_string):
         self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
-        self.densities = self.meta['density']
+        self.densities = self.meta['densities']
         try: self.AIStep = self.meta['AIStep']
         except: self.AIStep = -1
+        self.slider1 = self.meta['slider1']
+        self.slider2 = self.meta['slider2']
+        self.AIWeights = self.meta['AIWeights']
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
@@ -39,14 +42,25 @@ class City(object):
             and (self.width == other.width) and (self.height == other.height)
 
     def to_dict(self):
-        self.meta["density"] = self.densities
+        self.meta["densities"] = self.densities
         self.meta["population"] = self.population
         self.meta["AIStep"] = self.AIStep
+        self.meta["slider1"] = self.slider1
+        self.meta["slider2"] = self.slider2
+        self.meta["AIWeights"] = self.AIWeights
         changes = {
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]
         }
         return update_dict(self.json_obj, changes)
+
+    def updateMeta(self, city):
+        self.densities = city.densities
+        self.population = city.population
+        self.AIStep = city.AIStep
+        self.slider1 = city.slider1
+        self.slider2 = city.slider2
+        self.AIWeights = city.AIWeights
 
     def to_json(self):
         return json.dumps(self.to_dict())
