@@ -5,10 +5,10 @@ from random import *
 from CityPrediction import predictor as ML
 import utils
 
-density_change_chance = 0.5
+density_change_chance = 0.3 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
 id_range = (0, 6)
-iterations = 1000 #RZ speed: about 150 iterations per second
+iterations = 500 #RZ speed: about 150 iterations per second
 
 def search(city):
     visited = []
