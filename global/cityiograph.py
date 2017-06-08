@@ -24,6 +24,7 @@ class City(object):
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
         self.height = max(map(lambda c: c.y, self.cells.values())) + 1
+        self.AIMov = None
 
         self.population = 0
         for c in self.cells.values():
@@ -44,23 +45,28 @@ class City(object):
     def to_dict(self):
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
-        self.meta["AIStep"] = self.AIStep
-        self.meta["slider1"] = self.slider1
-        self.meta["slider2"] = self.slider2
-        self.meta["AIWeights"] = self.AIWeights
+        self.meta["AIStep"] = self.AIStep #RZ
+        self.meta["slider1"] = self.slider1 #RZ
+        self.meta["slider2"] = self.slider2 #RZ
+        self.meta["AIWeights"] = self.AIWeights #RZ
+        self.meta["AIMov"] = self.AIMov #RZ
         changes = {
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]
         }
         return update_dict(self.json_obj, changes)
 
+    #RZ pass the data from GH CV to GH VIZ
     def updateMeta(self, city):
-        self.densities = city.densities
-        self.population = city.population
+        #self.densities = city.densities #RZ can not be here, will overwrite the right densities for AI_city
+        #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
         self.AIStep = city.AIStep
         self.slider1 = city.slider1
         self.slider2 = city.slider2
         self.AIWeights = city.AIWeights
+
+    def updateAIMov(self, mov):
+        self.AIMov = mov
 
     def to_json(self):
         return json.dumps(self.to_dict())

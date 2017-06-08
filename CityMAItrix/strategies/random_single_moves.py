@@ -5,10 +5,10 @@ from random import *
 from CityPrediction import predictor as ML
 import utils
 
-density_change_chance = 0.3 #RZ equal chance: (6*30)/(256*6)=0.1172
+density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
 id_range = (0, 6)
-iterations = 500 #RZ speed: about 150 iterations per second
+iterations = 150 #RZ speed: about 150 iterations per second
 
 def search(city):
     visited = []
@@ -44,19 +44,21 @@ def search(city):
             best_move = mov
 
     suggested_city = move(city, best_move)
-    print('best_score: ' + str(best_score))
-    print('best_move: ' + str(best_move))
+    #RZ log and pass AI Mov and Scores
+    print('best_score: ' + str(best_score)) #RZ
+    print('best_move: ' + str(best_move)) #RZ
+    suggested_city.updateAIMov(best_move) #RZ
     return (suggested_city, mov, objective.get_metrics(suggested_city))
 
 def move(city, mov):
-    city = city.copy()
+    new_city = city.copy()
     if mov[0] == "DENSITY":
-        city.change_density(mov[1], mov[2])
+        new_city.change_density(mov[1], mov[2])
     elif mov[0] == "CELL":
-        city.change_cell(mov[1], mov[2], mov[3])
+        new_city.change_cell(mov[1], mov[2], mov[3])
     else:
         raise error("Bad move!")
-    return city
+    return new_city
 
 def score(city, mov):
     new_city = move(city, mov)
