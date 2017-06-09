@@ -1,15 +1,20 @@
 import numpy as np
-import pickle as pkl
+from sklearn.externals import joblib
+import sys
+sys.path.append(['../global/'])
+# Ignore unneeded sklearn deprecation warnings
+import warnings
+warnings.filterwarnings("ignore", category = DeprecationWarning)
 
-model = None
-with open("./models/solar_model.pkl", "rb") as f:
-    model = pkl.load(f)
+from config import SOLAR_MODEL_FILENAME
+
+model = joblib.load(SOLAR_MODEL_FILENAME)
 
 def get_5x5_block(city, x, y):
     cells = []
 
-    for i in range(x - 2, x + 2):
-        for j in range(y - 2, y + 2):
+    for i in range(x - 2, x + 3):
+        for j in range(y - 2, y + 3):
             if i < 0 or i >= city.width or j < 0 or j >= city.height:
                 cells.append(None)
             else:
@@ -19,12 +24,13 @@ def get_5x5_block(city, x, y):
 
 def push_5x5_deltas(city, deltas, x, y):
     counter = 0
-    for i in range(x - 2, x + 2):
-        for j in range(y - 2, y + 2):
+    # print(deltas.reshape(5, 5))
+    for i in range(x - 2, x + 3):
+        for j in range(y - 2, y + 3):
             if i < 0 or i >= city.width or j < 0 or j >= city.height:
                 pass
             else:
-                city.cells[(i, j)].data["solar"] += deltas[counter]
+                city.cells[(i, j)].data["solar"] =  int(round(city.cells[(i, j)].data["solar"] + deltas[counter])) # Rounding to nearest int
             counter += 1
 
     return city
@@ -38,7 +44,10 @@ def deltas(block):
         else:
             heights.append(c.get_height())
 
-    return model.predict(heights)
+    model_output = model.predict(heights)
+
+    # But, this is (1, 1225) - need to average every 49 elements to get 5x5 block
+    return np.mean(model_output.reshape(-1, 49), axis = 1)
 
 
 def update_city(old_city, new_city, x, y):

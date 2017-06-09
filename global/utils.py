@@ -2,9 +2,9 @@
 	File name: utils.py
 	Author(s): Kevin Lyons, Alex Aubuchon
 	Date created: 5/12/2017
-	Date last modified: 6/4/2017
+	Date last modified: 6/8/2017
 	Python Version: 3.5
-	Purpose: Simple utils script to be used alongside our server, among other files. Various \
+	Purpose: Simple utils script to be used alongside our server, among other files. Various
 		tasks, including model serialization and math operations.
 	TODO:
 		- None at this time.
@@ -12,7 +12,7 @@
 
 # General imports
 import sys, json, os, time, pickle, traceback, logging, atexit, subprocess, threading, copy
-import smtplib, base64, glob, numpy as np
+import smtplib, base64, glob, random, numpy as np
 from email.mime.text import MIMEText
 from enum import Enum
 
@@ -151,6 +151,8 @@ def write_city(city):
 	# Write dictionary to JSON
 	with open(city.filename, 'w') as f:
 		f.write(json.dumps(d))
+
+	log.info("City filename = {}.".format(os.path.abspath(city.filename)))
 
 # Set up logging functionality
 log = logging.getLogger('__main__')

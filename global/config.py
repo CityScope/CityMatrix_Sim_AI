@@ -2,9 +2,9 @@
     File name: config.py
     Author(s): Kevin Lyons
     Date created: 5/17/2017
-    Date last modified: 6/5/2017
+    Date last modified: 6/8/2017
     Python Version: 3.5
-    Purpose: Configuration file for our project. All filenames are relative to the file in which they \
+    Purpose: Configuration file for our project. All filenames are relative to the file in which they
         are used.
     TODO:
     	- None at this time.
@@ -27,7 +27,6 @@ OPTIMIZER = 'adam' # Using adam, not SGD
 KERAS_METRICS = ['accuracy'] # Percent accuracy metric
 
 # Server variables
-LISTENING = True # Bool to say whether or not we want our server to be "on" and listening
 SERVER_NAME = 'CityMatrixServer'
 RECEIVE_IP = "127.0.0.1"
 RECEIVE_PORT = 7000

@@ -2,10 +2,10 @@
 Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
-Last modified by:   kalyons11 
-Last modified time: 2017-06-04 20:25:06
+Last modified by: kalyons11
+Last modified time: 2017-06-08 20:56:37
 Description:
-    - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and \
+    - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
 TODO:
     - None at this time.
@@ -15,10 +15,9 @@ TODO:
 import sys, logging
 sys.path.extend(['../global/', '../CityPrediction/', '../CityMAItrix/'])
 from utils import *
-import utils, city_udp, simulator, predictor as ML
+import city_udp, simulator, predictor as ML
 from strategies import random_single_moves as Strategy
 log = logging.getLogger('__main__')
-result = None
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
@@ -33,27 +32,24 @@ def register():
     log.warning("Closing all ports for {}.".format(SERVER_NAME))
 
 # Create instance of our simulator, if needed
-if DO_SIMULATE:
-    sim = simulator.CitySimulator(SIM_NAME, log)
+if DO_SIMULATE: sim = simulator.CitySimulator(SIM_NAME, log)
 
-log.info("{} listening on ip: {}, port: {}.\n".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
-log.info("Waiting to receive new city...")
+log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
 
 # Constantly loop and wait for new city packets to reach our UDP server
-while LISTENING:
+while True:
     # Get city from server and note timestamp
     city = server.receive_city()
     timestamp = str(int(time.time()))
 
+    # Only consider new city if it is different from most recent
     if city != None:
-
-        # Only consider new city if it is different from most recent
-        key, data = utils.diff_cities(city)
+        key, data = diff_cities(city)
         if FORCE_PREDICTION or key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
             simCity = simulator.SimCity(city, timestamp)
-            utils.write_city(simCity)
+            write_city(simCity)
 
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(city, key, data)
@@ -61,10 +57,10 @@ while LISTENING:
             # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)
 
-            # Now, we need to send 2 cities back to Grasshopper
+            # Now, we need to send 2 city objects back to GH
             result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
             server.send_data(result)
-            log.info("Predicted city sent!\n")
+            log.info("Predicted city data sent to GH.\n")
 
             # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
             if DO_SIMULATE: sim.simulate(simCity)
@@ -73,17 +69,8 @@ while LISTENING:
 
         else:
             # This new city is no different from the previous one
-            # Do not send prediction back to server client, just continue
-            log.info("Same city received. Waiting to receive new city...")
-            #RZ for same city, still need to send the result to activate AI suggestion animation tick
-            if not result is None: 
-                #RZ Now, we need to update only the meta data of the 2 cities
-                ml_city.updateMeta(city)
-                ai_city.updateMeta(city)
-                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
-                server.send_data(result)
-                log.info("Same predicted city sent!\n")
-
-    else:
-        # Invalid city, just continue and wait
-        continue
+            # But, we still need to take some action...
+            d = city.to_dict()
+            result = { 'predict' : d , 'ai' : d }
+            server.send_data(result)
+            log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")

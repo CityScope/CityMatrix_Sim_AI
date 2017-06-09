@@ -14,12 +14,22 @@ class City(object):
     def __init__(self, json_string):
         self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
-        self.densities = self.meta['densities']
+        try: self.densities = self.meta['densities']
+        except:
+            self.densities = self.meta['density']
+
+            # Now, delete that key and update meta
+            del self.meta['density']
+            self.meta['densities'] = self.densities
+
         try: self.AIStep = self.meta['AIStep']
         except: self.AIStep = -1
-        self.slider1 = self.meta['slider1']
-        self.slider2 = self.meta['slider2']
-        self.AIWeights = self.meta['AIWeights']
+        try:
+            self.slider1 = self.meta['slider1']
+            self.slider2 = self.meta['slider2']
+            self.AIWeights = self.meta['AIWeights']
+        except:
+            pass # Some older version cities may not have these keys - ignoring
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
@@ -43,13 +53,15 @@ class City(object):
             and (self.width == other.width) and (self.height == other.height)
 
     def to_dict(self):
-        self.meta["densities"] = self.densities
-        self.meta["population"] = self.population
-        self.meta["AIStep"] = self.AIStep #RZ
-        self.meta["slider1"] = self.slider1 #RZ
-        self.meta["slider2"] = self.slider2 #RZ
-        self.meta["AIWeights"] = self.AIWeights #RZ
-        self.meta["AIMov"] = self.AIMov #RZ
+        try:
+            self.meta["densities"] = self.densities
+            self.meta["population"] = self.population
+            self.meta["AIStep"] = self.AIStep # RZ
+            self.meta["slider1"] = self.slider1 # RZ
+            self.meta["slider2"] = self.slider2 # RZ
+            self.meta["AIWeights"] = self.AIWeights # RZ
+            self.meta["AIMov"] = self.AIMov #RZ
+        except: pass # Some older version cities may not have these keys - ignoring
         changes = {
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]

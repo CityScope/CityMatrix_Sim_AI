@@ -1,9 +1,11 @@
 import sys
+import logging
 sys.path.extend(['../', '../../CityPrediction/'])
 from objective import objective
 from random import *
 from CityPrediction import predictor as ML
 import utils
+log = logging.getLogger('__main__')
 
 density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
@@ -44,11 +46,10 @@ def search(city):
             best_move = mov
 
     suggested_city = move(city, best_move)
-    #RZ log and pass AI Mov and Scores
-    print('best_score: ' + str(best_score)) #RZ
-    print('best_move: ' + str(best_move)) #RZ
-    suggested_city.updateAIMov(best_move) #RZ
-    return (suggested_city, mov, objective.get_metrics(suggested_city))
+    # Update AI params based on this move - changes from Ryan
+    log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
+    suggested_city.updateAIMov(best_move)
+    return (suggested_city, best_move, objective.get_metrics(suggested_city))
 
 def move(city, mov):
     new_city = city.copy()

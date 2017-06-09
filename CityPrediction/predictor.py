@@ -3,9 +3,9 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-04 20:30:18
+Last modified time: 2017-06-08 20:34:20
 Description:
-	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for \
+	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
 TODO:
 	- Get solar model working, with support of Alex. Try to keep as much of his code intact as possible!
@@ -13,13 +13,13 @@ TODO:
 
 # Get our key utils script
 import sys; sys.path.extend(['../global/', '../MachineLearning/'])
+import config
 from utils import *
-# import solar_regression as solar
+import solar_regression as solar
 log = logging.getLogger('__main__')
 
 # Load 2 model files
 traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
-# solar_model = pickle.load(open(SOLAR_MODEL_FILENAME), 'rb')
 
 def traffic_predict(city):
 	'''
@@ -55,12 +55,11 @@ def solar_predict(city, prev, locations):
 
 	# For every location, update values based on solar radiation deltas predictor
 	for x, y in locations:
-		# result = solar.update_city(prev, result, x, y)
-		continue
+		result = solar.update_city(prev, result, x, y)
 
 	return result
 
-def predict(city, change_key, change_data, force_predict = False):
+def predict(city, change_key, change_data, force_predict = config.FORCE_PREDICTION):
 	'''
 	Black box predictor function for our machine learning.
 	Input: 	city - instance of cityiograph.City to be predicted
@@ -70,7 +69,7 @@ def predict(city, change_key, change_data, force_predict = False):
 	Output: result_city - instance of cityiograph.City, with updated cell data values
 	'''
 
-	if change_data == False and force_predict == True:
+	if not change_data and force_predict:
 		# Same city, just want traffic update
 		return traffic_predict(city)
 
