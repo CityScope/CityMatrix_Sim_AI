@@ -18,6 +18,7 @@ from utils import *
 import city_udp, simulator, predictor as ML
 from strategies import random_single_moves as Strategy
 log = logging.getLogger('__main__')
+result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
@@ -70,7 +71,12 @@ while True:
         else:
             # This new city is no different from the previous one
             # But, we still need to take some action...
-            d = city.to_dict()
-            result = { 'predict' : d , 'ai' : d }
-            server.send_data(result)
-            log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+            if not result is None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+                #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
+                ml_city.updateMeta(city) #RZ necessary, do not delete
+                ai_city.updateMeta(city) #RZ necessary, do not delete
+                d1 = ml_city.to_dict() #RZ necessary, do not delete
+                d2 = ai_city.to_dict() #RZ necessary, do not delete
+                result = { 'predict' : d1 , 'ai' : d2 }
+                server.send_data(result)
+                log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
