@@ -49,11 +49,12 @@ while True:
         if FORCE_PREDICTION or key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
-            simCity = simulator.SimCity(city, timestamp)
-            write_city(simCity)
 
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(city, key, data)
+
+            simCity = simulator.SimCity(ml_city, timestamp)
+            write_city(simCity)
 
             # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)

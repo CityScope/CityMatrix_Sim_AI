@@ -163,7 +163,10 @@ class Cell(object):
         self.rot = jcell['rot']
         self.magnitude = 0 # jcell['magnitude']
         self.data = jcell.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding solar
+        #self.data = jcell['data'] #RZ
         if 'solar' not in self.data: self.data['solar'] = 0 # Changed by Kevin - solar bug
+        #if 'traffic' not in self.data: self.data['traffic'] = 0 #RZ
+        #if 'wait' not in self.data: self.data['wait'] = 0 #RZ
 
         if self.type_id == ROAD_ID:
             self.density = 0
@@ -185,9 +188,7 @@ class Cell(object):
         """True if type, x, y, rot and mag are the same
         """
         return (self.type_id == other.type_id) \
-            and (self.x == other.x) and (self.y == other.y) \
-            and (self.rot == other.rot) and (self.magnitude == other.magnitude) \
-            and (self.data == other.data)
+            and (self.x == other.x) and (self.y == other.y)
 
     def to_dict(self):
         changes = {
