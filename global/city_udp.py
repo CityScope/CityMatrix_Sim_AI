@@ -41,7 +41,18 @@ class City_UDP(socket.socket):
         self.receive_port = receive_port
         self.buffer_size = buffer_size
         socket.socket.__init__(self, socket.AF_INET, socket.SOCK_DGRAM)
-        self.bind((self.receive_ip, self.receive_port))
+        try:
+            self.bind((self.receive_ip, self.receive_port))
+        except OSError as e:
+            log.error(e); log.error("Attempting to close any open ports...")
+            if SERVER_OS == 'MAC':
+                # Run command to close the port
+                # First, get the process ID (pid) where this port is running
+                p = subprocess.Popen(['lsof', '-i :' + str(RECEIVE_PORT)], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                out, err = p.communicate()
+                pid = out.decode("utf-8")
+                # Close it
+                x = subprocess.Popen(['kill', '-9', pid])
 
     def send_city(self, city):
         packet_dict = city.to_dict()

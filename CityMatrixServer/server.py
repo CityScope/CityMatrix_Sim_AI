@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-08 21:14:58
+Last modified time: 2017-06-11 00:20:56
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -53,6 +53,7 @@ while True:
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(city, key, data)
 
+            # Write city to local file for later comparison
             simCity = simulator.SimCity(ml_city, timestamp)
             write_city(simCity)
 
@@ -69,15 +70,10 @@ while True:
 
             log.info("Waiting to receive new city...")
 
-        else:
-            # This new city is no different from the previous one
-            # But, we still need to take some action...
-            if not result is None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
-                #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
-                ml_city.updateMeta(city) #RZ necessary, do not delete
-                ai_city.updateMeta(city) #RZ necessary, do not delete
-                d1 = ml_city.to_dict() #RZ necessary, do not delete
-                d2 = ai_city.to_dict() #RZ necessary, do not delete
-                result = { 'predict' : d1 , 'ai' : d2 }
-                server.send_data(result)
-                log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+        elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+            #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
+            ml_city.updateMeta(city) #RZ necessary, do not delete
+            ai_city.updateMeta(city) #RZ necessary, do not delete
+            result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+            server.send_data(result)
+            log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")

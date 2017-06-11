@@ -2,15 +2,16 @@
     File name: config.py
     Author(s): Kevin Lyons
     Date created: 5/17/2017
-    Date last modified: 6/8/2017
+    Date last modified: 6/11/2017
     Python Version: 3.5
     Purpose: Configuration file for our project. All filenames are relative to the file in which they
         are used.
     TODO:
-    	- None at this time.
+    	- Get windows port close command.
 '''
 
 # City variables
+CITY_SIZE = 16
 ROAD_ID = 6 # ID of a road cell on our grid matrix
 POP_ARR = [5, 8, 16, 16, 23, 59] # Array representing the number of people per floor in each building type
 EDGE_COST = 1 # Used in graph creation

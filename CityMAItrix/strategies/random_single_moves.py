@@ -69,5 +69,5 @@ def score(city, mov):
 def update(city, prev_city):
     # Need to run our ML prediction here
     # Run our black box predictor on this city with given changes
-    key, data = utils.diff_cities(city, prev_city)
+    key, data = utils.diff_cities(city, prev_city = prev_city)
     return ML.predict(city, key, data, force_predict = True)

@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-08 20:34:20
+Last modified time: 2017-06-11 00:19:17
 Description:
 	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -18,7 +18,7 @@ from utils import *
 import solar_regression as solar
 log = logging.getLogger('__main__')
 
-# Load 2 model files
+# Load traffic model file
 traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 
 def traffic_predict(city):
@@ -41,7 +41,7 @@ def traffic_predict(city):
 	# Write prediction back to the cityiograph.City structure and return
 	return output_to_city(city, result)
 
-def solar_predict(city, prev, locations):
+def solar_predict(new_city, prev, locations):
 	'''
 	Generic solar radiation predictor with accumulation functionality.
 	Input: 	city - instance of cityiograph.City to be predicted
@@ -51,7 +51,7 @@ def solar_predict(city, prev, locations):
 	'''
 
 	# Keep a running accumulated city
-	result = city
+	result = new_city
 
 	# For every location, update values based on solar radiation deltas predictor
 	for x, y in locations:

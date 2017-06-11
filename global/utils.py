@@ -2,7 +2,7 @@
 	File name: utils.py
 	Author(s): Kevin Lyons, Alex Aubuchon
 	Date created: 5/12/2017
-	Date last modified: 6/8/2017
+	Date last modified: 6/11/2017
 	Python Version: 3.5
 	Purpose: Simple utils script to be used alongside our server, among other files. Various
 		tasks, including model serialization and math operations.

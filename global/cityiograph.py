@@ -11,8 +11,11 @@ import collections
 from config import *
 
 class City(object):
-    def __init__(self, json_string):
-        self.json_obj = json.loads(json_string)
+    def __init__(self, json_str, dict_mode = False):
+        if dict_mode:
+            self.json_obj = json_str
+        else:
+            self.json_obj = json.loads(json_str)
         self.meta = self.json_obj['objects']
         try: self.densities = self.meta['densities']
         except:
@@ -72,10 +75,13 @@ class City(object):
     def updateMeta(self, city):
         #self.densities = city.densities #RZ can not be here, will overwrite the right densities for AI_city
         #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
-        self.AIStep = city.AIStep
-        self.slider1 = city.slider1
-        self.slider2 = city.slider2
-        self.AIWeights = city.AIWeights
+        try:
+            self.AIStep = city.AIStep
+            self.slider1 = city.slider1
+            self.slider2 = city.slider2
+            self.AIWeights = city.AIWeights
+        except:
+            pass # Added by Kevin - for old cities with bad keys
 
     def updateAIMov(self, mov):
         self.AIMov = mov
@@ -164,9 +170,6 @@ class Cell(object):
         self.magnitude = 0 # jcell['magnitude']
         self.data = jcell.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding solar
         #self.data = jcell['data'] #RZ
-        if 'solar' not in self.data: self.data['solar'] = 0 # Changed by Kevin - solar bug
-        #if 'traffic' not in self.data: self.data['traffic'] = 0 #RZ
-        #if 'wait' not in self.data: self.data['wait'] = 0 #RZ
 
         if self.type_id == ROAD_ID:
             self.density = 0
@@ -182,7 +185,7 @@ class Cell(object):
         return (self.x, self.y)
 
     def get_height(self):
-        return round(4 * self.density / 15)
+        return float(8 * self.density / 3)
 
     def equals(self, other):
         """True if type, x, y, rot and mag are the same
