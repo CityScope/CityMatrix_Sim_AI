@@ -85,6 +85,6 @@ class SimCity:
 	def __init__(self, cityObject, timestamp):
 		self.cityObject = cityObject # Instance of cityiograph.City object
 		self.timestamp = timestamp # UNIX timestamp
-		self.prefix = "city_" + timestamp # Prefix
+		self.prefix = "city_input_" + timestamp # Prefix
 		self.filename = os.path.abspath(INPUT_CITIES_DIRECTORY + self.prefix + ".json") # Full filename
 		self.xml = os.path.abspath(XML_DIRECTORY + 'experiment_' + self.timestamp + '.xml') # Path to corresponding XML path

@@ -44,7 +44,7 @@ SERVER_FILENAME = '../CityMatrixServer/server.py' # Relative path from utils scr
 
 # Log variables
 INPUT_CITIES_DIRECTORY = '../CityPrediction/input_cities/' # Directory to save incoming cities, before simulation
-OUTPUT_CITIES_DIRECTORY = '../CityPrediction/output_cities/' # Directory to save outgoing cities, after simulation
+PREDICTED_CITIES_DIRECTORY = '../CityPrediction/predicted_cities/' # Directory to save outgoing cities, after simulation
 LOGGER_FILENAME = 'output.log' # Log file
 
 # Simulator variables

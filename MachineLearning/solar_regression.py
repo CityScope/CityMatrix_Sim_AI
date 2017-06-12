@@ -45,6 +45,8 @@ def deltas(block):
 
     model_output = model.predict(heights)[0]
 
+    '''
+
     # Need to perform custom logic for the solar sensor layout
     # Changes made by Kevin, 6/11/17
     # First, reshape
@@ -60,6 +62,12 @@ def deltas(block):
     # Finally, average
     return three.mean(axis = (1, 2))
 
+    '''
+
+    # Going back to old logic
+    # But, this is (1, 1225) - need to average every 49 elements to get 5x5 block
+    return np.mean(model_output.reshape(-1, 49), axis = 1)
+
 
 def update_city(old_city, new_city, x, y):
     remove_old = deltas(get_5x5_block(old_city, x, y))
@@ -68,8 +76,8 @@ def update_city(old_city, new_city, x, y):
     change = np.subtract(add_new, remove_old) # Kevin - switched order for subtract operation...
     # print(change)
 
-    push_5x5_deltas(new_city, change, x, y)
-    return new_city
+    push_5x5_deltas(old_city, change, x, y)
+    return old_city
 
 if __name__ == "__main__":
     import sys

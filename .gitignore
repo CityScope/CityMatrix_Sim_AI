@@ -12,5 +12,6 @@ normalized_outputs*/
 *.log
 input_cities/
 output_cities/
+predicted_cities/
 sim_output/
 xml/

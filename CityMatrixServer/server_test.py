@@ -9,7 +9,7 @@
 '''
 
 # Global imports
-import sys, os, time, random, logging, glob, time, json, numpy as np, matplotlib.pyplot as plt
+import sys, os, time, random, logging, glob, time, json, pprint, numpy as np, matplotlib.pyplot as plt
 
 # Custom imports
 sys.path.insert(0, '../global/')
@@ -39,6 +39,7 @@ log.debug("Successfully loaded city.")
 
 # city.cells[(random.randint(0, 16), random.randint(0, 16))].data['traffic'] = random.randint(0, 1000)
 city.densities[random.randint(0, 5)] = random.randint(0, 30)
+# city.densities = [30, 30, 30, 1, 2, 30]
 
 # Send that city to our UDP server
 server.send_city(city)
@@ -63,8 +64,28 @@ plt.subplot(211)
 plt.imshow(np.array(types).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
 # plt.show()
 
-# Run any validation checks on the city
-p = City(data['ai'], dict_mode = True)
+# Run any validation checks on the cities
+ml = City(data['predict'], dict_mode = True)
+ai = City(data['ai'], dict_mode = True)
+
+'''
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(ml.to_dict())
+
+one, two = [], []
+for x in range(CITY_SIZE):
+	for y in range(CITY_SIZE):
+		a = ml.get_cell((x, y))
+		b = ai.get_cell((x, y))
+		one.append(a.data['traffic'])
+		two.append(b.data['traffic'])
+
+one = np.array(one).reshape(CITY_SIZE, CITY_SIZE)
+two = np.array(two).reshape(CITY_SIZE, CITY_SIZE)
+
+log.debug(one)
+log.debug(two)
 
 # Get solar info and vis
 solar = []
@@ -75,5 +96,6 @@ for x in range(CITY_SIZE):
 plt.subplot(212)
 plt.imshow(np.array(solar).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
 plt.show()
+'''
 
 log.debug("Process complete.")

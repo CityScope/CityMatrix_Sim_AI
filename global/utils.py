@@ -136,23 +136,37 @@ def output_to_city(city, output):
 			i += 2	
 	return city
 
-def write_city(city):
+def write_city(city, timestamp = None):
 	'''
 	Write a city to a JSON file
-	Input: 	city - instance of simCity - city to be logged
+	Input: 	city - instance of simCity - city to be logged OR dictionary ready to be logged
 	Output: None - write city as JSON to specified filename for later ML purposes
 	'''
-	# Convert to dictionary object for editing
-	d = city.cityObject.to_dict()
 
-	# Add UNIX timestamp to JSON
-	d['objects']['timestamp'] = city.timestamp
+	if isinstance(city, dict):
+		# Get filename
+		filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predicted_output_' + timestamp + '.json')
 
-	# Write dictionary to JSON
-	with open(city.filename, 'w') as f:
-		f.write(json.dumps(d))
+		# Write to JSON
+		with open(filename, 'w') as f:
+			f.write(json.dumps(city))
 
-	log.info("City filename = {}.".format(os.path.abspath(city.filename)))
+	else:
+		# Get filename
+		filename = city.filename
+
+		# Handle full city object case
+		# Convert to dictionary object for editing
+		d = city.cityObject.to_dict()
+
+		# Add UNIX timestamp to JSON
+		d['objects']['timestamp'] = city.timestamp
+
+		# Write dictionary to JSON
+		with open(filename, 'w') as f:
+			f.write(json.dumps(d))
+
+	log.info("City data written at filename = {}.".format(os.path.abspath(filename)))
 
 # Set up logging functionality
 log = logging.getLogger('__main__')
@@ -292,7 +306,8 @@ def diff_cities(current_city, prev_city = None):
 			prev_city = City(f.read())
 		
 	# Now, compare directly for densities, size and cells
-	if prev_city.equals(current_city): return ( CityChange.NO, False ) # No difference
+	if prev_city.equals(current_city):
+		return ( CityChange.NO, False ) # No difference
 	else: # Yes, we have a difference, let's explore
 		result = []
 		if prev_city.densities != current_city.densities:
@@ -347,3 +362,12 @@ def async_process(commands, hook, log, city):
 	# Set up threading functionality
 	thread = threading.Thread(target = run, args = (commands, hook, log, city))
 	thread.start()
+
+def metrics_dictionary(metrics):
+	'''
+	Helper method to convert list of tuples to dictionary for JSON submission.
+	Input:	metrics - list of tuples of the form [ ('Population Density Performance', 0.11217427049946581, 1) , ... ]
+	Output:	d - dictionary mapping metric name -> value
+	'''
+
+	return { name : [ value , weight ] for name, value, weight in metrics }
