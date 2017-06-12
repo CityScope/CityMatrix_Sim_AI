@@ -67,7 +67,7 @@ while True:
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
             ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ml_city.to_dict()
+            ai_dict = ai_city.to_dict()
             ai_dict['objects']['metrics'] = ai_metrics
 
             # Save result locally and send
@@ -93,7 +93,7 @@ while True:
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
             ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ml_city.to_dict()
+            ai_dict = ai_city.to_dict()
             ai_dict['objects']['metrics'] = ai_metrics
 
             # Send result
