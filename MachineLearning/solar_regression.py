@@ -10,6 +10,8 @@ from config import SOLAR_MODEL_FILENAME
 
 model = joblib.load(SOLAR_MODEL_FILENAME)
 
+# Figure out bugs w/ Alex, Ryan
+
 def get_5x5_block(city, x, y):
     cells = []
 

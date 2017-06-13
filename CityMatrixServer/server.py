@@ -3,12 +3,12 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-11 23:35:17
+Last modified time: 2017-06-12 22:31:49
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
 TODO:
-    - None at this time.
+    - Avoid code repeats.
 '''
 
 # Import local scripts for all key functionality, both ML and AI

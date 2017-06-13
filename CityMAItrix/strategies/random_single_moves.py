@@ -51,6 +51,7 @@ def search(city):
     suggested_city.updateAIMov(best_move)
     return (suggested_city, best_move, objective.get_metrics(suggested_city))
 
+# Clean up
 def move(city, mov):
     new_city = city.copy()
     if mov[0] == "DENSITY":
@@ -61,11 +62,13 @@ def move(city, mov):
         raise error("Bad move!")
     return new_city
 
+# Get ryan's new method
 def score(city, mov):
     new_city = move(city, mov)
     final_city = update(new_city, city)
     return objective.predict(final_city)
 
+# Redundant
 def update(city, prev_city):
     # Need to run our ML prediction here
     # Run our black box predictor on this city with given changes
