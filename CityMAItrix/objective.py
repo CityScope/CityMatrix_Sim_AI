@@ -2,7 +2,7 @@ class ObjectiveFunction(object):
     def __init__(self):
         self.metrics = []
 
-    def predict(self, city):
+    def evaluate(self, city):
         outputs = [weight * fun(city) for name, fun, weight in self.metrics]
         return sum(outputs)
 

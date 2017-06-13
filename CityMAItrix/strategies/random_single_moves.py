@@ -64,7 +64,7 @@ def move(city, mov):
 def score(city, mov):
     new_city = move(city, mov)
     update(new_city, city)
-    return objective.predict(new_city)
+    return objective.evaluate(new_city)
 
 def update(city, prev_city):
     # Need to run our ML prediction here
