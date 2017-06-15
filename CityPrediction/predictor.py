@@ -78,7 +78,7 @@ def predict(city, change_key, change_data, force_predict = config.FORCE_PREDICTI
         return traffic_predict(city)
 
     # Parse our change data
-    #RZ170614 print(change_data)
+    #RZ 170614 print(change_data)
     l, prev = tuple(change_data)
         
     # First, do full traffic prediction

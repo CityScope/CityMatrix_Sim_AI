@@ -18,7 +18,7 @@ class City(object):
             self.json_obj = json.loads(json_str)
         self.meta = self.json_obj['objects']
 
-        #RZ170614 meta data read from json
+        #RZ 170614 meta data read from json
         try: self.densities = self.meta['densities']
         except:self.densities = [1,1,1,1,1,1]
         try: self.slider1 = self.meta['slider1']
@@ -35,6 +35,8 @@ class City(object):
         except: self.AIWeights = [0.2,0.2,0.2,0.2,0.2]
         try: self.startFlag = self.meta['startFlag']
         except: self.startFlag = 0
+        try: self.animBlink = self.meta['animBlink']
+        except: self.animBlink = 0
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -60,7 +62,7 @@ class City(object):
 
     def to_dict(self):
         try:
-            #RZ170614
+            #RZ 170614
             self.meta["densities"] = self.densities
             self.meta["population"] = self.population
             self.meta["slider1"] = self.slider1
@@ -70,6 +72,7 @@ class City(object):
             self.meta["AIMov"] = self.AIMov
             self.meta["AIWeights"] = self.AIWeights
             self.meta["startFlag"] = self.startFlag
+            self.meta["animBlink"] = self.animBlink
         except: pass # Some older version cities may not have these keys - ignoring
         changes = {
             "objects": self.meta,
@@ -82,7 +85,7 @@ class City(object):
         #self.densities = city.densities #RZ can not be here, will overwrite the right densities for AI_city
         #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
         try:
-            #RZ170614
+            #RZ 170614
             self.densities = city.densities
             self.population = city.population
             self.slider1 = city.slider2
@@ -92,6 +95,7 @@ class City(object):
             #self.AIMov = city.AIMov #RZ shouldn't pass from GH CV, but added by python server
             self.AIWeights = city.AIWeights
             self.startFlag = city.startFlag
+            self.animBlink = city.animBlink
         except:
             pass # Added by Kevin - for old cities with bad keys
 

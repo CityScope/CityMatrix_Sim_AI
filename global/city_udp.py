@@ -26,7 +26,7 @@ DEFAULT_SEND_IP = "127.0.0.1"
 DEFAULT_SEND_PORT = 7985
 DEFAULT_RECEIVE_IP = "127.0.0.1"
 DEFAULT_RECEIVE_PORT = 7986
-DEFAULT_BUFFER_SIZE = 1024 * 128 * 4 # Updated by Ryan, 6/5/17
+DEFAULT_BUFFER_SIZE = 1024 * 128 * 4 #RZ 170605 1024 * 128 wasn't enough
 
 class City_UDP(socket.socket):
 
@@ -42,6 +42,8 @@ class City_UDP(socket.socket):
         self.buffer_size = buffer_size
         socket.socket.__init__(self, socket.AF_INET, socket.SOCK_DGRAM)
         try:
+            #RZ 170614 https://stackoverflow.com/questions/12362542/python-server-only-one-usage-of-each-socket-address-is-normally-permitted
+            #self.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
             self.bind((self.receive_ip, self.receive_port))
         except OSError as e:
             log.error(e); log.error("Attempting to close any open ports...")
@@ -53,6 +55,12 @@ class City_UDP(socket.socket):
                 pid = out.decode("utf-8")
                 # Close it
                 x = subprocess.Popen(['kill', '-9', pid])
+            #RZ 170614 doesn't work yet
+            elif SERVER_OS == 'WIN':
+                # Run command to close the port
+                # get the process ID (pid) where this port is running and kill it
+                # https://stackoverflow.com/questions/6204003/kill-a-process-by-looking-up-the-port-being-used-by-it-from-a-bat
+                subprocess.call(['FOR', '/F \"tokens=4 delims= \" %P IN (\'netstat -a -n -o ^| findstr :7000\') DO taskKill.exe /PID %P /F']) # doesn't work yet
 
     def send_city(self, city):
         packet_dict = city.to_dict()

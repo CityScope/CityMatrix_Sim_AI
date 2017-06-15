@@ -7,10 +7,10 @@ from CityPrediction import predictor as ML
 import utils
 log = logging.getLogger('__main__')
 
-density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
+density_change_chance = 0.5 #RZ 170607 equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
 id_range = (0, 6)
-iterations = 150 #RZ speed: about 150 iterations per second
+iterations = 150 #RZ 170607 speed: about 150 iterations per second
 
 def search(city):
     visited = []
@@ -20,24 +20,24 @@ def search(city):
         r = random()
         if r <= density_change_chance:
             idx = dens = -1
-            lmt = 0 #RZ limit the while loop, it will cause dead loop when density_change_chance is high
+            lmt = 0 #RZ 170607 limit the while loop, it will cause dead loop when density_change_chance is high
             while ((dens == -1 or idx == -1)  \
                 or ("DENSITY", idx, dens) in visited)  \
-                and lmt < 6 * 30 : #RZ possible moves
+                and lmt < 6 * 30 : #RZ 170607 possible moves
                 idx = randint(id_range[0], id_range[1] - 1) #TOTO magic number here?
                 dens = randint(density_range[0], density_range[1])
-                lmt = lmt + 1 #RZ
+                lmt = lmt + 1 #RZ 170607
             mov = ("DENSITY", idx, dens)
         else:
             x = y = newid = -1
             lmt = 0 #RZ limit the while loop
             while ((x == -1 or y == -1 or newid == -1) \
                 or ("CELL", x, y, newid) in visited)  \
-                and lmt < 256 * 6 : #RZ possible moves
+                and lmt < 256 * 6 : #RZ 170607 possible moves
                 x = randint(0, city.width - 1)
                 y = randint(0, city.height - 1)
                 newid = randint(id_range[0], id_range[1])
-                lmt = lmt + 1 #RZ
+                lmt = lmt + 1 #RZ 170607
             mov = ("CELL", x, y, newid)
         visited.append(mov)
         scr = score(city, mov)
