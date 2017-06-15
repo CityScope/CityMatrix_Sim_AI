@@ -98,7 +98,7 @@ class City(object):
             #self.animBlink = city.animBlink this will be handled in server.py
         except:
             pass # Added by Kevin - for old cities with bad keys
-
+    
     def updateAIMov(self, mov):
         self.AIMov = mov
 

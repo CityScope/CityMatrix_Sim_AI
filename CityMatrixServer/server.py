@@ -24,7 +24,7 @@ log = logging.getLogger('__main__')
 result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
 animBlink = 0 #RZ 170614
 PRINT_CITY_RECEIVED = False
-PRINT_CITY_TO_SEND = True
+PRINT_CITY_TO_SEND = False
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
@@ -63,6 +63,9 @@ while True:
         animBlink = 0
     #print("animBlink: {}".format(animBlink))
 
+    #RZ 170615 update objective weights
+
+
     #RZ 170614 print to check received city
     if PRINT_CITY_RECEIVED:
         print("\nReceived City: ")
@@ -85,16 +88,18 @@ while True:
             # Write city to local file for later comparison
             simCity = simulator.SimCity(ml_city, timestamp)
             write_city(simCity)
+            # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)
             #RZ 170614 update city.animBlink
             ml_city.animBlink = animBlink
             ai_city.animBlink = animBlink
             #RZ update city meta data
-            ml_city.updateMeta(city)  
+            ml_city.updateMeta(city)
             ai_city.updateMeta(city)
+            # format output json
             result = {'predict': ml_city.to_dict(), 'ai': ai_city.to_dict()}
+            # send json via udp
             server.send_data(result)
-            #server_unity.send_data(result)
         elif FORCE_PREDICTION or key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
@@ -108,21 +113,18 @@ while True:
 
             # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)
+
             #RZ 170614 update city.animBlink
             ml_city.animBlink = animBlink
             ai_city.animBlink = animBlink
             #RZ update city meta data
-            ml_city.updateMeta(city)  
+            ml_city.updateMeta(city)
             ai_city.updateMeta(city)
 
             # Now, we need to send 2 city objects back to GH
             result = {'predict': ml_city.to_dict(), 'ai': ai_city.to_dict()}
             server.send_data(result)
             log.info("Predicted city data sent to GH. ")
-
-            #RZ 170614 send city to unity
-            #server_unity.send_data(result)
-            #log.info("Predicted city data sent to Unity. \n")
 
             # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
             if DO_SIMULATE: sim.simulate(simCity)
@@ -147,6 +149,7 @@ while True:
                 print("slider1: {}".format(ml_city.slider1))
                 print("slider2: {}".format(ml_city.slider2))
                 print("toggle1: {}".format(ml_city.toggle1))
+                print("AIStep: {}".format(ml_city.AIStep))
                 print("AIWeights: {}".format(ml_city.AIWeights))
                 print("startFlag: {}".format(ml_city.startFlag))
                 print("AIMov: {}".format(ml_city.AIMov))
@@ -157,6 +160,7 @@ while True:
                 print("slider1: {}".format(ai_city.slider1))
                 print("slider2: {}".format(ai_city.slider2))
                 print("toggle1: {}".format(ai_city.toggle1))
+                print("AIStep: {}".format(ai_city.AIStep))
                 print("AIWeights: {}".format(ai_city.AIWeights))
                 print("startFlag: {}".format(ai_city.startFlag))
                 print("AIMov: {}".format(ai_city.AIMov))
@@ -164,7 +168,6 @@ while True:
             
             #print('result: {}'.format(result))
             server.send_data(result)
-            #server_unity.send_data(result)
             log.info("Same city received. Still sent some metadata to GH and Unity. Waiting to receive new city...")
 
 """
