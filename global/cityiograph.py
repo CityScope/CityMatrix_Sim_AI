@@ -95,7 +95,7 @@ class City(object):
             #self.AIMov = city.AIMov #RZ shouldn't pass from GH CV, but added by python server
             self.AIWeights = city.AIWeights
             self.startFlag = city.startFlag
-            self.animBlink = city.animBlink
+            #self.animBlink = city.animBlink this will be handled in server.py
         except:
             pass # Added by Kevin - for old cities with bad keys
 
