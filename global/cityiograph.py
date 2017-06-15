@@ -17,22 +17,25 @@ class City(object):
         else:
             self.json_obj = json.loads(json_str)
         self.meta = self.json_obj['objects']
+
+        #RZ170614 meta data read from json
         try: self.densities = self.meta['densities']
-        except:
-            self.densities = self.meta['density']
-
-            # Now, delete that key and update meta
-            del self.meta['density']
-            self.meta['densities'] = self.densities
-
+        except:self.densities = [1,1,1,1,1,1]
+        try: self.slider1 = self.meta['slider1']
+        except: self.slider1 = 0.0
+        try: self.slider2 = self.meta['slider2']
+        except: self.slider2 = 0.0
+        try: self.toggle1 = self.meta['toggle1']
+        except: self.toggle1 = 0
         try: self.AIStep = self.meta['AIStep']
         except: self.AIStep = -1
-        try:
-            self.slider1 = self.meta['slider1']
-            self.slider2 = self.meta['slider2']
-            self.AIWeights = self.meta['AIWeights']
-        except:
-            pass # Some older version cities may not have these keys - ignoring
+        try: self.AIMov = self.meta['AIMov']
+        except: self.AIMov = ['CELL',0,0,0]
+        try: self.AIWeights = self.meta['AIWeights']
+        except: self.AIWeights = [0.2,0.2,0.2,0.2,0.2]
+        try: self.startFlag = self.meta['startFlag']
+        except: self.startFlag = 0
+
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
@@ -57,13 +60,16 @@ class City(object):
 
     def to_dict(self):
         try:
+            #RZ170614
             self.meta["densities"] = self.densities
             self.meta["population"] = self.population
-            self.meta["AIStep"] = self.AIStep # RZ
-            self.meta["slider1"] = self.slider1 # RZ
-            self.meta["slider2"] = self.slider2 # RZ
-            self.meta["AIWeights"] = self.AIWeights # RZ
-            self.meta["AIMov"] = self.AIMov #RZ
+            self.meta["slider1"] = self.slider1
+            self.meta["slider2"] = self.slider2
+            self.meta["toggle1"] = self.toggle1
+            self.meta["AIStep"] = self.AIStep
+            self.meta["AIMov"] = self.AIMov
+            self.meta["AIWeights"] = self.AIWeights
+            self.meta["startFlag"] = self.startFlag
         except: pass # Some older version cities may not have these keys - ignoring
         changes = {
             "objects": self.meta,
@@ -76,10 +82,16 @@ class City(object):
         #self.densities = city.densities #RZ can not be here, will overwrite the right densities for AI_city
         #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
         try:
-            self.AIStep = city.AIStep
-            self.slider1 = city.slider1
+            #RZ170614
+            self.densities = city.densities
+            self.population = city.population
+            self.slider1 = city.slider2
             self.slider2 = city.slider2
+            self.toggle1 = city.toggle1
+            self.AIStep = city.AIStep
+            #self.AIMov = city.AIMov #RZ shouldn't pass from GH CV, but added by python server
             self.AIWeights = city.AIWeights
+            self.startFlag = city.startFlag
         except:
             pass # Added by Kevin - for old cities with bad keys
 

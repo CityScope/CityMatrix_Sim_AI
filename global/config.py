@@ -56,7 +56,7 @@ XML_DIRECTORY = '../CityPrediction/xml/' # Directory to save custom XML configur
 DEFAULT_XML = {'Experiment_plan': {'Simulation': {'@finalStep': '8642', '@id': '1', '@experiment': 'Run', 'Parameters': {'Parameter': [{'@value': 'TMP_VALUE', '@name': 'filename', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'output_dir', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'prefix', '@type': 'STRING'}]}, '@sourcePath': SIM_SCRIPT_PATH }}} # Data dictionary that is to be converted into XML
 
 # Environment variables
-SERVER_OS = 'MAC' # Operating system of the prediction server, either MAC or WIN
+SERVER_OS = 'WIN' # Operating system of the prediction server, either MAC or WIN
 if SERVER_OS == 'MAC':
 	JAR_PATH = '/Applications/Gama.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.3.100.v20150511-1540.jar' # Path to Eclipse JAR file needed for GAMA plugins
 	GAMA_COMMANDS = ['java', '-cp', JAR_PATH, '-Xms512m', '-Xmx2048m', '-Djava.awt.headless=true', 'org.eclipse.core.launcher.Main', '-application', 'msi.gama.headless.id4', 'XML_PATH', GAMA_OUTPUT_DIRECTORY] # Command list for subprocess.Popen
