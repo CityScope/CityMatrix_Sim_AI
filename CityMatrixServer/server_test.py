@@ -2,12 +2,12 @@
     File name: server_test.py
     Author: Kevin Lyons
     Date created: 4/11/2017
-    Date last modified: 6/12/2017
+    Date last modified: 6/15/2017
     Python Version: 3.5
     Purpose: Quick script to test the functionality of our prediciton server. Make minor tweaks to cities
      to test our code.
     TODO:
-    	- Make this file representative of Ryan's tests.
+    	- Make this file representative of Ryan's tests!!!
 '''
 
 # Global imports

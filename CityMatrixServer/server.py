@@ -3,16 +3,18 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-12 22:31:49
+Last modified time: 2017-06-15 21:01:28
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
 TODO:
-    - Avoid code repeats.
+    - None at this time.
 '''
 
-# Import local scripts for all key functionality, both ML and AI
+''' --- IMPORTS --- '''
+
 import sys, logging
+
 sys.path.extend(['../global/', '../CityPrediction/', '../CityMAItrix/'])
 from utils import *
 import city_udp, simulator, predictor as ML
@@ -20,6 +22,8 @@ from strategies import random_single_moves as Strategy
 from objective import objective
 log = logging.getLogger('__main__')
 result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+
+''' --- CONFIGURATIONS --- '''
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
@@ -35,6 +39,8 @@ def register():
 
 # Create instance of our simulator, if needed
 if DO_SIMULATE: sim = simulator.CitySimulator(SIM_NAME, log)
+
+''' --- MAIN SERVER LOGIC --- '''
 
 log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
 
@@ -100,3 +106,14 @@ while True:
             result = { 'predict' : ml_dict , 'ai' : ai_dict }
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+
+''' --- GLOBAL HELPER METHODS --- '''
+
+def metrics_dictionary(metrics):
+    '''
+    Helper method to convert list of tuples to dictionary for JSON submission.
+    Input:  metrics - list of tuples of the form [ ('Population Density Performance', 0.11217427049946581, 1) , ... ]
+    Output: d - dictionary mapping metric name -> value
+    '''
+
+    return { name : [ value , weight ] for name, value, weight in metrics }

@@ -4,10 +4,10 @@
     Date created: 5/17/2017
     Date last modified: 6/12/2017
     Python Version: 3.5
-    Purpose: Configuration file for our project. All filenames are relative to the file in which they
+    Purpose: Configuration file for our project. Note: all filenames are relative to the file in which they
         are used.
     TODO:
-    	- Remove unneeded configs. Organize.
+    	- None at this time.
 '''
 
 # City variables
@@ -19,13 +19,7 @@ EDGE_COST = 1 # Used in graph creation
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'
 LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_model.pkl' # Pickle file for traffic predictor
-ROOT_NN_FILENAME = MODEL_DIR + 'neural_model' # Root name for neural network JSON/H5 model/weights files
 SOLAR_MODEL_FILENAME = MODEL_DIR + 'solar_model.pkl' # Pickle file for solar predictor
-NUM_FEATURES = 512 # Traffic and wait for 256 cells = 512
-MATRIX_SHAPE = (-1, 16, 16, 2) # 3D matrix representation of our city grid as "image" for CNN
-LOSS_FUNCTION = 'mean_squared_error' # Loss function for our neural network
-OPTIMIZER = 'adam' # Using adam, not SGD
-KERAS_METRICS = ['accuracy'] # Percent accuracy metric
 
 # Server variables
 SERVER_NAME = 'CityMatrixServer'
@@ -53,7 +47,11 @@ SIM_NAME = 'PythonSim' # Name of our simulator for ID purposes
 SIM_SCRIPT_PATH = '../../CityGamatrix/models/CityGamatrix_PEV.gaml' # GAMA simulation script
 GAMA_OUTPUT_DIRECTORY = '../CityPrediction/sim_output/' # Output directory for misc GAMA needs
 XML_DIRECTORY = '../CityPrediction/xml/' # Directory to save custom XML configuration files
-DEFAULT_XML = {'Experiment_plan': {'Simulation': {'@finalStep': '8642', '@id': '1', '@experiment': 'Run', 'Parameters': {'Parameter': [{'@value': 'TMP_VALUE', '@name': 'filename', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'output_dir', '@type': 'STRING'}, {'@value': 'TMP_VALUE', '@name': 'prefix', '@type': 'STRING'}]}, '@sourcePath': SIM_SCRIPT_PATH }}} # Data dictionary that is to be converted into XML
+DEFAULT_XML = {'Experiment_plan': {'Simulation': {'@finalStep': '8642', '@id': '1', '@experiment': 'Run',
+    'Parameters': {'Parameter': [{'@value': 'TMP_VALUE', '@name': 'filename', '@type': 'STRING'},
+    {'@value': 'TMP_VALUE', '@name': 'output_dir', '@type': 'STRING'}, {'@value': 'TMP_VALUE',
+    '@name': 'prefix', '@type': 'STRING'}]}, '@sourcePath': SIM_SCRIPT_PATH }}}
+    # Data dictionary that is to be converted into XML
 
 # Environment variables
 SERVER_OS = 'MAC' # Operating system of the prediction server, either MAC or WIN

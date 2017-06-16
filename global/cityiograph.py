@@ -2,15 +2,40 @@
 """
 Created on Wed Feb 15 23:13:35 2017
 
-@author: Alex
+@author: Alex, Kevin
 """
+
+''' --- IMPORTS --- '''
+
 import json
 import numpy as np
 import collections
+import logging
 
 from config import *
 
+''' --- CONFIGURATIONS --- '''
+log = logging.getLogger('__main__')
+
+''' --- CLASS DEFINITIONS --- '''
+
 class City(object):
+    """General representation of a city matrix.
+    
+    Attributes:
+        AIMov (list): list data describing the move suggested by an AI for a given city 
+        AIStep (int): indexer used by GH to show AI progress
+        AIWeights (list): list of weights corresponding to metrics used by AI
+        cells (dict): (x, y) -> cityiograph.Cell
+        densities (list): list of densities for each cell type id in the city
+        height (int): city dimensionality
+        json_obj (dict): full JSON object describing the city
+        meta (dict): contains meta information about the city, not the grid
+        population (int): total population of the city
+        slider1 (int): data from table
+        slider2 (int): data from table
+        width (int): city dimensionality
+    """
     def __init__(self, json_string):
         self.json_obj = json.loads(json_str)
         self.meta = self.json_obj['objects']
@@ -32,15 +57,23 @@ class City(object):
             self.population += c.population
 
     def equals(self, other):
-        """True iff all of this city's cells are equal to their corresponding
-        cells in other and densities, width, and height are the same.
-        """
+        '''
+        Determines if this city object is equivalent to another. Need all cells, densities and 
+            densities to be equal.
+        Input:  other - < cityiograph.City > - the city to be compared
+        Output: < bool > - indicates the equality of this city and other
+        '''
         cells_equal = all(
             [c.equals(other.cells.get(pos)) for pos, c in self.cells.items()])
         return cells_equal and (self.densities == other.densities) \
             and (self.width == other.width) and (self.height == other.height)
 
     def to_dict(self):
+        '''
+        Converts this city to a dictionary object for storage and other purposes.
+        Input:  None
+        Output: result - < dict > - dictionary mapping of this city
+        '''
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
 
@@ -54,12 +87,15 @@ class City(object):
             "objects": self.meta,
             "grid": [c.to_dict() for c in self.cells.values()]
         }
+
         return result
 
-    #RZ pass the data from GH CV to GH VIZ
     def updateMeta(self, other_city):
-        #self.densities = city.densities #RZ can not be here, will overwrite the right densities for AI_city
-        #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
+        '''
+        Ignoring a prediction of any sort, simply update the metadata of a given city with the data from another.
+        Input:  other_city < cityiograph.City > - 
+        Output: None
+        '''
         self.AIStep = other_city.AIStep
         self.slider1 = other_city.slider1
         self.slider2 = other_city.slider2
@@ -69,69 +105,45 @@ class City(object):
         self.AIMov = mov # TODO - Remove
 
     def to_json(self):
+        """Converts the current city object to a JSON string.
+        
+        Returns:
+            string: JSON string of city
+        """
         return json.dumps(self.to_dict())
 
     def get_cell(self, pos):
+        """Helper method to get a cell from our dictionary.
+        
+        Args:
+            pos (2-tuple): (x, y) tuple describing the cell location we want to retreive
+        
+        Returns:
+            cityiograph.Cell: the cell object at that location
+        """
         return self.cells[pos]
 
-    # Move
-    def nesw(self, pos):
-        x = pos[0]
-        y = pos[1]
-        directions = []
-        if x > 0:
-            directions.append((x - 1, y))
-        if x < self.width - 1:
-            directions.append((x + 1, y))
-        if y > 0:
-            directions.append((x, y - 1))
-        if y < self.height - 1:
-            directions.append((x, y + 1))
-        return directions
-
-    # Move
-    def get_graph(self):
-        graph = {}
-        for cell in self.cells.values():
-            edges = {}
-            for n in self.nesw(cell.get_pos()):
-                edges[n] = EDGE_COST
-            graph[cell.get_pos()] = edges
-        return graph
-
-    # Move
-    def get_road_nearby_population_map(self):
-        pop_map = {}
-        for pos, cell in self.cells.items():
-            if cell.type_id == ROAD_ID:
-                pop_map[pos] = 0
-                for n in [self.cells[p] for p in self.nesw(pos)]:
-                    if n.type_id != ROAD_ID:
-                        pop_map[pos] += n.population
-        return pop_map
-
-    # Move
-    def get_road_graph(self):
-        road_graph = {}
-        for (pos, edges) in self.get_graph().items():
-            if self.cells[pos].type_id == ROAD_ID:
-                new_edges = {}
-                for (other_pos, cost) in edges.items():
-                    if self.cells[other_pos].type_id == ROAD_ID:
-                        new_edges[other_pos] = cost
-                road_graph[pos] = new_edges
-        return road_graph
-
-    # Keep
     def change_density(self, idx, new_density):
+        """Helper method to update a density on a city. Used in AI modeling.
+        
+        Args:
+            idx (int): type id of the density we are updating
+            new_density (int): the new density value
+        """
         for cell in self.cells.values():
             if cell.type_id == idx:
                 cell.density = new_density
 
         self.densities[idx] = new_density
 
-    # Keep
     def change_cell(self, x, y, new_id):
+        """Helper method to update a particular cell on a city. Used in AI modeling.
+        
+        Args:
+            x (int): x location
+            y (int): y location
+            new_id (int): the new type id for this paricular cell
+        """
         cell = self.cells[(x, y)]
         cell.type_id = new_id
 
@@ -143,10 +155,22 @@ class City(object):
         cell.population = density_to_pop(cell.type_id, cell.density)
 
 class Cell(object):
+    """General representation of a single block within an instance of a cityiograph.City.
+    
+    Attributes:
+        data (dict): contains ML attributes of city
+        density (int): -
+        json_obj (dict): full data object
+        magnitude (int): ?
+        population (int): number of people who live on this cell
+        rot (int): direction wrt the table
+        type_id (int): -
+        x (int): -
+        y (int): -
+    """
     def __init__(self, json_data, density_array):
         self.json_obj = json_data
         self.type_id = json_data['type']
-        if self.type_id > 6: self.type_id = -1
         self.x = json_data['x']
         self.y = json_data['y']
         self.rot = json_data['rot']
@@ -164,20 +188,40 @@ class Cell(object):
         self.population = density_to_pop(self.type_id, self.density)
 
     def get_pos(self):
+        """Basic helper method to get location of a cell.
+        
+        Returns:
+            2-tuple: (x, y) location
+        """
         return (self.x, self.y)
 
     def get_height(self):
-        return float(8 * self.density / 3) # Why
+        """Get the relative height of a building. Used for solar prediction.
+        
+        Returns:
+            float: scaled density of building
+        """
+        return float(8 * self.density / 3)
 
     def equals(self, other_cell):
-        """True if type, x and y are the same
+        """True if type, x and y are the same.
+        
+        Args:
+            other_cell (cityiograph.Cell): -
+        
+        Returns:
+            bool: indicator of equality
         """
         return (self.type_id == other_cell.type_id) \
             and (self.x == other_cell.x) and (self.y == other_cell.y)
 
-    # Fix
     def to_dict(self):
-        changes = {
+        """Helper method to convert cell to dictionary object for later use.
+        
+        Returns:
+            dict: -
+        """
+        result = {
             "type": self.type_id,
             "x": self.x,
             "y": self.y,
@@ -185,24 +229,20 @@ class Cell(object):
             "rot": self.rot,
             "data": self.data
         }
-        return update_dict(self.json_obj, changes)
+        return result
 
-# Remove
-def update_dict(d, u):
-    """
-    http://stackoverflow.com/questions/3232943
-    /update-value-of-a-nested-dictionary-of-varying-depth
-    """
-    for k, v in u.items():
-        if isinstance(v, collections.Mapping):
-            r = update_dict(d.get(k, {}), v)
-            d[k] = r
-        else:
-            d[k] = u[k]
-    return d
+''' --- GLOBAL HELPER METHODS --- '''
 
-# Move
 def cells_from_json(json_buildings, densities):
+    """Extract cell objects from json.
+    
+    Args:
+        json_buildings (json mapping): input grid of cell data
+        densities (list): list of densities for each cell type id in the city
+    
+    Returns:
+        list: cell instances in the city
+    """
     cells = []
     for jcell in json_buildings:
         c = Cell(jcell, densities)
@@ -210,43 +250,124 @@ def cells_from_json(json_buildings, densities):
 
     return cells
 
-# Move
 def dict_from_cells(cells):
+    """Provides dictionary mapping (x, y) : cityiograph.Cell.
+    
+    Args:
+        cells (list): cell instances in the city
+    
+    Returns:
+        dict: -
+    """
     cell_dict = {}
     for cell in cells:
         cell_dict[cell.get_pos()] = cell
     return cell_dict
 
-# vis utils - move
-def plot_city(city):
-
-    plotWidget = pg.plot()
-    building_points = []
-    road_points = []
-    for c in city.cells.values():
-        if c.type_id == ROAD_ID:
-            road_points.append(c.get_pos())
-        else:
-            building_points.append(c.get_pos())
-
-    plotWidget.plot(
-        [t[0] for t in road_points], [t[1] for t in road_points],
-        pen=None,
-        symbol='+')
-    plotWidget.plot(
-        [t[0] for t in building_points], [t[1] for t in building_points],
-        pen=None,
-        symbol='s')
-
-
-def traffic_plot(city):
-    data = np.zeros([city.width, city.height])
-    for c in city.cells.values():
-        data[c.x][-c.y] = c.data["traffic"]
-    pg.image(data)
-
-# Document
 def density_to_pop(type_id, density):
+    """Converts the raw floor density to actual people living in a cell.
+    
+    Args:
+        type_id (int): -
+        density (int): density value for this type id
+    
+    Returns:
+        float: total number of people living at this given location
+    """
     if type_id not in range(len(POP_ARR)):
         return 0
     return density * POP_ARR[type_id]
+
+def cell_features(cell):
+    '''
+    Get the 2 input features for a given cell
+    Currently using population and is road
+    Input:  cell - instance of cityiograph.Cell
+    Output: feats - list of input features for this cell
+    '''
+    feats = [ cell.population ]
+    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    return feats
+
+def cell_results(cell):
+    '''
+    Get the 2 output features for a given cell
+    Currently using traffic score and wait time
+    Input:  cell - instance of cityiograph.Cell
+    Output: feats - list of output features for this cell
+    '''
+    return [ cell.data["traffic"], cell.data["wait"] ]
+
+def get_features(city):
+    '''
+    Get the input feature vector for a given city
+    Input:  city - instance of cityiograph.City
+    Output: feats - np array of input features for this city
+    '''
+    features = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            features += cell_features(cell)
+    return np.array(features)
+
+def get_results(city):
+    '''
+    Get the output feature vector for a given city
+    Input:  city - instance of cityiograph.City
+    Output: feats - np array of output features for this city
+    '''
+    results = []
+    for i in range(city.width):
+        for j in range(city.height):
+            cell = city.cells.get((i, j))
+            results += cell_results(cell)
+    return np.array(results)
+
+def output_to_city(city, output):
+    '''
+    Custom method to write new data to city object for later serialization
+    Input:  city - instance of cityiograph.City
+    output - list of traffic and wait scores, alternating
+    Output: city - simply write this data to the existing city object and return
+    '''
+    i = 0
+    for x in range(city.width):
+        for y in range(city.height):
+            cell = city.cells.get((x, y))
+            cell.data["traffic"] = int(round(output[i]))
+            cell.data["wait"] = int(round(output[i + 1]))
+            i += 2  
+    return city
+
+def write_city(city, timestamp = None):
+    '''
+    Write a city to a JSON file
+    Input:  city - instance of simCity - city to be logged OR dictionary ready to be logged
+    Output: None - write city as JSON to specified filename for later ML purposes
+    '''
+
+    if isinstance(city, dict):
+        # Get filename
+        filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predicted_output_' + timestamp + '.json')
+
+        # Write to JSON
+        with open(filename, 'w') as f:
+            f.write(json.dumps(city))
+
+    else:
+        # Get filename
+        filename = city.filename
+
+        # Handle full city object case
+        # Convert to dictionary object for editing
+        d = city.cityObject.to_dict()
+
+        # Add UNIX timestamp to JSON
+        d['objects']['timestamp'] = city.timestamp
+
+        # Write dictionary to JSON
+        with open(filename, 'w') as f:
+            f.write(json.dumps(d))
+
+    log.info("City data written at filename = {}.".format(os.path.abspath(filename)))
