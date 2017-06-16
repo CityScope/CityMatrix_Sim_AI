@@ -41,7 +41,7 @@ city = City(json_string)
 log.debug("Successfully loaded city.")
 
 # city.cells[(random.randint(0, 16), random.randint(0, 16))].data['traffic'] = random.randint(0, 1000)
-# city.densities[random.randint(0, 5)] = random.randint(0, 30)
+city.densities[random.randint(0, 5)] = random.randint(0, 30)
 # city.densities = [30, 30, 30, 1, 2, 30]
 
 # Send that city to our UDP server
@@ -68,8 +68,8 @@ plt.imshow(np.array(types).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpol
 # plt.show()
 
 # Run any validation checks on the cities
-ml = City(data['predict'], dict_mode = True)
-ai = City(data['ai'], dict_mode = True)
+ml = City(json.dumps(data['predict']))
+# ai = City(json.dumps(data['ai']))
 
 '''
 
@@ -90,15 +90,16 @@ two = np.array(two).reshape(CITY_SIZE, CITY_SIZE)
 log.debug(one)
 log.debug(two)
 
+'''
+
 # Get solar info and vis
 solar = []
 for x in range(CITY_SIZE):
 	for y in range(CITY_SIZE):
-		cell = p.get_cell((x, y))
+		cell = ml.get_cell((x, y))
 		solar.append(cell.data['solar'])
 plt.subplot(212)
 plt.imshow(np.array(solar).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
 plt.show()
-'''
 
 log.debug("Process complete.")

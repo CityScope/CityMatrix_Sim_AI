@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-15 21:54:02
+Last modified time: 2017-06-15 22:29:39
 Description:
 	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -12,7 +12,7 @@ TODO:
 '''
 
 # Get our key utils script
-import sys; sys.path.extend(['../global/', '../MachineLearning/'])
+import sys; sys.path.extend(['../global/'])
 import config
 from utils import *
 import solar_regression as solar
@@ -36,10 +36,12 @@ def traffic_predict(city):
 	traffic_output = traffic_model.predict([ features ])[0].clip(min = 0) # Type = np array, 1 x 512
 
 	# Only care about traffic values right now
-	result = features; result[::2] = traffic_output[::2]
+	result = features
+	result[::2] = traffic_output[::2]
 
 	# Write prediction back to the cityiograph.City structure and return
-	return output_to_city(city, result)
+	new_city = output_to_city(city, result)
+	return new_city
 
 def solar_predict(new_city, prev, locations):
 	'''
@@ -69,7 +71,7 @@ def predict(city, change_key, change_data):
 	Output: result_city - instance of cityiograph.City, with updated cell data values
 	'''
 
-	if isinstance(change_key, bool):
+	if isinstance(change_data, bool):
 		# First city OR same city - just want traffic update
 		return traffic_predict(city)
 
@@ -86,7 +88,7 @@ def predict(city, change_key, change_data):
 		for i in indices:
 			for c in prev.cells.values():
 				if c.type_id == i:
-					locations.append((c.x, c.y))
+					locations.append(c.get_pos())
 
 	elif change_key == CityChange.CELL:
 		locations = l # Already have changed locations from data

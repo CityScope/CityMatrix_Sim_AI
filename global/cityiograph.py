@@ -346,13 +346,14 @@ def output_to_city(city, output):
     Output: city - simply write this data to the existing city object and return
     '''
     i = 0
+    new_city = city.copy()
     for x in range(city.width):
         for y in range(city.height):
-            cell = city.cells.get((x, y))
+            cell = new_city.cells.get((x, y))
             cell.data["traffic"] = int(round(output[i]))
             cell.data["wait"] = int(round(output[i + 1]))
             i += 2  
-    return city
+    return new_city
 
 def write_city(city, timestamp = None):
     '''
