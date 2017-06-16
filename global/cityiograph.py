@@ -133,6 +133,23 @@ class City(object):
         """
         return self.cells[pos]
 
+    def get_data_matrix(self, key):
+        """Get a data output for the city in a numpy format for data analysis.
+        
+        Args:
+            key (string): data key we will check in cell { 'traffic', 'wait', 'solar' }
+        
+        Returns:
+            nparray (self.height, self.width): -
+        """
+        result = []
+        for x in range(self.width):
+            for y in range(self.height):
+                cell = self.get_cell((x, y))
+                result.append(cell.data[key])
+        result = np.array(result).reshape(self.height, self.width)
+        return result
+
     def change_density(self, idx, new_density):
         """Helper method to update a density on a city. Used in AI modeling.
         

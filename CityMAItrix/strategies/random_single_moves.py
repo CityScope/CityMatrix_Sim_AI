@@ -62,10 +62,12 @@ def search(city):
             best_move = mov
 
     suggested_city = move(city, best_move)
+    key, data = utils.diff_cities(suggested_city, prev_city = city)
+    final_city = ML.predict(suggested_city, key, data)
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
-    suggested_city.updateAIMov(best_move)
-    return (suggested_city, best_move, objective.get_metrics(suggested_city))
+    final_city.updateAIMov(best_move)
+    return (final_city, best_move, objective.get_metrics(final_city))
 
 def move(city, mov):
     """Helper method to change a city in some minor yet optimal way.
@@ -100,11 +102,12 @@ def score(city, mov):
         float: weighted objective score of the city, given certain metrics
     """
     # Make the move
-    new_city = move(city, mov)
+    the_city = city.copy()
+    new_city = move(the_city, mov)
 
     # Need to run our ML prediction here
     # Run our black box predictor on this city with given changes
-    key, data = utils.diff_cities(new_city, prev_city = city)
+    key, data = utils.diff_cities(new_city, prev_city = the_city)
     final_city = ML.predict(new_city, key, data)
 
     # Return the evaluated metrics score

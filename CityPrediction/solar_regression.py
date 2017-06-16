@@ -1,4 +1,4 @@
-import numpy as np; # np.set_printoptions(threshold = np.nan)
+import numpy as np
 from sklearn.externals import joblib
 import sys
 sys.path.append('../global/')
@@ -42,7 +42,7 @@ def push_5x5_deltas(city, deltas, x, y):
         y (int): -
     
     Returns:
-        TYPE: Description
+        cityiograph.City: output city
     """
     counter = 0
     for i in range(x - 2, x + 3):

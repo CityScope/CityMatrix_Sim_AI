@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-15 22:29:39
+Last modified time: 2017-06-15 23:37:24
 Description:
 	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -12,7 +12,9 @@ TODO:
 '''
 
 # Get our key utils script
-import sys; sys.path.extend(['../global/'])
+import sys, numpy as np
+np.set_printoptions(threshold = np.nan)
+sys.path.extend(['../global/'])
 import config
 from utils import *
 import solar_regression as solar
@@ -57,7 +59,11 @@ def solar_predict(new_city, prev, locations):
 
 	# For every location, update values based on solar radiation deltas predictor
 	for x, y in locations:
+		next_prev = result.copy()
 		result = solar.update_city(prev, result, x, y)
+		prev = next_prev # Maybe???
+		# np.set_printoptions(threshold = np.nan)
+		# print(result.get_data_matrix('solar'))
 
 	return result
 
@@ -77,9 +83,13 @@ def predict(city, change_key, change_data):
 
 	# Parse our change data
 	l, prev = tuple(change_data)
+	# print(prev.densities, "prev")
 		
 	# First, do full traffic prediction
 	current = traffic_predict(city)
+	# print(id(city), "city")
+	# print(id(current), "current")
+	# print(id(prev), "prev")
 	locations = []
 
 	if change_key == CityChange.DENSITY:

@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-15 22:27:18
+Last modified time: 2017-06-15 23:50:46
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -64,8 +64,9 @@ while True:
     # Only consider new city if it is different from most recent
     if input_city != None:
         key, data = diff_cities(input_city)
-        print(key)
-        print(data)
+        # print(key)
+        # print(data)
+        # print(input_city.densities, "inp")
         if key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
@@ -74,23 +75,25 @@ while True:
 
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(input_city, key, data)
+            # print(ml_city.densities, "ml")
 
             # Run our AI on this city
-            # ai_city, move, ai_metrics_list = Strategy.search(input_city)
+            ai_city, move, ai_metrics_list = Strategy.search(input_city)
+            # print(ai_city.densities, "ai")
 
             # Now, we need to send 2 city objects back to GH
             # First, get metrics dicts for cities
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            # ai_metrics = metrics_dictionary(ai_metrics_list)
+            ai_metrics = metrics_dictionary(ai_metrics_list)
 
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
             ml_dict['objects']['metrics'] = ml_metrics
-            # ai_dict = ai_city.to_dict()
-            # ai_dict['objects']['metrics'] = ai_metrics
+            ai_dict = ai_city.to_dict()
+            ai_dict['objects']['metrics'] = ai_metrics
 
             # Save result locally and send
-            result = { 'predict' : ml_dict , 'ai' : None } # ai_dict
+            result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             write_city(result, timestamp = timestamp)
             server.send_data(result)
             log.info("Predicted city data successfully sent to GH.\n")
@@ -103,19 +106,19 @@ while True:
         elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
             #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
             ml_city.updateMeta(input_city) #RZ necessary, do not delete
-            # ai_city.updateMeta(input_city) #RZ necessary, do not delete
+            ai_city.updateMeta(input_city) #RZ necessary, do not delete
 
             # Then, get metrics dicts for cities
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            # ai_metrics = metrics_dictionary(ai_metrics_list)
+            ai_metrics = metrics_dictionary(ai_metrics_list)
 
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
             ml_dict['objects']['metrics'] = ml_metrics
-            # ai_dict = ai_city.to_dict()
-            # ai_dict['objects']['metrics'] = ai_metrics
+            ai_dict = ai_city.to_dict()
+            ai_dict['objects']['metrics'] = ai_metrics
 
             # Send result
-            result = { 'predict' : ml_dict , 'ai' : None } # ai_dict
+            result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
