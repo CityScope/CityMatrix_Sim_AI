@@ -20,7 +20,7 @@ def normalize(x, min, max):
     return (x - min) / (max - min)
 
 pdp_min = 0
-pdp_max = 958464
+pdp_max = 20000 #958464
 def pop_density_perf(city):
     pop_dict = id_pop_dict(city)
     #print(pop_dict)
@@ -45,7 +45,7 @@ def pop_diversity_perf(city):
 energy_per_sqm = [0.8, 1.0, 1.2, 2.0, 2.5, 3.0, 0]
 floor_area = 1562.5 # square meters
 ep_min = 0
-ep_max = 10000000 # need to determine this
+ep_max = 500000 # need to determine this
 def energy_perf(city):
     tot = 0
     for cell in city.cells.values():
@@ -54,13 +54,13 @@ def energy_perf(city):
     return normalize(tot, ep_min, ep_max)
 
 tp_min = 0
-tp_max = 10000000 # need to determine this
+tp_max = 100 # need to determine this
 def traffic_perf(city):
     traffics = [cell.data["traffic"] for cell in city.cells.values()]
     return normalize(sum(traffics) / len(traffics), tp_min, tp_max)
 
 sp_min = 0
-sp_max = 10000000 # need to determine this
+sp_max = 500 # need to determine this
 def solar_perf(city):
     solars = [cell.data["solar"] for cell in city.cells.values()]
     return normalize(sum(solars) / len(solars), sp_min, sp_max)
