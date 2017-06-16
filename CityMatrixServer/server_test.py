@@ -24,10 +24,11 @@ log = logging.getLogger('__main__')
 # filename = 'C:/RH_GH/_verification/170510_ML_Validation_003/02_kevin_prediction_linear_normalized/city_8000_output_normalized.json'
 # filename = '../../../data/cities/cityIO.json'
 # filename = '../../../data/cities/city_9000.json'
+filename = '../../../data/cities/new_city.json'
 # filename = random.choice(glob.glob('../../../data/train_good/*.json'))
-d = '../CityPrediction/input_cities/'
-files = glob.glob(d + '*')
-filename = max(files, key = os.path.getctime) # Get the latest one
+# d = '../CityPrediction/input_cities/'
+# files = glob.glob(d + '*')
+# filename = max(files, key = os.path.getctime) # Get the latest one
 log.debug("Getting data from city at {}.".format(os.path.abspath(filename)))
 
 # Initialize server, flip ports
@@ -40,7 +41,7 @@ city = City(json_string)
 log.debug("Successfully loaded city.")
 
 # city.cells[(random.randint(0, 16), random.randint(0, 16))].data['traffic'] = random.randint(0, 1000)
-city.densities[random.randint(0, 5)] = random.randint(0, 30)
+# city.densities[random.randint(0, 5)] = random.randint(0, 30)
 # city.densities = [30, 30, 30, 1, 2, 30]
 
 # Send that city to our UDP server

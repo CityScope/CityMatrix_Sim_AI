@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-15 21:01:28
+Last modified time: 2017-06-15 21:51:48
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -53,7 +53,7 @@ while True:
     # Only consider new city if it is different from most recent
     if input_city != None:
         key, data = diff_cities(input_city)
-        if FORCE_PREDICTION or key is not CityChange.NO:
+        if key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
             inputSimCity = simulator.SimCity(input_city, timestamp)

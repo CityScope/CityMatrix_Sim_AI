@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-12 22:32:58
+Last modified time: 2017-06-15 21:54:02
 Description:
 	- Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
 	all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -59,7 +59,7 @@ def solar_predict(new_city, prev, locations):
 
 	return result
 
-def predict(city, change_key, change_data, force_predict = config.FORCE_PREDICTION):
+def predict(city, change_key, change_data):
 	'''
 	Black box predictor function for our machine learning.
 	Input: 	city - instance of cityiograph.City to be predicted
@@ -69,8 +69,8 @@ def predict(city, change_key, change_data, force_predict = config.FORCE_PREDICTI
 	Output: result_city - instance of cityiograph.City, with updated cell data values
 	'''
 
-	if (not change_data and force_predict) or change_key == CityChange.FIRST:
-		# Same city, just want traffic update
+	if isinstance(change_key, bool):
+		# First city OR same city - just want traffic update
 		return traffic_predict(city)
 
 	# Parse our change data

@@ -7,6 +7,8 @@ Created on Wed Feb 15 23:13:35 2017
 
 ''' --- IMPORTS --- '''
 
+import sys
+import os
 import json
 import numpy as np
 import collections
@@ -37,7 +39,7 @@ class City(object):
         width (int): city dimensionality
     """
     def __init__(self, json_string):
-        self.json_obj = json.loads(json_str)
+        self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
 
         self.densities = self.meta['densities']
@@ -112,6 +114,14 @@ class City(object):
         """
         return json.dumps(self.to_dict())
 
+    def copy(self):
+        """General copy method to avoid object pointer errors.
+        
+        Returns:
+            cityiograph.City: new city with exact same internal data
+        """
+        return City(self.to_json())
+
     def get_cell(self, pos):
         """Helper method to get a cell from our dictionary.
         
@@ -173,8 +183,12 @@ class Cell(object):
         self.type_id = json_data['type']
         self.x = json_data['x']
         self.y = json_data['y']
-        self.rot = json_data['rot']
-        self.magnitude = json_data['magnitude']
+        try:
+            self.rot = json_data['rot']
+            self.magnitude = json_data['magnitude']
+        except:
+            self.rot = 0
+            self.magnitude = 0
         self.data = json_data.get('data', {'traffic': 0, "wait": 0, "solar" : 0}) # Changed by Kevin - adding solar
 
         if self.type_id == ROAD_ID:

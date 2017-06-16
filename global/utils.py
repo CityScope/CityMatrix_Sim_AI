@@ -16,13 +16,6 @@ import smtplib, base64, glob, random, numpy as np
 from email.mime.text import MIMEText
 from enum import Enum
 
-# Prevent TensorFlow log statements
-# Taken from https://github.com/tensorflow/tensorflow/issues/8340
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-# Keras import for JSON functionality
-from keras.models import model_from_json
-
 # Custom imports
 from cityiograph import *
 from config import *
@@ -102,32 +95,33 @@ def notify(message, did_restart):
 	'''
 
 	try:
-		# Retreive data from credentials file
-		cred = pickle.load(open(CREDENTIALS_FILENAME, 'rb'))
-		username, password = tuple(base64.b64decode(cred[k]).decode() for k in ['u', 'p'])
-		
-		# Set up STMP connection
-		server = smtplib.SMTP(SMTP_HOSTNAME, SMTP_PORT)
-		server.ehlo()
-		server.starttls()
-		server.login(username, password)
+		if not DEBUG: # Only do this in release mode for the server
+			# Retreive data from credentials file
+			cred = pickle.load(open(CREDENTIALS_FILENAME, 'rb'))
+			username, password = tuple(base64.b64decode(cred[k]).decode() for k in ['u', 'p'])
+			
+			# Set up STMP connection
+			server = smtplib.SMTP(SMTP_HOSTNAME, SMTP_PORT)
+			server.ehlo()
+			server.starttls()
+			server.login(username, password)
 
-		# Prepare e-mail message
-		body = 'This is a notice that {} has been stopped. See below for stack trace information.\n\n{}\n\n'.format(SERVER_NAME, message)
-		if did_restart:
-			body += '{} was able to successfully restart.'.format(SERVER_NAME)
-		else:
-			body += '{} could not restart at this time.'.format(SERVER_NAME)
+			# Prepare e-mail message
+			body = 'This is a notice that {} has been stopped. See below for stack trace information.\n\n{}\n\n'.format(SERVER_NAME, message)
+			if did_restart:
+				body += '{} was able to successfully restart.'.format(SERVER_NAME)
+			else:
+				body += '{} could not restart at this time.'.format(SERVER_NAME)
 
-		msg = MIMEText(body)
-		msg['Subject'] = '{} has been stopped.'.format(SERVER_NAME)
-		msg['From'] = username
-		msg['To'] = ", ".join(EMAIL_LIST)
+			msg = MIMEText(body)
+			msg['Subject'] = '{} has been stopped.'.format(SERVER_NAME)
+			msg['From'] = username
+			msg['To'] = ", ".join(EMAIL_LIST)
 
-		# Send message and log
-		server.sendmail(username, EMAIL_LIST, msg.as_string())
-		server.close()
-		log.info("Successfully notified users via e-mail.")
+			# Send message and log
+			server.sendmail(username, EMAIL_LIST, msg.as_string())
+			server.close()
+			log.info("Successfully notified users via e-mail.")
 
 	except Exception as e:
 		log.exception(e)
@@ -148,6 +142,8 @@ def diff_cities(current_city, prev_city = None):
 	Input: 	current_city - instance of cityiograph.City object - incoming city to server
 			prev_city - instance of cityiograph.City object - may be given if we are doing direct comparison
 	Output:	Return the difference between current city and previouly saved one
+			key - CityChange instance
+			data - list of [ [ changes ] , previous_predicted_city or BOOL indicator ]
 	'''
 
 	if prev_city is None:
@@ -156,29 +152,43 @@ def diff_cities(current_city, prev_city = None):
 		files = glob.glob(INPUT_CITIES_DIRECTORY + '*')
 
 		# If this is the first city, return need for prediction
-		if len(files) == 0: return ( CityChange.FIRST , True )
+		if len(files) == 0:
+			return ( CityChange.FIRST , True )
 
 		# Run comparison on this city and most recent one
 		with open(max(files, key = os.path.getctime), 'r') as f:
 			# Load prev_city from JSON
 			prev_city = City(f.read())
+
+		# Also, get the previous PREDICTED city from our directory
+		predicted_files = glob.glob(PREDICTED_CITIES_DIRECTORY + '*')
+		with open(max(predicted_files, key = os.path.getctime)) as g: # Get the most recent one by created time
+			# Load dict
+			json_dict = json.load(g)
+
+			# Get predicted city object
+			prev_predicted_city = City(json.dumps(json_dict['predict']))
+	else:
+		prev_predicted_city = prev_city.copy() # Update our prev var
 		
 	# Now, compare directly for densities, size and cells
 	if prev_city.equals(current_city):
-		return ( CityChange.NO, False ) # No difference
-	else: # Yes, we have a difference, let's explore
+		return ( CityChange.NO , False ) # No difference
+	else:
+		# Yes, we have a difference, let's explore
 		result = []
-		if prev_city.densities != current_city.densities:
+		if prev_city.densities != current_city.densities: # Density changes - note indices
 			for i, d in enumerate(prev_city.densities):
 				if current_city.densities[i] != d:
 					result.append(i)
-			return ( CityChange.DENSITY , [ result, prev_city ] )
+			return ( CityChange.DENSITY , [ result, prev_predicted_city ] )
 		else:
 			# We likely have some cell mismatch(es) - need to find
+			# Return locations (x, y)
 			for x in range(prev_city.width):
 				for y in range(prev_city.height):
 					old = prev_city.cells.get((x, y))
 					new = current_city.cells.get((x, y))
 					if not old.equals(new):
 						result.append( (x, y) )
-			return ( CityChange.CELL , [ result, prev_city ] )
+			return ( CityChange.CELL , [ result, prev_predicted_city ] )

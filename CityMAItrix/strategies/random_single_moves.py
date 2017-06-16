@@ -68,7 +68,7 @@ def search(city):
     return (suggested_city, best_move, objective.get_metrics(suggested_city))
 
 def move(city, mov):
-    """Helper method to 
+    """Helper method to change a city in some minor yet optimal way.
     
     Args:
         city (cityiograph.City): -
@@ -78,15 +78,15 @@ def move(city, mov):
         cityiograph.City: new suggested city from AI step
     
     Raises:
-        error: if we make a bad move
+        ValueError: if we make a bad move
     """
-    new_city = city
+    new_city = city.copy()
     if mov[0] == "DENSITY":
         new_city.change_density(mov[1], mov[2])
     elif mov[0] == "CELL":
         new_city.change_cell(mov[1], mov[2], mov[3])
     else:
-        raise error("Bad move!")
+        raise ValueError("Bad move!")
     return new_city
 
 def score(city, mov):
@@ -104,6 +104,8 @@ def score(city, mov):
 
     # Need to run our ML prediction here
     # Run our black box predictor on this city with given changes
-    key, data = utils.diff_cities(city, prev_city = new_city)
-    final_city = update(new_city, city)
+    key, data = utils.diff_cities(new_city, prev_city = city)
+    final_city = ML.predict(new_city, key, data)
+
+    # Return the evaluated metrics score
     return objective.evaluate(final_city)
