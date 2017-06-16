@@ -88,6 +88,9 @@ while True:
             # Write city to local file for later comparison
             simCity = simulator.SimCity(ml_city, timestamp)
             write_city(simCity)
+            #RZ 170615 score the current city
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
             # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)
             #RZ 170614 update city.animBlink
@@ -110,6 +113,10 @@ while True:
             # Write city to local file for later comparison
             simCity = simulator.SimCity(ml_city, timestamp)
             write_city(simCity)
+
+            #RZ 170615 score the current city
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
 
             # Run our AI on this city
             ai_city, move, metrics = Strategy.search(city)

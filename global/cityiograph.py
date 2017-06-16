@@ -37,6 +37,8 @@ class City(object):
         except: self.startFlag = 0
         try: self.animBlink = self.meta['animBlink']
         except: self.animBlink = 0
+        try: self.scores = self.meta['scores']
+        except: self.scores = [0,0,0,0,0]
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -73,6 +75,7 @@ class City(object):
             self.meta["AIWeights"] = self.AIWeights
             self.meta["startFlag"] = self.startFlag
             self.meta["animBlink"] = self.animBlink
+            self.meta["scores"] = self.scores
         except: pass # Some older version cities may not have these keys - ignoring
         changes = {
             "objects": self.meta,
@@ -95,12 +98,17 @@ class City(object):
             #self.AIMov = city.AIMov #RZ shouldn't pass from GH CV, but added by python server
             self.AIWeights = city.AIWeights
             self.startFlag = city.startFlag
-            #self.animBlink = city.animBlink this will be handled in server.py
+            #self.animBlink = city.animBlink #RZ this will be handled in server.py
         except:
             pass # Added by Kevin - for old cities with bad keys
-    
+
+    #RZ
     def updateAIMov(self, mov):
         self.AIMov = mov
+
+    #RZ 170615
+    def updateScores(self, scores):
+        self.scores = scores
 
     def to_json(self):
         return json.dumps(self.to_dict())

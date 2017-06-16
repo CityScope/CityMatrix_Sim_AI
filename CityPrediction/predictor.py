@@ -75,6 +75,10 @@ def predict(city, change_key, change_data, force_predict = config.FORCE_PREDICTI
 
     if change_key == CityChange.FIRST or city.startFlag == 1:
         # First city, just want traffic update
+        #RZ 170615 traffic update
+        outputCity = traffic_predict(city)
+        # evaluate and update scores
+        
         return traffic_predict(city)
 
     # Parse our change data

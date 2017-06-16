@@ -15,6 +15,7 @@ iterations = 150 #RZ 170607 speed: about 150 iterations per second
 def search(city):
     visited = []
     best_score = None
+    best_scores = None #RZ 170615 passing score array to json
     best_move = None
     #RZ 170615 update the weights before search
     objective.update_weights(city.AIWeights)
@@ -42,15 +43,17 @@ def search(city):
                 lmt = lmt + 1 #RZ 170607
             mov = ("CELL", x, y, newid)
         visited.append(mov)
-        scr = score(city, mov)
+        scr = scores(city, mov)[0]
         if best_score == None or scr > best_score:
             best_score = scr
+            best_scores = scores(city, mov)[1]
             best_move = mov
 
     suggested_city = move(city, best_move)
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
     suggested_city.updateAIMov(best_move)
+    suggested_city.updateScores(best_scores)
     return (suggested_city, best_move, objective.get_metrics(suggested_city))
 
 def move(city, mov):
@@ -63,10 +66,13 @@ def move(city, mov):
         raise error("Bad move!")
     return new_city
 
-def score(city, mov):
-    new_city = move(city, mov)
-    update(new_city, city)
-    return objective.evaluate(new_city)
+def scores(city, mov = None):
+    if mov is not None: #RZ 170615
+        new_city = move(city, mov)
+        update(new_city, city)
+        return objective.evaluate(new_city)
+    else:
+        return objective.evaluate(city) #RZ 170615
 
 def update(city, prev_city):
     # Need to run our ML prediction here
