@@ -122,3 +122,16 @@ while True:
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+
+"""
+#RZ 170614
+Notes for socket error in windows 10: 
+run flowing in cmd: 
+FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
+
+#RZ 170615
+Notes for udp ports: 
+7000 - GH CV send to python server
+7001 - python server send to unity
+7002 - python server send to GH VIZ
+"""
