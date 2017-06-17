@@ -7,7 +7,7 @@
     Purpose: Configuration file for our project. Note: all filenames are relative to the file in which they
         are used.
     TODO:
-    	- None at this time.
+        - None at this time.
 '''
 
 # Environment configs
@@ -59,5 +59,5 @@ DEFAULT_XML = {'Experiment_plan': {'Simulation': {'@finalStep': '8642', '@id': '
 
 # Other vars
 if SERVER_OS == 'MAC':
-	JAR_PATH = '/Applications/Gama.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.3.100.v20150511-1540.jar' # Path to Eclipse JAR file needed for GAMA plugins
-	GAMA_COMMANDS = ['java', '-cp', JAR_PATH, '-Xms512m', '-Xmx2048m', '-Djava.awt.headless=true', 'org.eclipse.core.launcher.Main', '-application', 'msi.gama.headless.id4', 'XML_PATH', GAMA_OUTPUT_DIRECTORY] # Command list for subprocess.Popen
+    JAR_PATH = '/Applications/Gama.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.3.100.v20150511-1540.jar' # Path to Eclipse JAR file needed for GAMA plugins
+    GAMA_COMMANDS = ['java', '-cp', JAR_PATH, '-Xms512m', '-Xmx2048m', '-Djava.awt.headless=true', 'org.eclipse.core.launcher.Main', '-application', 'msi.gama.headless.id4', 'XML_PATH', GAMA_OUTPUT_DIRECTORY] # Command list for subprocess.Popen

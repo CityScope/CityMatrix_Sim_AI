@@ -22,6 +22,9 @@ from strategies import random_single_moves as Strategy
 from objective import objective
 log = logging.getLogger('__main__')
 result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+animBlink = 0 #RZ 170614
+PRINT_CITY_RECEIVED = False
+PRINT_CITY_TO_SEND = True
 
 ''' --- CONFIGURATIONS --- '''
 
@@ -59,7 +62,24 @@ log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".form
 while True:
     # Get city from server and note timestamp
     input_city = server.receive_city()
-    timestamp = str(int(time.time()))
+    timestamp = str(int(time.time()))#RZ 170614 alter animBlink after received a city from GH CV
+    if animBlink == 0: 
+        animBlink = 1
+    else: 
+        animBlink = 0
+    #print("animBlink: {}".format(animBlink))
+
+    #RZ 170614 print to check received city
+    if PRINT_CITY_RECEIVED:
+        print("\nReceived City: ")
+        print("densities: {}".format(city.densities))
+        print("population: {}".format(city.population))
+        print("slider1: {}".format(city.slider1))
+        print("slider2: {}".format(city.slider2))
+        print("toggle1: {}".format(city.toggle1))
+        print("AIWeights: {}".format(city.AIWeights))
+        print("startFlag: {}".format(city.startFlag))
+        print("AIMov: {}".format(city.AIMov))
 
     # Only consider new city if it is different from most recent
     if input_city != None:
@@ -67,7 +87,27 @@ while True:
         # print(key)
         # print(data)
         # print(input_city.densities, "inp")
-        if key is not CityChange.NO:
+        #RZ 170613 for resetting the solar by pressing "startFlag" button in GH CV
+        if input_city.startFlag == 1:
+            log.info("First/reset city received @ timestamp {}.".format(timestamp))
+            inputSimCity = simulator.SimCity(input_city, timestamp)
+            write_city(inputSimCity)
+            ml_city = ML.predict(input_city, key, data)
+            ai_city, move, ai_metrics_list = Strategy.search(input_city)
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
+            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
+            ai_metrics = metrics_dictionary(ai_metrics_list)
+            ml_city.updateMeta(input_city)
+            ai_city.updateMeta(input_city)
+            ml_dict = ml_city.to_dict()
+            ml_dict['objects']['metrics'] = ml_metrics
+            ai_dict = ai_city.to_dict()
+            ai_dict['objects']['metrics'] = ai_metrics
+            result = { 'predict' : ml_dict , 'ai' : ai_dict }
+            server.send_data(result)
+            log.info("First/reset ml_city and ai_city data successfully sent to GH.\n")
+        elif key is not CityChange.NO:
             # First, write new city to local file
             log.info("New city received @ timestamp {}.".format(timestamp))
             inputSimCity = simulator.SimCity(input_city, timestamp)
@@ -81,10 +121,17 @@ while True:
             ai_city, move, ai_metrics_list = Strategy.search(input_city)
             # print(ai_city.densities, "ai")
 
+            #RZ 170614 update city.animBlink
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
+
             # Now, we need to send 2 city objects back to GH
             # First, get metrics dicts for cities
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
             ai_metrics = metrics_dictionary(ai_metrics_list)
+
+            ml_city.updateMeta(input_city)
+            ai_city.updateMeta(input_city)
 
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
@@ -96,7 +143,7 @@ while True:
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             write_city(result, timestamp = timestamp)
             server.send_data(result)
-            log.info("Predicted city data successfully sent to GH.\n")
+            log.info("New ml_city and ai_city data successfully sent to GH.\n")
 
             # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
             if DO_SIMULATE: sim.simulate(simCity)
@@ -104,13 +151,17 @@ while True:
             log.info("Waiting to receive new city...")
 
         elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
-            #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
-            ml_city.updateMeta(input_city) #RZ necessary, do not delete
-            ai_city.updateMeta(input_city) #RZ necessary, do not delete
+            #RZ 170614 update city.animBlink
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
 
             # Then, get metrics dicts for cities
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
             ai_metrics = metrics_dictionary(ai_metrics_list)
+            
+            #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
+            ml_city.updateMeta(input_city)
+            ai_city.updateMeta(input_city)
 
             # Now, update dictionaries
             ml_dict = ml_city.to_dict()
@@ -120,5 +171,38 @@ while True:
 
             # Send result
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
+            
+            #RZ 170614 print to check city to send
+            if PRINT_CITY_TO_SEND:
+                print("\nml_city to send: ")
+                print("densities: {}".format(ml_city.densities))
+                print("slider1: {}".format(ml_city.slider1))
+                print("slider2: {}".format(ml_city.slider2))
+                print("AIWeights: {}".format(ml_city.AIWeights))
+                print("startFlag: {}".format(ml_city.startFlag))
+                print("AIMov: {}".format(ml_city.AIMov))
+                print("animBlink: {}".format(ml_city.animBlink))
+                print("ai_city to send: ")
+                print("densities: {}".format(ai_city.densities))
+                print("slider1: {}".format(ai_city.slider1))
+                print("slider2: {}".format(ai_city.slider2))
+                print("AIWeights: {}".format(ai_city.AIWeights))
+                print("startFlag: {}".format(ai_city.startFlag))
+                print("AIMov: {}".format(ai_city.AIMov))
+                print("animBlink: {}".format(ai_city.animBlink))
+
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+
+"""
+#RZ 170614
+Notes for socket error in windows 10: 
+run flowing in cmd: 
+FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
+
+#RZ 170615
+Notes for udp ports: 
+7000 - GH CV send to python server
+7001 - python server send to unity
+7002 - python server send to GH VIZ
+"""

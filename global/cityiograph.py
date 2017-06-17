@@ -46,8 +46,11 @@ class City(object):
         self.AIStep = self.meta['AIStep']
         self.slider1 = self.meta['slider1']
         self.slider2 = self.meta['slider2']
+        self.toggle1 = self.meta['toggle1']
         self.AIWeights = self.meta['AIWeights']
-        self.AIMov = None
+        self.AIMov = self.meta['AIMov']
+        self.animBlink = self.meta['animBlink']
+        self.startFlag = self.meta['startFlag']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -82,8 +85,11 @@ class City(object):
         self.meta["AIStep"] = self.AIStep # RZ
         self.meta["slider1"] = self.slider1 # RZ
         self.meta["slider2"] = self.slider2 # RZ
+        self.meta["toggle1"] = self.toggle1 # RZ
         self.meta["AIWeights"] = self.AIWeights # RZ
         self.meta["AIMov"] = self.AIMov #RZ
+        self.meta["animBlink"] = self.animBlink
+        self.meta["startFlag"] = self.startFlag
 
         result = {
             "objects": self.meta,
@@ -98,10 +104,15 @@ class City(object):
         Input:  other_city < cityiograph.City > - 
         Output: None
         '''
-        self.AIStep = other_city.AIStep
         self.slider1 = other_city.slider1
         self.slider2 = other_city.slider2
+        self.toggle1 = other_city.toggle1
         self.AIWeights = other_city.AIWeights
+        self.AIStep = other_city.AIStep
+        self.startFlag = other_city.startFlag
+        #self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
+        #self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
+        #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
 
     def updateAIMov(self, mov):
         self.AIMov = mov # TODO - Remove

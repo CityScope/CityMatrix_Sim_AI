@@ -98,48 +98,48 @@ def update_dict(d, u):
 ''' --- /globals/utils.py --- '''
 
 def serialize_model(model, root_filename):
-	'''
-	Serializes a Keras model to a JSON and h5 data file
-	Input: 	model - instance of Keras model to be serialized
-	root_filename - string representing root of JSON and h5 data file for model
-	Output:	None - simply write the model to the files
-	'''
+    '''
+    Serializes a Keras model to a JSON and h5 data file
+    Input:  model - instance of Keras model to be serialized
+    root_filename - string representing root of JSON and h5 data file for model
+    Output: None - simply write the model to the files
+    '''
 
-	# Convert to JSON
-	model_in_json = model.to_json()
+    # Convert to JSON
+    model_in_json = model.to_json()
 
-	# Write to file
-	with open(root_filename + ".json", "w") as json_file:
-		json_file.write(model_in_json)
+    # Write to file
+    with open(root_filename + ".json", "w") as json_file:
+        json_file.write(model_in_json)
 
-	# Save weights
-	model.save_weights(root_filename + ".h5")
+    # Save weights
+    model.save_weights(root_filename + ".h5")
 
 def deserialize_model(root_filename):
-	'''
-	Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
-	Input: 	root_filename - string representing root of JSON and h5 data file for model
-	Output:	model - instance of Keras model taken from data
-	'''
+    '''
+    Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
+    Input:  root_filename - string representing root of JSON and h5 data file for model
+    Output: model - instance of Keras model taken from data
+    '''
 
-	# Read JSON string
-	with open(root_filename + '.json', 'r') as f:
-		model_in_json = f.read()
+    # Read JSON string
+    with open(root_filename + '.json', 'r') as f:
+        model_in_json = f.read()
 
-	# Load model with architecture and weights
-	model = model_from_json(model_in_json)
-	model.load_weights(root_filename + '.h5')
+    # Load model with architecture and weights
+    model = model_from_json(model_in_json)
+    model.load_weights(root_filename + '.h5')
 
-	# Compile the model with loss, optimizer and metrics and return
-	model.compile(loss = LOSS_FUNCTION, optimizer = OPTIMIZER, metrics = KERAS_METRICS)
-	return model
+    # Compile the model with loss, optimizer and metrics and return
+    model.compile(loss = LOSS_FUNCTION, optimizer = OPTIMIZER, metrics = KERAS_METRICS)
+    return model
 
 def compute_accuracy(true, pred):
-	'''
-	Compute percent accuracy between 2 input matrices (true and predicted values)
-	Input: 	a, b - np array n x ( )
-	Output: accuracy - scalar that represents (1 - percent error) between a and b, in range [0, 1]
-	'''
+    '''
+    Compute percent accuracy between 2 input matrices (true and predicted values)
+    Input:  a, b - np array n x ( )
+    Output: accuracy - scalar that represents (1 - percent error) between a and b, in range [0, 1]
+    '''
 
-	# Simple solution taken from http://stackoverflow.com/questions/20402109/calculating-percentage-error-by-comparing-two-arrays
-	return 1 - np.mean(true != pred)
+    # Simple solution taken from http://stackoverflow.com/questions/20402109/calculating-percentage-error-by-comparing-two-arrays
+    return 1 - np.mean(true != pred)
