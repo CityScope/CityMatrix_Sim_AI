@@ -32,6 +32,8 @@ def search(city):
     visited = []
     best_score = None
     best_move = None
+    #RZ 170615 update the weights before search
+    objective.update_weights(city.AIWeights)
     for i in range(iterations):
         r = random()
         if r <= density_change_chance:

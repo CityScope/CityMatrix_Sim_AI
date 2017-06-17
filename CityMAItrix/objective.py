@@ -11,17 +11,23 @@ class ObjectiveFunction(object):
 
     def add_metric(self, name, metric, weight):
         self.metrics.append((name, metric, weight))
+        
+    #RZ 170615 update AIWeights before search
+    def update_weights(self, weights):
+        for i in range(5):
+            self.metrics[i] = self.metrics[i][:2] + (weights[i],)
+        #print("updated self.metrics: {}".format(self.metrics))
 
 from metrics import citymatrix_stats as Metrics
 
 objective = ObjectiveFunction()
-objective.add_metric("Population Density Performance",
-                     Metrics.pop_density_perf, 1)
-objective.add_metric("Population Diversity Performance",
-                     Metrics.pop_diversity_perf, 1)
-objective.add_metric("Energy & Cost Performance",
-                     Metrics.energy_perf, 1)
-objective.add_metric("Traffic Performance",
-                     Metrics.traffic_perf, 1)
-objective.add_metric("Solar Access Performace",
-                     Metrics.solar_perf, 1)
+objective.add_metric("Density",
+                     Metrics.pop_density_perf, 0.2)
+objective.add_metric("Diversity",
+                     Metrics.pop_diversity_perf, 0.2)
+objective.add_metric("Energy",
+                     Metrics.energy_perf, 0.2)
+objective.add_metric("Traffic",
+                     Metrics.traffic_perf, 0.2)
+objective.add_metric("Solar",
+                     Metrics.solar_perf, 0.2)
