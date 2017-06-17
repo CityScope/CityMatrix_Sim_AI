@@ -24,7 +24,7 @@ log = logging.getLogger('__main__')
 result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
 animBlink = 0 #RZ 170614
 PRINT_CITY_RECEIVED = False
-PRINT_CITY_TO_SEND = False
+PRINT_CITY_TO_SEND = True
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False

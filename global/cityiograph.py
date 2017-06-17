@@ -89,7 +89,7 @@ class City(object):
         #self.population = city.population #RZ can not be here, will overwrite the right population for AI_city
         try:
             #RZ 170614
-            self.densities = city.densities
+            #self.densities = city.densities #RZ 170615 shouldn't pass from GH CV, will updated by AI search
             self.population = city.population
             self.slider1 = city.slider2
             self.slider2 = city.slider2
