@@ -11,7 +11,7 @@
 '''
 
 # Environment configs
-SERVER_OS = 'MAC' # Operating system of the prediction server, either MAC or WIN
+SERVER_OS = 'WIN' # Operating system of the prediction server, either MAC or WIN
 PYTHON_VERSION = 'python3.5' # Version we are running the server on - used for restart command
 DEBUG = True
 
