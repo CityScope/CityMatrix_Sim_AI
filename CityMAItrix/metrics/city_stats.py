@@ -5,4 +5,3 @@ def population(city):
 
 def cost(city):
     return np.sum([c.density for c in city.cells.values()])
-

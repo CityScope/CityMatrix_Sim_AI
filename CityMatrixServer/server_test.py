@@ -7,7 +7,7 @@
     Purpose: Quick script to test the functionality of our prediciton server. Make minor tweaks to cities
      to test our code.
     TODO:
-    	- Make this file representative of Ryan's tests!!!
+        - Make this file representative of Ryan's tests!!!
 '''
 
 # Global imports
@@ -37,7 +37,7 @@ server = city_udp.City_UDP("CityMatrixSimTestServer", receive_port = SEND_PORT, 
 
 # Load some test file into a city
 with open(filename, 'r') as f:
-	json_string = f.read()
+    json_string = f.read()
 city = City(json_string)
 log.debug("Successfully loaded city.")
 
@@ -70,9 +70,9 @@ log.debug("Data response received! Took a total of {} seconds.".format(time.time
 # Vis our first city
 types = []
 for y in range(CITY_SIZE):
-	for x in range(CITY_SIZE): # Reverse order for correct vis
-		cell = city.get_cell((x, y))
-		types.append(cell.type_id)
+    for x in range(CITY_SIZE): # Reverse order for correct vis
+        cell = city.get_cell((x, y))
+        types.append(cell.type_id)
 plt.figure()
 plt.subplot(311)
 plt.imshow(np.array(types).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
@@ -89,11 +89,11 @@ pp.pprint(ml.to_dict())
 
 one, two = [], []
 for x in range(CITY_SIZE):
-	for y in range(CITY_SIZE):
-		a = ml.get_cell((x, y))
-		b = ai.get_cell((x, y))
-		one.append(a.data['traffic'])
-		two.append(b.data['traffic'])
+    for y in range(CITY_SIZE):
+        a = ml.get_cell((x, y))
+        b = ai.get_cell((x, y))
+        one.append(a.data['traffic'])
+        two.append(b.data['traffic'])
 
 one = np.array(one).reshape(CITY_SIZE, CITY_SIZE)
 two = np.array(two).reshape(CITY_SIZE, CITY_SIZE)

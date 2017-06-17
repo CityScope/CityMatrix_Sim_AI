@@ -5,9 +5,9 @@ Created: 2017-06-04 20:23:55
 Last modified by: kalyons11
 Last modified time: 2017-06-11 23:20:57
 Description:
-	- General setup.py script to be run before we start the server for the first time.
+    - General setup.py script to be run before we start the server for the first time.
 TODO:
-	- None at this time.
+    - None at this time.
 '''
 
 import os

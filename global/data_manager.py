@@ -29,92 +29,92 @@ TRAIN_SIZE = 8000
 
 # Get population given an index in an array. Population array is constant
 def get_population(t, density_array):
-	if t not in range(min(len(POP_ARR), len(density_array))):
-		return 0
-	return density_array[t] * POP_ARR[t]
+    if t not in range(min(len(POP_ARR), len(density_array))):
+        return 0
+    return density_array[t] * POP_ARR[t]
 
 def extract_features(directory):
 
-	cities = []
-	filenames = []
-	input_features = []
-	output_features = []
+    cities = []
+    filenames = []
+    input_features = []
+    output_features = []
 
-	files = glob.glob(directory)
+    files = glob.glob(directory)
 
-	for name in files:
-		with open(name, 'r') as f:
-			city = cityiograph.City(f.read())
-			cities.append(city)
-			input_features.append(get_features(city))
-			output_features.append(get_results(city))
+    for name in files:
+        with open(name, 'r') as f:
+            city = cityiograph.City(f.read())
+            cities.append(city)
+            input_features.append(get_features(city))
+            output_features.append(get_results(city))
 
-	input_features = np.array(input_features).astype('int32')
-	output_features = np.array(output_features).astype('int32')
+    input_features = np.array(input_features).astype('int32')
+    output_features = np.array(output_features).astype('int32')
 
-	return cities, input_features, output_features
+    return cities, input_features, output_features
 
-	# This funciton has been giving me some trouble when it comes to training the neural model - sticking with my custom extract_data functin below...
+    # This funciton has been giving me some trouble when it comes to training the neural model - sticking with my custom extract_data functin below...
 
 def extract_data(directory, return_endpoints = False):
 
-	print("Extracting data for directory {}.".format(directory))
+    print("Extracting data for directory {}.".format(directory))
 
-	# Get all JSON files
-	# Recursive feature taken from https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
-	files = glob.glob(directory, recursive = True) # Load list of filenames from the directory
+    # Get all JSON files
+    # Recursive feature taken from https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
+    files = glob.glob(directory, recursive = True) # Load list of filenames from the directory
 
-	cities = [] # City objects list
-	filenames = [] # List of raw filenames
-	inp = [] # Input feature matrix
-	out = [] # Output feature matrix
+    cities = [] # City objects list
+    filenames = [] # List of raw filenames
+    inp = [] # Input feature matrix
+    out = [] # Output feature matrix
 
-	# Create dictionary mapping of bounds for both traffic and wait
-	# bounds = { 'low_traffic' : 0 , 'high_traffic' : 0 , 'low_wait' : 0 , 'high_wait' : 0 }
+    # Create dictionary mapping of bounds for both traffic and wait
+    # bounds = { 'low_traffic' : 0 , 'high_traffic' : 0 , 'low_wait' : 0 , 'high_wait' : 0 }
 
-	# Create np array objects for traffic and wait values
-	traffic = []
-	wait = []
+    # Create np array objects for traffic and wait values
+    traffic = []
+    wait = []
 
-	for name in tqdm(files): # Using tqdm for loop analysis
-		with open(name, 'r') as f:
-			current_input = []
-			current_output = []
-			s = f.read()
-			city = cityiograph.City(s)
-			raw = os.path.splitext(os.path.basename(name))[0]
-			d = json.loads(s)
-			max_traffic = max([cell['data']['traffic'] for cell in d['grid'] if 'data' in cell])
-			max_wait = max([cell['data']['wait'] for cell in d['grid'] if 'data' in cell])
-			# Check bounds if needed
-			if return_endpoints:
-				traffic.append(max_traffic)
-				wait.append(max_wait)
-			# Ignore zero cities - suprisingly high percentage
-			if max_traffic == 0 or max_wait == 0:
-				continue
-			# Else, construct feature vector for city
-			for i in range(city.width):
-				for j in range(city.height):
-					cell = city.cells.get((i, j))
-					current_input.append(cell.population)
-					current_input.append(0) if (cell.type_id == 6) else current_input.append(1)
-					current_output.append(cell.data["traffic"])
-					current_output.append(cell.data["wait"])
-			cities.append(city) # Append city structure
-			filenames.append(raw) # Append raw filename for later reference
-			inp.append(np.array(current_input))
-			out.append(np.array(current_output))
+    for name in tqdm(files): # Using tqdm for loop analysis
+        with open(name, 'r') as f:
+            current_input = []
+            current_output = []
+            s = f.read()
+            city = cityiograph.City(s)
+            raw = os.path.splitext(os.path.basename(name))[0]
+            d = json.loads(s)
+            max_traffic = max([cell['data']['traffic'] for cell in d['grid'] if 'data' in cell])
+            max_wait = max([cell['data']['wait'] for cell in d['grid'] if 'data' in cell])
+            # Check bounds if needed
+            if return_endpoints:
+                traffic.append(max_traffic)
+                wait.append(max_wait)
+            # Ignore zero cities - suprisingly high percentage
+            if max_traffic == 0 or max_wait == 0:
+                continue
+            # Else, construct feature vector for city
+            for i in range(city.width):
+                for j in range(city.height):
+                    cell = city.cells.get((i, j))
+                    current_input.append(cell.population)
+                    current_input.append(0) if (cell.type_id == 6) else current_input.append(1)
+                    current_output.append(cell.data["traffic"])
+                    current_output.append(cell.data["wait"])
+            cities.append(city) # Append city structure
+            filenames.append(raw) # Append raw filename for later reference
+            inp.append(np.array(current_input))
+            out.append(np.array(current_output))
 
-	# Return correct data based on return_endpoints parameter
-	if return_endpoints:
-		return np.array(traffic), np.array(wait)
+    # Return correct data based on return_endpoints parameter
+    if return_endpoints:
+        return np.array(traffic), np.array(wait)
 
-	# Construct feature matrices and return
-	inp = np.array(inp).astype(int)
-	out = np.array(out).astype(int)
+    # Construct feature matrices and return
+    inp = np.array(inp).astype(int)
+    out = np.array(out).astype(int)
 
-	return cities, filenames, inp, out
+    return cities, filenames, inp, out
 
 # Data manager...
 
