@@ -2,14 +2,17 @@
     File name: server_test.py
     Author: Kevin Lyons
     Date created: 4/11/2017
-    Date last modified: 6/11/2017
+    Date last modified: 6/15/2017
     Python Version: 3.5
     Purpose: Quick script to test the functionality of our prediciton server. Make minor tweaks to cities
      to test our code.
+    TODO:
+    	- Make this file representative of Ryan's tests!!!
 '''
 
 # Global imports
-import sys, os, time, random, logging, glob, time, json, numpy as np, matplotlib.pyplot as plt
+import sys, os, time, random, logging, glob, time, json, pprint, numpy as np, matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 # Custom imports
 sys.path.insert(0, '../global/')
@@ -22,6 +25,7 @@ log = logging.getLogger('__main__')
 # filename = 'C:/RH_GH/_verification/170510_ML_Validation_003/02_kevin_prediction_linear_normalized/city_8000_output_normalized.json'
 # filename = '../../../data/cities/cityIO.json'
 # filename = '../../../data/cities/city_9000.json'
+# filename = '../../../data/cities/new_city.json'
 # filename = random.choice(glob.glob('../../../data/train_good/*.json'))
 d = '../CityPrediction/input_cities/'
 files = glob.glob(d + '*')
@@ -37,8 +41,19 @@ with open(filename, 'r') as f:
 city = City(json_string)
 log.debug("Successfully loaded city.")
 
-# city.cells[(random.randint(0, 16), random.randint(0, 16))].data['traffic'] = random.randint(0, 1000)
-city.densities[random.randint(0, 5)] = random.randint(0, 30)
+# Make some changes for testing purposes
+x = np.random.randint(0, 16)
+y = np.random.randint(0, 16)
+t = np.random.randint(0, 6)
+print("change", x, y, t)
+city.change_cell(x, y, t)
+
+# d_new = np.random.randint(0, 30)
+# i = np.random.randint(0, 6)
+# print(d_new, "@", i)
+# city.densities[i] = d_new
+
+# city.densities = [30, 30, 30, 1, 2, 30]
 
 # Send that city to our UDP server
 server.send_city(city)
@@ -54,26 +69,48 @@ log.debug("Data response received! Took a total of {} seconds.".format(time.time
 
 # Vis our first city
 types = []
-for x in range(CITY_SIZE):
-	for y in range(CITY_SIZE):
+for y in range(CITY_SIZE):
+	for x in range(CITY_SIZE): # Reverse order for correct vis
 		cell = city.get_cell((x, y))
 		types.append(cell.type_id)
 plt.figure()
-plt.subplot(211)
+plt.subplot(311)
 plt.imshow(np.array(types).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
 # plt.show()
 
-# Run any validation checks on the city
-p = City(data['ai'], dict_mode = True)
+# Run any validation checks on the cities
+ml = City(json.dumps(data['predict']))
+ai = City(json.dumps(data['ai']))
 
-# Get solar info and vis
-solar = []
+'''
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(ml.to_dict())
+
+one, two = [], []
 for x in range(CITY_SIZE):
 	for y in range(CITY_SIZE):
-		cell = p.get_cell((x, y))
-		solar.append(cell.data['solar'])
-plt.subplot(212)
-plt.imshow(np.array(solar).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpolation = 'nearest')
+		a = ml.get_cell((x, y))
+		b = ai.get_cell((x, y))
+		one.append(a.data['traffic'])
+		two.append(b.data['traffic'])
+
+one = np.array(one).reshape(CITY_SIZE, CITY_SIZE)
+two = np.array(two).reshape(CITY_SIZE, CITY_SIZE)
+
+log.debug(one)
+log.debug(two)
+
+'''
+
+# Get solar info and vis
+solar_matrix = ai.get_data_matrix('solar')
+plt.subplot(312)
+plt.imshow(solar_matrix.T, cmap = 'hot', interpolation = 'nearest')
+solar_matrix2 = city.get_data_matrix('solar')
+plt.subplot(313)
+plt.imshow(solar_matrix2.T, cmap = 'hot', interpolation = 'nearest')
+# plt.matshow(solar_matrix.T, cmap = 'hot', norm=LogNorm(vmin=300, vmax=5000))
 plt.show()
 
 log.debug("Process complete.")
