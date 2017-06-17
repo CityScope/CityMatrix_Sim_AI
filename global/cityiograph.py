@@ -48,6 +48,7 @@ class City(object):
         self.slider2 = self.meta['slider2']
         self.AIWeights = self.meta['AIWeights']
         self.AIMov = None
+        self.animBlink = self.meta['animBlink']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -84,6 +85,7 @@ class City(object):
         self.meta["slider2"] = self.slider2 # RZ
         self.meta["AIWeights"] = self.AIWeights # RZ
         self.meta["AIMov"] = self.AIMov #RZ
+        self.meta["animBlink"] = self.animBlink
 
         result = {
             "objects": self.meta,
@@ -98,10 +100,11 @@ class City(object):
         Input:  other_city < cityiograph.City > - 
         Output: None
         '''
-        self.AIStep = other_city.AIStep
+        #self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
         self.slider1 = other_city.slider1
         self.slider2 = other_city.slider2
         self.AIWeights = other_city.AIWeights
+        #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
 
     def updateAIMov(self, mov):
         self.AIMov = mov # TODO - Remove

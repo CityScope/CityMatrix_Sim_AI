@@ -22,6 +22,9 @@ from strategies import random_single_moves as Strategy
 from objective import objective
 log = logging.getLogger('__main__')
 result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+animBlink = 0 #RZ 170614
+PRINT_CITY_RECEIVED = False
+PRINT_CITY_TO_SEND = True
 
 ''' --- CONFIGURATIONS --- '''
 
@@ -59,7 +62,24 @@ log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".form
 while True:
     # Get city from server and note timestamp
     input_city = server.receive_city()
-    timestamp = str(int(time.time()))
+    timestamp = str(int(time.time()))#RZ 170614 alter animBlink after received a city from GH CV
+    if animBlink == 0: 
+        animBlink = 1
+    else: 
+        animBlink = 0
+    #print("animBlink: {}".format(animBlink))
+
+    #RZ 170614 print to check received city
+    if PRINT_CITY_RECEIVED:
+        print("\nReceived City: ")
+        print("densities: {}".format(city.densities))
+        print("population: {}".format(city.population))
+        print("slider1: {}".format(city.slider1))
+        print("slider2: {}".format(city.slider2))
+        print("toggle1: {}".format(city.toggle1))
+        print("AIWeights: {}".format(city.AIWeights))
+        print("startFlag: {}".format(city.startFlag))
+        print("AIMov: {}".format(city.AIMov))
 
     # Only consider new city if it is different from most recent
     if input_city != None:
@@ -80,6 +100,10 @@ while True:
             # Run our AI on this city
             ai_city, move, ai_metrics_list = Strategy.search(input_city)
             # print(ai_city.densities, "ai")
+            
+            #RZ 170614 update city.animBlink
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
 
             # Now, we need to send 2 city objects back to GH
             # First, get metrics dicts for cities
@@ -104,6 +128,9 @@ while True:
             log.info("Waiting to receive new city...")
 
         elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+            #RZ 170614 update city.animBlink
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
             #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
             ml_city.updateMeta(input_city) #RZ necessary, do not delete
             ai_city.updateMeta(input_city) #RZ necessary, do not delete
@@ -120,6 +147,26 @@ while True:
 
             # Send result
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
+            
+            #RZ 170614 print to check city to send
+            if PRINT_CITY_TO_SEND:
+                print("\nml_city to send: ")
+                print("densities: {}".format(ml_city.densities))
+                print("slider1: {}".format(ml_city.slider1))
+                print("slider2: {}".format(ml_city.slider2))
+                print("AIWeights: {}".format(ml_city.AIWeights))
+                #print("startFlag: {}".format(ml_city.startFlag))
+                print("AIMov: {}".format(ml_city.AIMov))
+                print("animBlink: {}".format(ml_city.animBlink))
+                print("ai_city to send: ")
+                print("densities: {}".format(ai_city.densities))
+                print("slider1: {}".format(ai_city.slider1))
+                print("slider2: {}".format(ai_city.slider2))
+                print("AIWeights: {}".format(ai_city.AIWeights))
+                #print("startFlag: {}".format(ai_city.startFlag))
+                print("AIMov: {}".format(ai_city.AIMov))
+                print("animBlink: {}".format(ai_city.animBlink))
+
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
 
