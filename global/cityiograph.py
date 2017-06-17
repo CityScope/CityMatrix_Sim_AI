@@ -49,6 +49,7 @@ class City(object):
         self.AIWeights = self.meta['AIWeights']
         self.AIMov = None
         self.animBlink = self.meta['animBlink']
+        self.startFlag = self.meta['startFlag']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -86,6 +87,7 @@ class City(object):
         self.meta["AIWeights"] = self.AIWeights # RZ
         self.meta["AIMov"] = self.AIMov #RZ
         self.meta["animBlink"] = self.animBlink
+        self.meta["startFlag"] = self.startFlag
 
         result = {
             "objects": self.meta,
@@ -105,6 +107,7 @@ class City(object):
         self.slider2 = other_city.slider2
         self.AIWeights = other_city.AIWeights
         #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
+        self.startFlag = other_city.startFlag
 
     def updateAIMov(self, mov):
         self.AIMov = mov # TODO - Remove
