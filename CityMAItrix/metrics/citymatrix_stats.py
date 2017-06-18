@@ -42,7 +42,8 @@ def pop_diversity_perf(city):
     return (residential_diversity + office_diversity +
             living_working_diversity) / 3
 
-energy_per_sqm = [0.8, 1.0, 1.2, 2.0, 2.5, 3.0, 0]
+#energy_per_sqm = [0.8, 1.0, 1.2, 2.0, 2.5, 3.0, 0]
+energy_per_sqm = [-0.2, 0.0, 0.2, -0.4, 0.0, 0.4, 0.0] #RZ 170617 
 floor_area = 1562.5 # square meters
 ep_min = 0
 ep_max = 10000000 # need to determine this
