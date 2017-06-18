@@ -51,6 +51,7 @@ class City(object):
         self.AIMov = self.meta['AIMov']
         self.animBlink = self.meta['animBlink']
         self.startFlag = self.meta['startFlag']
+        self.scores = self.meta['scores']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -90,6 +91,7 @@ class City(object):
         self.meta["AIMov"] = self.AIMov #RZ
         self.meta["animBlink"] = self.animBlink
         self.meta["startFlag"] = self.startFlag
+        self.meta["scores"] = self.scores
 
         result = {
             "objects": self.meta,
@@ -116,6 +118,10 @@ class City(object):
 
     def updateAIMov(self, mov):
         self.AIMov = mov # TODO - Remove
+
+    #RZ 170615
+    def updateScores(self, scores):
+        self.scores = scores
 
     def to_json(self):
         """Converts the current city object to a JSON string.

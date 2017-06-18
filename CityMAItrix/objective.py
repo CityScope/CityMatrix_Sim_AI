@@ -4,7 +4,7 @@ class ObjectiveFunction(object):
 
     def evaluate(self, city):
         outputs = [weight * fun(city) for name, fun, weight in self.metrics]
-        return sum(outputs)
+        return [sum(outputs),outputs]
 
     def get_metrics(self, city):
         return [(name, fun(city), weight) for name, fun, weight in self.metrics]

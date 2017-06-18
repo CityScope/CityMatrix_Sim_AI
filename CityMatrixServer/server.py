@@ -92,6 +92,9 @@ while True:
             log.info("First/reset city received @ timestamp {}.".format(timestamp))
             inputSimCity = simulator.SimCity(input_city, timestamp)
             write_city(inputSimCity)
+            #RZ 170615 score the current city
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
             ml_city = ML.predict(input_city, key, data)
             ai_city, move, ai_metrics_list = Strategy.search(input_city)
             ml_city.animBlink = animBlink
@@ -112,6 +115,10 @@ while True:
             log.info("New city received @ timestamp {}.".format(timestamp))
             inputSimCity = simulator.SimCity(input_city, timestamp)
             write_city(inputSimCity)
+            
+            #RZ 170615 score the current city
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
 
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(input_city, key, data)
