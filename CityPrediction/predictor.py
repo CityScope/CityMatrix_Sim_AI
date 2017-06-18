@@ -77,8 +77,9 @@ def predict(city, change_key, change_data):
     Output: result_city - instance of cityiograph.City, with updated cell data values
     '''
 
-    if isinstance(change_data, bool):
+    if isinstance(change_data, bool) or city.startFlag == 1:
         # First city OR same city - just want traffic update
+        # evaluate and update scores
         return traffic_predict(city)
 
     # Parse our change data

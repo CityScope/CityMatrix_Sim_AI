@@ -92,7 +92,10 @@ while True:
             log.info("First/reset city received @ timestamp {}.".format(timestamp))
             inputSimCity = simulator.SimCity(input_city, timestamp)
             write_city(inputSimCity)
+            #RZ 170615 score the current city
             ml_city = ML.predict(input_city, key, data)
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
             ai_city, move, ai_metrics_list = Strategy.search(input_city)
             ml_city.animBlink = animBlink
             ai_city.animBlink = animBlink
@@ -116,6 +119,10 @@ while True:
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(input_city, key, data)
             # print(ml_city.densities, "ml")
+            
+            #RZ 170615 score the current city
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
 
             # Run our AI on this city
             ai_city, move, ai_metrics_list = Strategy.search(input_city)
@@ -182,6 +189,7 @@ while True:
                 print("startFlag: {}".format(ml_city.startFlag))
                 print("AIMov: {}".format(ml_city.AIMov))
                 print("animBlink: {}".format(ml_city.animBlink))
+                print("scores: {}".format(ml_city.scores))
                 print("ai_city to send: ")
                 print("densities: {}".format(ai_city.densities))
                 print("slider1: {}".format(ai_city.slider1))
@@ -190,6 +198,7 @@ while True:
                 print("startFlag: {}".format(ai_city.startFlag))
                 print("AIMov: {}".format(ai_city.AIMov))
                 print("animBlink: {}".format(ai_city.animBlink))
+                print("scores: {}".format(ai_city.scores))
 
             server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")

@@ -31,7 +31,10 @@ def search(city):
     """
     visited = []
     best_score = None
+    best_scores = None #RZ 170615 passing score array to json
     best_move = None
+    #RZ 170615 update the weights before search
+    objective.update_weights(city.AIWeights)
     for i in range(iterations):
         r = random()
         if r <= density_change_chance:
@@ -56,9 +59,10 @@ def search(city):
                 lmt = lmt + 1 #RZ
             mov = ("CELL", x, y, newid)
         visited.append(mov)
-        scr = score(city, mov)
+        scr = scores(city, mov)[0]
         if best_score == None or scr > best_score:
             best_score = scr
+            best_scores = scores(city, mov)[1]
             best_move = mov
 
     suggested_city = move(city, best_move)
@@ -67,6 +71,7 @@ def search(city):
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
     final_city.updateAIMov(best_move)
+    final_city.updateScores(best_scores)
     return (final_city, best_move, objective.get_metrics(final_city))
 
 def move(city, mov):
@@ -91,7 +96,7 @@ def move(city, mov):
         raise ValueError("Bad move!")
     return new_city
 
-def score(city, mov):
+def scores(city, mov = None):
     """Calculate the score of a city after a given move has been made.
     
     Args:
@@ -101,14 +106,17 @@ def score(city, mov):
     Returns:
         float: weighted objective score of the city, given certain metrics
     """
-    # Make the move
-    the_city = city.copy()
-    new_city = move(the_city, mov)
+    if mov is not None: #RZ 170615
+        # Make the move
+        the_city = city.copy()
+        new_city = move(the_city, mov)
 
-    # Need to run our ML prediction here
-    # Run our black box predictor on this city with given changes
-    key, data = utils.diff_cities(new_city, prev_city = the_city)
-    final_city = ML.predict(new_city, key, data)
+        # Need to run our ML prediction here
+        # Run our black box predictor on this city with given changes
+        key, data = utils.diff_cities(new_city, prev_city = the_city)
+        final_city = ML.predict(new_city, key, data)
 
-    # Return the evaluated metrics score
-    return objective.evaluate(final_city)
+        # Return the evaluated metrics score
+        return objective.evaluate(final_city)
+    else:
+        return objective.evaluate(city) #RZ 170615
