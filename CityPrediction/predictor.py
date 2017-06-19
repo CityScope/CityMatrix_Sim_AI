@@ -59,7 +59,7 @@ def solar_predict(new_city, prev, locations):
 
     # For every location, update values based on solar radiation deltas predictor
     for x, y in locations:
-        next_prev = result.copy()
+        next_prev = result.copy() # TODO need to figure out wether this next prev stuff is good or not
         result = solar.update_city(prev, result, x, y)
         prev = next_prev # Maybe???
         # np.set_printoptions(threshold = np.nan)
@@ -67,7 +67,7 @@ def solar_predict(new_city, prev, locations):
 
     return result
 
-def predict(city, change_key, change_data):
+def predict(city, change_key, change_data): # TODO next/prev update
     '''
     Black box predictor function for our machine learning.
     Input:     city - instance of cityiograph.City to be predicted
@@ -83,9 +83,9 @@ def predict(city, change_key, change_data):
         return traffic_predict(city)
 
     # Parse our change data
-    l, prev = tuple(change_data)
+    l, prev = tuple(change_data) # TODO next/prev update
     # print(prev.densities, "prev")
-        
+
     # First, do full traffic prediction
     current = traffic_predict(city)
     # print(id(city), "city")
@@ -99,7 +99,7 @@ def predict(city, change_key, change_data):
         for i in indices:
             for c in prev.cells.values():
                 if c.type_id == i:
-                    locations.append(c.get_pos())
+                    locations.append(c.get_pos()) # TODO keep an eye on how this is working
 
     elif change_key == CityChange.CELL:
         locations = l # Already have changed locations from data

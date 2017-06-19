@@ -12,18 +12,18 @@ model = joblib.load(SOLAR_MODEL_FILENAME)
 
 def get_5x5_block(city, x, y):
     """Return an array of a 5x5 block around a point of a city.
-    
+
     Args:
         city (cityiograph.City): -
         x (int): -
         y (int): -
-    
+
     Returns:
         list: list of cityiograph.Cell objects representing the block
     """
     cells = []
 
-    for i in range(x - 2, x + 3):
+    for i in range(x - 2, x + 3): # TODO May need to negate one of these
         for j in range(y - 2, y + 3):
             if i < 0 or i >= city.width or j < 0 or j >= city.height:
                 cells.append(None)
@@ -34,18 +34,18 @@ def get_5x5_block(city, x, y):
 
 def push_5x5_deltas(city, deltas, x, y):
     """Add the delta values to the block around a point of a city
-    
+
     Args:
         city (cityiograph.City): -
         deltas (nparray (5, 5)): delta matrix
         x (int): -
         y (int): -
-    
+
     Returns:
         cityiograph.City: output city
     """
     counter = 0
-    for i in range(x - 2, x + 3):
+    for i in range(x - 2, x + 3): # TODO May need to negate one of these
         for j in range(y - 2, y + 3):
             if i < 0 or i >= city.width or j < 0 or j >= city.height:
                 pass # 0 value here
@@ -57,10 +57,10 @@ def push_5x5_deltas(city, deltas, x, y):
 
 def deltas(block):
     """Get the solar delta values for removing a building at the center of a block.
-    
+
     Args:
         block (list): list of cell objects that are in the block
-    
+
     Returns:
         nparray (5, 5): delta values for this block
     """
@@ -77,15 +77,15 @@ def deltas(block):
     return np.mean(model_output.reshape(-1, 49), axis = 1)
 
 
-def update_city(old_city, new_city, x, y):
+def update_city(old_city, new_city, x, y): # TODO maybe prev_city should be replaced with prev_height, the code in solar_predict needs
     """Function to update a city's solar predictoin values based on a prior state.
-    
+
     Args:
         old_city (cityiograph.City): -
         new_city (cityiograph.City): -
         x (int): location in x
         y (int): location in y
-    
+
     Returns:
         TYPE: Description
     """
@@ -94,12 +94,11 @@ def update_city(old_city, new_city, x, y):
     add_new = deltas(get_5x5_block(new_city, x, y))
 
     # find real change
-    change = np.subtract(add_new, remove_old) # Kevin - switched order for subtract operation...
+    change = np.subtract(add_new, remove_old) # Kevin - switched order for TODO Alex, other way around due to the model being "if this city was removed"
 
     # Push the change to the OLD city
-    final_city = old_city.copy()
-    push_5x5_deltas(final_city, change, x, y)
-    return final_city
+    push_5x5_deltas(old_city, change, x, y)
+    return old_city
 
 if __name__ == "__main__":
     import sys
