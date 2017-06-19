@@ -94,7 +94,7 @@ def update_city(old_city, new_city, x, y): # TODO maybe prev_city should be repl
     add_new = deltas(get_5x5_block(new_city, x, y))
 
     # find real change
-    change = np.subtract(add_new, remove_old) # Kevin - switched order for TODO Alex, other way around due to the model being "if this city was removed"
+    change = np.subtract(remove_old, add_new)
 
     # Push the change to the OLD city
     push_5x5_deltas(old_city, change, x, y)
