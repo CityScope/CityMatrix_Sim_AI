@@ -94,7 +94,7 @@ def update_city(old_city, new_city, x, y):
     add_new = deltas(get_5x5_block(new_city, x, y))
 
     # find real change
-    change = np.subtract(add_new, remove_old) # Kevin - switched order for subtract operation...
+    change = np.subtract(remove_old, add_new)
 
     # Push the change to the OLD city
     final_city = old_city.copy()

@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-15 23:50:46
+Last modified time: 2017-06-18 23:13:38
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -33,6 +33,7 @@ if len(sys.argv) == 2: AUTO_RESTART = False
 
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
+unity_server = city_udp.City_UDP("Unity_Test_Sever", receive_port = 7009, send_port = 7001)
 
 # Close all ports if server closed
 @atexit.register
@@ -109,6 +110,7 @@ while True:
             ai_dict['objects']['metrics'] = ai_metrics
             result = { 'predict' : ml_dict , 'ai' : ai_dict }
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("First/reset ml_city and ai_city data successfully sent to GH.\n")
         elif key is not CityChange.NO:
             # First, write new city to local file
@@ -150,6 +152,7 @@ while True:
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             write_city(result, timestamp = timestamp)
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("New ml_city and ai_city data successfully sent to GH.\n")
 
             # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
@@ -201,6 +204,7 @@ while True:
                 print("scores: {}".format(ai_city.scores))
 
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
 
 """
