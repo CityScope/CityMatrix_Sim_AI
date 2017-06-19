@@ -99,7 +99,7 @@ while True:
             ml_city = ML.predict(input_city, key, data)
             mlCityScores = Strategy.scores(ml_city)[1]
             ml_city.updateScores(mlCityScores)
-            ai_city, move, ai_metrics_list = Strategy.search(input_city) # TODO change this to ml_city
+            ai_city, move, ai_metrics_list = Strategy.search(ml_city)
             ml_city.animBlink = animBlink
             ai_city.animBlink = animBlink
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
@@ -129,7 +129,7 @@ while True:
             ml_city.updateScores(mlCityScores)
 
             # Run our AI on this city
-            ai_city, move, ai_metrics_list = Strategy.search(input_city) # TODO change this to ml_city
+            ai_city, move, ai_metrics_list = Strategy.search(ml_city)
             # print(ai_city.densities, "ai")
 
             #RZ 170614 update city.animBlink
