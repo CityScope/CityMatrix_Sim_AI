@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-15 23:50:46
+Last modified time: 2017-06-18 23:13:38
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -33,6 +33,7 @@ if len(sys.argv) == 2: AUTO_RESTART = False
 
 # Create instance of our server
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
+unity_server = city_udp.City_UDP("Unity_Test_Sever", receive_port = 7009, send_port = 7001)
 
 # Close all ports if server closed
 @atexit.register
@@ -57,15 +58,17 @@ def metrics_dictionary(metrics):
 ''' --- MAIN SERVER LOGIC --- '''
 
 log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
-
+# TODO add the storage of the previous city that holds the most recent solar radiation values and also lets us find the move made
+# TODO push the previous city solar values onto the incoming city immediately (and get the moves made), then don't worry about the previous city anymore, it shouldn't have any impact after that point
+# TODO the previous city is first set on the initialization json step
 # Constantly loop and wait for new city packets to reach our UDP server
 while True:
     # Get city from server and note timestamp
     input_city = server.receive_city()
     timestamp = str(int(time.time()))#RZ 170614 alter animBlink after received a city from GH CV
-    if animBlink == 0: 
+    if animBlink == 0:
         animBlink = 1
-    else: 
+    else:
         animBlink = 0
     #print("animBlink: {}".format(animBlink))
 
@@ -109,6 +112,7 @@ while True:
             ai_dict['objects']['metrics'] = ai_metrics
             result = { 'predict' : ml_dict , 'ai' : ai_dict }
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("First/reset ml_city and ai_city data successfully sent to GH.\n")
         elif key is not CityChange.NO:
             # First, write new city to local file
@@ -119,7 +123,7 @@ while True:
             # Run our black box predictor on this city with given changes
             ml_city = ML.predict(input_city, key, data)
             # print(ml_city.densities, "ml")
-            
+
             #RZ 170615 score the current city
             mlCityScores = Strategy.scores(ml_city)[1]
             ml_city.updateScores(mlCityScores)
@@ -150,6 +154,7 @@ while True:
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
             write_city(result, timestamp = timestamp)
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("New ml_city and ai_city data successfully sent to GH.\n")
 
             # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
@@ -165,7 +170,7 @@ while True:
             # Then, get metrics dicts for cities
             ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
             ai_metrics = metrics_dictionary(ai_metrics_list)
-            
+
             #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
             ml_city.updateMeta(input_city)
             ai_city.updateMeta(input_city)
@@ -178,7 +183,7 @@ while True:
 
             # Send result
             result = { 'predict' : ml_dict , 'ai' : ai_dict } # None
-            
+
             #RZ 170614 print to check city to send
             if PRINT_CITY_TO_SEND:
                 print("\nml_city to send: ")
@@ -201,16 +206,17 @@ while True:
                 print("scores: {}".format(ai_city.scores))
 
             server.send_data(result)
+            unity_server.send_data(result)
             log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
 
 """
 #RZ 170614
-Notes for socket error in windows 10: 
-run flowing in cmd: 
+Notes for socket error in windows 10:
+run flowing in cmd:
 FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
 
 #RZ 170615
-Notes for udp ports: 
+Notes for udp ports:
 7000 - GH CV send to python server
 7001 - python server send to unity
 7002 - python server send to GH VIZ
