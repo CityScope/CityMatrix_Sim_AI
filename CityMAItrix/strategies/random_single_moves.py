@@ -12,7 +12,7 @@ log = logging.getLogger('__main__')
 density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
 id_range = (0, 6)
-iterations = 150 #RZ speed: about 150 iterations per second
+iterations = 50 #RZ speed: about 150 iterations per second
 
 ''' --- METHOD DEFINITIONS --- '''
 
