@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-20 23:07:34
+Last modified time: 2017-06-20 23:28:06
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -54,6 +54,20 @@ def metrics_dictionary(metrics):
         dict: dictionary mapping metric name -> value and weight
     '''
     return { name : [ value , weight ] for name, value, weight in metrics }
+
+def write_dict(result_dict, timestamp):
+    """Helper method to write our output prediction dictionary to JSON.
+    
+    Args:
+        result_dict (dict): output from ML/AI work
+        timestamp (str): -
+    """
+    # Get filename
+    filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predictions_' + timestamp + '.json')
+
+    # Write dictionary
+    with open(filename, 'w') as f:
+        f.write(json.dumps(result_dict))
 
 ''' --- MAIN SERVER LOGIC --- '''
 
@@ -121,6 +135,7 @@ while True:
 
             # Send resulting 2-city dictionary (predict/ai) back to GH
             result = { 'predict' : ml_dict , 'ai' : ai_dict }
+            write_dict(result, timestamp)
             server.send_data(result)
             unity_server.send_data(result)
 
@@ -174,6 +189,7 @@ while True:
 
                 # Send resulting 2-city dictionary (predict/ai) back to GH
                 result = { 'predict' : ml_dict , 'ai' : ai_dict }
+                write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
 
