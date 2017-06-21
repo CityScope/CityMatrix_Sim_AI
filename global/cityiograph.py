@@ -29,14 +29,18 @@ class City(object):
         AIMov (list): list data describing the move suggested by an AI for a given city 
         AIStep (int): indexer used by GH to show AI progress
         AIWeights (list): list of weights corresponding to metrics used by AI
+        animBlink (int): describes the current blink state for GH
         cells (dict): (x, y) -> cityiograph.Cell
         densities (list): list of densities for each cell type id in the city
         height (int): city dimensionality
         json_obj (dict): full JSON object describing the city
         meta (dict): contains meta information about the city, not the grid
         population (int): total population of the city
+        scores (list): list of objective scores for the city
         slider1 (int): data from table
         slider2 (int): data from table
+        startFlag (int): 1 = restart process with fresh input city; copy solar values
+        toggle1 (unknown): -
         width (int): city dimensionality
     """
     def __init__(self, json_string):
@@ -64,11 +68,14 @@ class City(object):
             self.population += c.population
 
     def equals(self, other):
-        '''
-        Determines if this city object is equivalent to another. Need all cells, densities and 
+        '''Determines if this city object is equivalent to another. Need all cells, densities and 
             densities to be equal.
-        Input:  other - < cityiograph.City > - the city to be compared
-        Output: < bool > - indicates the equality of this city and other
+        
+        Args:
+            other (cityiograph.City): the city to be compared
+        
+        Returns:
+            bool: indicates the equality of this city and other
         '''
         cells_equal = all(
             [c.equals(other.cells.get(pos)) for pos, c in self.cells.items()])
@@ -76,10 +83,10 @@ class City(object):
             and (self.width == other.width) and (self.height == other.height)
 
     def to_dict(self):
-        '''
-        Converts this city to a dictionary object for storage and other purposes.
-        Input:  None
-        Output: result - < dict > - dictionary mapping of this city
+        '''Converts this city to a dictionary object for storage and other purposes.
+        
+        Returns:
+            dict: dictionary mapping of this city
         '''
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
@@ -102,10 +109,10 @@ class City(object):
         return result
 
     def updateMeta(self, other_city):
-        '''
-        Ignoring a prediction of any sort, simply update the metadata of a given city with the data from another.
-        Input:  other_city < cityiograph.City > - 
-        Output: None
+        '''Ignoring a prediction of any sort, simply update the metadata of a given city with the data from another.
+        
+        Args:
+            other_city (cityiograph.City): -
         '''
         self.slider1 = other_city.slider1
         self.slider2 = other_city.slider2
@@ -118,10 +125,20 @@ class City(object):
         #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
 
     def updateAIMov(self, mov):
-        self.AIMov = mov # TODO - Remove
+        """Quick method from Ryan to update AI move.
+        
+        Args:
+            mov (unknown): move representation
+        """
+        self.AIMov = mov
 
     #RZ 170615
     def updateScores(self, scores):
+        """Quick method from Ryan to update AI score values.
+        
+        Args:
+            scores (list): -
+        """
         self.scores = scores
 
     def to_json(self):
@@ -406,30 +423,37 @@ def density_to_pop(type_id, density):
     return density * POP_ARR[type_id]
 
 def cell_features(cell):
-    '''
-    Get the 2 input features for a given cell
-    Currently using population and is road
-    Input:  cell - instance of cityiograph.Cell
-    Output: feats - list of input features for this cell
+    '''Get the 2 input features for a given cell.
+    
+    Args:
+        cell (cityiograph.Cell): Description
+    
+    Returns:
+        list: input features for this cell
     '''
     feats = [ cell.population ]
     feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
     return feats
 
 def cell_results(cell):
-    '''
-    Get the 2 output features for a given cell
-    Currently using traffic score and wait time
-    Input:  cell - instance of cityiograph.Cell
-    Output: feats - list of output features for this cell
+    '''Get the 2 output features for a given cell.
+    
+    Args:
+        cell (cityiograph.Cell): Description
+    
+    Returns:
+        list: output features for this cell
     '''
     return [ cell.data["traffic"], cell.data["wait"] ]
 
 def get_features(city):
-    '''
-    Get the input feature vector for a given city
-    Input:  city - instance of cityiograph.City
-    Output: feats - np array of input features for this city
+    '''Get the input feature vector for a given city.
+    
+    Args:
+        city (cityiograph.City): -
+    
+    Returns:
+        nparray: input features for this city
     '''
     features = []
     for i in range(city.width):
@@ -439,10 +463,13 @@ def get_features(city):
     return np.array(features)
 
 def get_results(city):
-    '''
-    Get the output feature vector for a given city
-    Input:  city - instance of cityiograph.City
-    Output: feats - np array of output features for this city
+    '''Get the output feature vector for a given city.
+    
+    Args:
+        city (cityiograph.City): -
+    
+    Returns:
+        nparray: output features for this city
     '''
     results = []
     for i in range(city.width):

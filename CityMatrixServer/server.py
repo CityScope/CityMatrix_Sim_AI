@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-20 22:38:14
+Last modified time: 2017-06-20 23:07:34
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -45,20 +45,20 @@ def register():
 ''' --- GLOBAL HELPER METHODS --- '''
 
 def metrics_dictionary(metrics):
+    '''Helper method to convert list of tuples to dictionary for JSON submission.
+    
+    Args:
+        metrics (list): list of tuples (name, value, weight)
+    
+    Returns:
+        dict: dictionary mapping metric name -> value and weight
     '''
-    Helper method to convert list of tuples to dictionary for JSON submission.
-    Input:  metrics - list of tuples of the form [ ('Population Density Performance', 0.11217427049946581, 1) , ... ]
-    Output: d - dictionary mapping metric name -> value
-    '''
-
     return { name : [ value , weight ] for name, value, weight in metrics }
 
 ''' --- MAIN SERVER LOGIC --- '''
 
 log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
-# TODO add the storage of the previous city that holds the most recent solar radiation values and also lets us find the move made
-# TODO push the previous city solar values onto the incoming city immediately (and get the moves made), then don't worry about the previous city anymore, it shouldn't have any impact after that point
-# TODO the previous city is first set on the initialization json step
+
 # Constantly loop and wait for new city packets to reach our UDP server
 while True:
     # Get city from server and note timestamp

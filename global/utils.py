@@ -1,13 +1,14 @@
 '''
-    File name: utils.py
-    Author(s): Kevin Lyons, Alex Aubuchon
-    Date created: 5/12/2017
-    Date last modified: 6/15/2017
-    Python Version: 3.5
-    Purpose: Simple utils script to be used alongside our server, among other files. Various
+Filename: utils.py
+Author: kalyons11 <mailto:kalyons@mit.edu>
+Created: 2017-05-12 23:13:20
+Last modified by: kalyons11
+Last modified time: 2017-06-20 23:15:28
+Description:
+    - Simple utils script to be used alongside our server, among other files. Various
         tasks, including model serialization and math operations.
-    TODO:
-        - Clean up!!!
+TODO:
+    - None at this time.
 '''
 
 # General imports
@@ -45,12 +46,17 @@ consoleHandler = logging.StreamHandler(sys.stdout)
 consoleHandler.setFormatter(logFormatter)
 log.addHandler(consoleHandler)
 
-if first: log.info("Successfully initialized log file at {}.".format(LOGGER_FILENAME))
+if first:
+    log.info("Successfully initialized log file at {}.".format(LOGGER_FILENAME))
 
-# Configure log to handle all uncaught exceptions and reboot server, if needed
-# Taken from http://stackoverflow.com/questions/8050775/using-pythons-logging-module-to-log-all-exceptions-and-errors
-# Also from http://stackoverflow.com/questions/4564559/get-exception-description-and-stack-trace-which-caused-an-exception-all-as-a-st
 def handler(t, value, tb):
+    """Helper method to log exceptions for the server and attempt to restart if needed.
+    
+    Args:
+        t (type): exception type
+        value (str): exception message
+        tb (traceback): object showing us where the error came from
+    """
     # Log exception
     message = str(value) + "\n" + "\n".join(traceback.format_tb(tb))
     log.exception(message)
@@ -70,10 +76,10 @@ def handler(t, value, tb):
 sys.excepthook = handler
 
 def restart(message):
-    '''
-    Restarts the CityMatrixServer after some fatal error. Notifies of any error message via e-mail.
-    Input:     message - string describing the error message
-    Output:    None - restart server and send e-mail accordingly
+    '''Restarts the CityMatrixServer after some fatal error. Notifies of any error message via e-mail.
+    
+    Args:
+        message (str): string describing the error message
     '''
 
     did_restart = False
@@ -87,11 +93,11 @@ def restart(message):
         notify(message, did_restart)
 
 def notify(message, did_restart):
-    '''
-    Sends notification of server crash and reboot to users.
-    Input:    message - string describing the error message
-            did_restart - bool indiciating success of restart operation
-    Output:    None - send e-mail to users
+    '''Sends notification of server crash and reboot to users.
+    
+    Args:
+        message (str): string describing the error message
+        did_restart (bool): bool indiciating success of restart operation
     '''
 
     try:

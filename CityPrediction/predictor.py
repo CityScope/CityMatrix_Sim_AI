@@ -3,12 +3,12 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-20 22:25:54
+Last modified time: 2017-06-20 23:18:44
 Description:
     - Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
     all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
 TODO:
-    - Remove redundancies.
+    - None at this time.
 '''
 
 # Get our key utils script
@@ -25,6 +25,7 @@ traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
 
 def traffic_predict(input_city):
     '''Generic traffic predictor.
+    
     Args:
         input_city (cityiograph.City): -
     
@@ -92,7 +93,7 @@ def predict(input_city, previous_city_heights, move_type, move_data):
         for i in indices:
             for c in input_city.cells.values():
                 if c.type_id == i:
-                    locations.append(c.get_pos()) # TODO keep an eye on how this is working
+                    locations.append(c.get_pos())
 
     elif move_type == "CELL":
         locations = move_data # Already have changed locations from data

@@ -12,12 +12,12 @@ model = joblib.load(SOLAR_MODEL_FILENAME)
 
 def get_5x5_block(city, x, y):
     """Return an array of a 5x5 block of heights around a point of a city.
-
+    
     Args:
         city (cityiograph.City OR dict): either city object OR dictionary mapping (x , y) location to cell height
         x (int): -
         y (int): -
-
+    
     Returns:
         list: list of height values representing the block
     """
@@ -60,7 +60,7 @@ def deltas(block_heights):
         block_heights (list): list of height values representing the block
     
     Returns:
-        nparray (25, ): delta values for this block, in column major order
+        nparray (25,): delta values for this block, in column major order
     """
     # Use the lin reg model to predict
     model_output = model.predict(block_heights)[0]
@@ -92,17 +92,3 @@ def update_city(input_city, previous_city_heights, x, y):
     push_5x5_deltas(input_city, change, x, y)
     
     return input_city
-
-if __name__ == "__main__":
-    import sys
-    sys.path.append("../global/")
-    import cityiograph
-    with open("./city_0_output_solar.json", 'r') as f:
-        city = cityiograph.City(f.read())
-        # for cell in city.cells.values():
-            # cell.data["solar"] = 0
-        new_city = city.copy()
-        for cell in new_city.cells.values(): cell.density = 0
-        update_city(new_city, city, 5,5)
-        # with open("city_0_output_solar_new.json", 'w') as o:
-        #   o.write(city.to_json())

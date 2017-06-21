@@ -23,11 +23,12 @@ def search(city):
         city (cityiograph.City): the city for which we would like to optimize our metrics
     
     Returns:
-        3-tuple:    suggested_city: -
-                    best_move (3-tuple):    move type { 'DENSITY', 'CELL' } (str)
-                                            index (int) and new density (int)
-                                                OR
-                                            x (int), y (int) and new type id for that cell
+        3-tuple: suggested_city (cityiograph.City): -
+                 best_move (3-tuple):    move type { 'DENSITY', 'CELL' } (str)
+                                        index (int) and new density (int)
+                                            OR
+                                        x (int), y (int) and new type id for that cell
+                 scores (list): AI metrics scores
     """
     visited = []
     best_score = None
