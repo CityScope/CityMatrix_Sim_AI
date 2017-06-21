@@ -18,6 +18,7 @@ from enum import Enum
 
 # Custom imports
 from config import *
+from cityiograph import *
 
 # Set up logging functionality
 log = logging.getLogger('__main__')

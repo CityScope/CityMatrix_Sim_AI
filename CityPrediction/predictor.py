@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-20 21:30:31
+Last modified time: 2017-06-20 22:25:54
 Description:
     - Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
     all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -32,7 +32,7 @@ def traffic_predict(input_city):
         cityiograph.City: new city instance with traffic ML prediction scores applied
     '''
     # Extract feature matrix from this city
-    features = get_features(city)
+    features = get_features(input_city)
 
     # Make traffic prediction using linear model and trim negative values
     # Taken https://stackoverflow.com/questions/3391843/how-to-transform-negative-elements-to-zero-without-a-loop
@@ -43,7 +43,7 @@ def traffic_predict(input_city):
     result_data[::2] = traffic_output[::2]
 
     # Write prediction back to the cityiograph.City structure and return
-    new_city = city.update_traffic_wait_values(result_data)
+    new_city = input_city.update_traffic_wait_values(result_data)
 
     return new_city
 

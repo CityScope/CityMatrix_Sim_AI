@@ -207,7 +207,7 @@ class City(object):
         """
         # Get filename
         filename = os.path.join(os.path.abspath(os.path.join(INPUT_CITIES_DIRECTORY,
-            , 'city_input_', timestamp, ".json")))
+            'city_input_' + timestamp + ".json")))
 
         # Write to that file
         with open(filename, 'w') as f:
@@ -245,37 +245,37 @@ class City(object):
                             result.append( (x, y) )
                 return { "type" : "CELL" , "data" : result }
 
-        def update_traffic_wait_values(self, data_array):
-            """Given some new data, we want to push this onto the current city and return a copy.
-            
-            Args:
-                data_array (nparray (self.width * self.height * 2, )): traffic/wait array
-            
-            Returns:
-                cityiograph.City: resulting city with this new data
-            """
-            i = 0
-            new_city = self.copy()
-            for x in range(self.width):
-                for y in range(self.height):
-                    cell = new_city.cells.get((x, y))
-                    cell.data["traffic"] = int(round(output[i]))
-                    cell.data["wait"] = int(round(output[i + 1]))
-                    i += 2  
-            return new_city
+    def update_traffic_wait_values(self, data_array):
+        """Given some new data, we want to push this onto the current city and return a copy.
+        
+        Args:
+            data_array (nparray (self.width * self.height * 2, )): traffic/wait array
+        
+        Returns:
+            cityiograph.City: resulting city with this new data
+        """
+        i = 0
+        new_city = self.copy()
+        for x in range(self.width):
+            for y in range(self.height):
+                cell = new_city.cells.get((x, y))
+                cell.data["traffic"] = int(round(data_array[i]))
+                cell.data["wait"] = int(round(data_array[i + 1]))
+                i += 2  
+        return new_city
 
-        def copy_solar_values(self, solar_city):
-            """Helper method to copy solar radiation values from an old city to a new blank one (self).
-            
-            Args:
-                solar_city (cityiograph.City): -
-            """
-            # Simply iterate over all cells and update self accordingly
-            for x in range(self.width):
-                for y in range(self.height):
-                    self_cell = self.get_cell( (x , y) )
-                    solar_cell = solar_city.get_cell( (x , y) )
-                    self_cell.data['solar'] = solar_cell.data['solar']
+    def copy_solar_values(self, solar_city):
+        """Helper method to copy solar radiation values from an old city to a new blank one (self).
+        
+        Args:
+            solar_city (cityiograph.City): -
+        """
+        # Simply iterate over all cells and update self accordingly
+        for x in range(self.width):
+            for y in range(self.height):
+                self_cell = self.get_cell( (x , y) )
+                solar_cell = solar_city.get_cell( (x , y) )
+                self_cell.data['solar'] = solar_cell.data['solar']
 
 class Cell(object):
     """General representation of a single block within an instance of a cityiograph.City.

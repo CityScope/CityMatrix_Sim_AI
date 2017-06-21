@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-20 21:41:57
+Last modified time: 2017-06-20 22:38:14
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -90,7 +90,7 @@ while True:
         input_city.write_to_file(timestamp)
 
         #RZ 170613 for resetting the solar by pressing "startFlag" button in GH CV
-        if input_city.startFlag == 1:
+        if input_city.startFlag == 1 or previous_city is None:
             log.info("First/reset city received @ timestamp {}.".format(timestamp))
             # Save the previous city to be this incoming city
             previous_city = input_city
@@ -134,7 +134,7 @@ while True:
             # Get the type of the change
             move_type = move_dictionary["type"]
 
-            if move_type is not CityChange.NO:
+            if move_type is not "NONE":
                 # We have some change in the city, in the data key
                 move_data = move_dictionary["data"]
 
@@ -177,7 +177,8 @@ while True:
                 server.send_data(result)
                 unity_server.send_data(result)
 
-                log.info("New ml_city and ai_city data successfully sent to GH.\n\nWaiting to receive new city...")
+                log.info("New ml_city and ai_city data successfully sent to GH.\n")
+                log.info("Waiting to receive new city...")
 
             elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
                 #RZ 170614 update city.animBlink

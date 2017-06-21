@@ -6,7 +6,7 @@ sys.path.append('../global/')
 import warnings
 warnings.filterwarnings("ignore", category = DeprecationWarning)
 
-from config import SOLAR_MODEL_FILENAME
+from config import SOLAR_MODEL_FILENAME, CITY_SIZE
 
 model = joblib.load(SOLAR_MODEL_FILENAME)
 
@@ -25,7 +25,7 @@ def get_5x5_block(city, x, y):
 
     for i in range(x - 2, x + 3): # TODO May need to negate one of these
         for j in range(y - 2, y + 3):
-            if i < 0 or i >= city.width or j < 0 or j >= city.height:
+            if i < 0 or i >= CITY_SIZE or j < 0 or j >= CITY_SIZE:
                 cells.append(0) # Out of bounds of city
             else:
                 if isinstance(city, dict): # Just use the existing dict mapping
@@ -37,15 +37,12 @@ def get_5x5_block(city, x, y):
 
 def push_5x5_deltas(city, deltas, x, y):
     """Add the delta values to the block around a point of a city
-
+    
     Args:
         city (cityiograph.City): -
         deltas (nparray (5, 5)): delta matrix
         x (int): -
         y (int): -
-
-    Returns:
-        cityiograph.City: output city
     """
     counter = 0
     for i in range(x - 2, x + 3): # TODO May need to negate one of these
@@ -55,8 +52,6 @@ def push_5x5_deltas(city, deltas, x, y):
             else:
                 city.cells[(i, j)].data["solar"] += deltas[counter]
             counter += 1
-
-    return city
 
 def deltas(block_heights):
     """Get the solar delta values for removing a building at the center of a block.
@@ -95,6 +90,7 @@ def update_city(input_city, previous_city_heights, x, y):
 
     # Push the change to the input city
     push_5x5_deltas(input_city, change, x, y)
+    
     return input_city
 
 if __name__ == "__main__":

@@ -25,11 +25,11 @@ log = logging.getLogger('__main__')
 # filename = 'C:/RH_GH/_verification/170510_ML_Validation_003/02_kevin_prediction_linear_normalized/city_8000_output_normalized.json'
 # filename = '../../../data/cities/cityIO.json'
 # filename = '../../../data/cities/city_9000.json'
-# filename = '../../../data/cities/new_city.json'
+filename = '../../../data/cities/new_city.json'
 # filename = random.choice(glob.glob('../../../data/train_good/*.json'))
-d = '../CityPrediction/input_cities/'
-files = glob.glob(d + '*')
-filename = max(files, key = os.path.getctime) # Get the latest one
+# d = '../CityPrediction/input_cities/'
+# files = glob.glob(d + '*')
+# filename = max(files, key = os.path.getctime) # Get the latest one
 log.debug("Getting data from city at {}.".format(os.path.abspath(filename)))
 
 # Initialize server, flip ports
@@ -104,10 +104,10 @@ log.debug(two)
 '''
 
 # Get solar info and vis
-solar_matrix = ai.get_data_matrix('solar')
+solar_matrix = ml.get_data_matrix('solar')
 plt.subplot(312)
 plt.imshow(solar_matrix.T, cmap = 'hot', interpolation = 'nearest')
-solar_matrix2 = city.get_data_matrix('solar')
+solar_matrix2 = ai.get_data_matrix('solar')
 plt.subplot(313)
 plt.imshow(solar_matrix2.T, cmap = 'hot', interpolation = 'nearest')
 # plt.matshow(solar_matrix.T, cmap = 'hot', norm=LogNorm(vmin=300, vmax=5000))
