@@ -1,13 +1,14 @@
 '''
-    File name: config.py
-    Author(s): Kevin Lyons
-    Date created: 5/17/2017
-    Date last modified: 6/12/2017
-    Python Version: 3.5
-    Purpose: Configuration file for our project. Note: all filenames are relative to the file in which they
+Filename: config.py
+Author: kalyons11 <mailto:kalyons@mit.edu>
+Created: 2017-06-11 21:00:13
+Last modified by: kalyons11
+Last modified time: 2017-06-20 21:04:27
+Description:
+    - Configuration file for our project. Note: all filenames are relative to the file in which they
         are used.
-    TODO:
-        - None at this time.
+TODO:
+    - None at this time.
 '''
 
 # Environment configs
@@ -33,7 +34,8 @@ SERVER_FILENAME = '../CityMatrixServer/server.py' # Relative path from utils scr
 CITY_SIZE = 16
 ROAD_ID = 6 # ID of a road cell on our grid matrix
 POP_ARR = [5, 8, 16, 16, 23, 59] # Array representing the number of people per floor in each building type
-EDGE_COST = 1 # Used in graph creation
+EDGE_COST = 1 # Used in graph creation'
+CITY_HEIGHT_FACTOR = 8. / 3 # Used for solar radiation analysis
 
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'

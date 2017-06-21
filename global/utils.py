@@ -17,7 +17,6 @@ from email.mime.text import MIMEText
 from enum import Enum
 
 # Custom imports
-from cityiograph import *
 from config import *
 
 # Set up logging functionality
@@ -126,69 +125,3 @@ def notify(message, did_restart):
     except Exception as e:
         log.exception(e)
         log.warning("Unable to notify users via e-mail.")
-
-class CityChange(Enum):
-    '''
-    Custom enum to describe the difference between two cities.
-    '''
-    NO = -1, # Exact same cities
-    FIRST = 0, # First city in our directory
-    DENSITY = 1, # Some change in the density array
-    CELL = 2 # Some change in a road/building cell on the grid
-
-def diff_cities(current_city, prev_city = None):
-    '''
-    Determine if a new city is different from the existing one in memory, and if so, how?
-    Input:     current_city - instance of cityiograph.City object - incoming city to server
-            prev_city - instance of cityiograph.City object - may be given if we are doing direct comparison
-    Output:    Return the difference between current city and previouly saved one
-            key - CityChange instance
-            data - list of [ [ changes ] , previous_predicted_city or BOOL indicator ]
-    '''
-
-    if prev_city is None:
-        # First, get the most recent city from our saved set
-        # Taken from http://stackoverflow.com/questions/39327032/how-to-get-the-latest-file-in-a-folder-using-python
-        files = glob.glob(INPUT_CITIES_DIRECTORY + '*')
-
-        # If this is the first city, return need for prediction
-        if len(files) == 0:
-            return ( CityChange.FIRST , True )
-
-        # Run comparison on this city and most recent one
-        with open(max(files, key = os.path.getctime), 'r') as f:
-            # Load prev_city from JSON
-            prev_city = City(f.read())
-
-        # Also, get the previous PREDICTED city from our directory
-        predicted_files = glob.glob(PREDICTED_CITIES_DIRECTORY + '*')
-        with open(max(predicted_files, key = os.path.getctime)) as g: # Get the most recent one by created time
-            # Load dict
-            json_dict = json.load(g)
-
-            # Get predicted city object
-            prev_predicted_city = City(json.dumps(json_dict['predict']))
-    else:
-        prev_predicted_city = prev_city.copy() # Update our prev var
-        
-    # Now, compare directly for densities, size and cells
-    if prev_city.equals(current_city):
-        return ( CityChange.NO , False ) # No difference
-    else:
-        # Yes, we have a difference, let's explore
-        result = []
-        if prev_city.densities != current_city.densities: # Density changes - note indices
-            for i, d in enumerate(prev_city.densities):
-                if current_city.densities[i] != d:
-                    result.append(i)
-            return ( CityChange.DENSITY , [ result, prev_predicted_city ] )
-        else:
-            # We likely have some cell mismatch(es) - need to find
-            # Return locations (x, y)
-            for x in range(prev_city.width):
-                for y in range(prev_city.height):
-                    old = prev_city.cells.get((x, y))
-                    new = current_city.cells.get((x, y))
-                    if not old.equals(new):
-                        result.append( (x, y) )
-            return ( CityChange.CELL , [ result, prev_predicted_city ] )

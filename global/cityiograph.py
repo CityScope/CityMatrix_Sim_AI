@@ -17,6 +17,7 @@ import logging
 from config import *
 
 ''' --- CONFIGURATIONS --- '''
+
 log = logging.getLogger('__main__')
 
 ''' --- CLASS DEFINITIONS --- '''
@@ -198,6 +199,84 @@ class City(object):
 
         cell.population = density_to_pop(cell.type_id, cell.density)
 
+    def write_to_file(self, timestamp):
+        """Helper method to write a city to a local filestore for later use.
+        
+        Args:
+            timestamp (str): str UNIX timestamp value when we received this city
+        """
+        # Get filename
+        filename = os.path.join(os.path.abspath(os.path.join(INPUT_CITIES_DIRECTORY,
+            , 'city_input_', timestamp, ".json")))
+
+        # Write to that file
+        with open(filename, 'w') as f:
+            f.write(self.to_json())
+
+    def get_city_moves(self, other):
+        """Get the moves that were made between one city (self) and other (other).
+        
+        Args:
+            other (cityiograph.City): -
+        
+        Returns:
+            dict: contains information about the type of move and corresponding data
+        """
+        # First, check if they are exactly equal
+        if self.equals(other):
+            return { "type" : "NONE" }
+
+        else:
+            # Need to compare density arrays and cell types
+            result = []
+            if other.densities != self.densities: # Density changes - note indices
+                for i, d in enumerate(other.densities):
+                    if self.densities[i] != d:
+                        result.append(i)
+                return { "type" : "DENSITY" , "data" : result }
+            else:
+                # We likely have some cell mismatch(es) - need to find
+                # Return locations (x, y)
+                for x in range(other.width):
+                    for y in range(other.height):
+                        old = other.cells.get((x, y))
+                        new = self.cells.get((x, y))
+                        if not old.equals(new):
+                            result.append( (x, y) )
+                return { "type" : "CELL" , "data" : result }
+
+        def update_traffic_wait_values(self, data_array):
+            """Given some new data, we want to push this onto the current city and return a copy.
+            
+            Args:
+                data_array (nparray (self.width * self.height * 2, )): traffic/wait array
+            
+            Returns:
+                cityiograph.City: resulting city with this new data
+            """
+            i = 0
+            new_city = self.copy()
+            for x in range(self.width):
+                for y in range(self.height):
+                    cell = new_city.cells.get((x, y))
+                    cell.data["traffic"] = int(round(output[i]))
+                    cell.data["wait"] = int(round(output[i + 1]))
+                    i += 2  
+            return new_city
+
+        def copy_solar_values(self, solar_city):
+            """Helper method to copy solar radiation values from an old city to a new blank one (self).
+            
+            Args:
+                solar_city (cityiograph.City): -
+            """
+            # Simply iterate over all cells and update self accordingly
+            for x in range(self.width):
+                for y in range(self.height):
+                    self_cell = self.get_cell( (x , y) )
+                    solar_cell = solar_city.get_cell( (x , y) )
+                    self_cell.data['solar'] = solar_cell.data['solar']
+
 class Cell(object):
     """General representation of a single block within an instance of a cityiograph.City.
     
@@ -249,7 +328,7 @@ class Cell(object):
         Returns:
             float: scaled density of building
         """
-        return float(8 * self.density / 3)
+        return float(self.density * CITY_HEIGHT_FACTOR)
 
     def equals(self, other_cell):
         """True if type, x and y are the same.
@@ -371,52 +450,3 @@ def get_results(city):
             cell = city.cells.get((i, j))
             results += cell_results(cell)
     return np.array(results)
-
-def output_to_city(city, output):
-    '''
-    Custom method to write new data to city object for later serialization
-    Input:  city - instance of cityiograph.City
-    output - list of traffic and wait scores, alternating
-    Output: city - simply write this data to the existing city object and return
-    '''
-    i = 0
-    new_city = city.copy()
-    for x in range(city.width):
-        for y in range(city.height):
-            cell = new_city.cells.get((x, y))
-            cell.data["traffic"] = int(round(output[i]))
-            cell.data["wait"] = int(round(output[i + 1]))
-            i += 2  
-    return new_city
-
-def write_city(city, timestamp = None):
-    '''
-    Write a city to a JSON file
-    Input:  city - instance of simCity - city to be logged OR dictionary ready to be logged
-    Output: None - write city as JSON to specified filename for later ML purposes
-    '''
-
-    if isinstance(city, dict):
-        # Get filename
-        filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predicted_output_' + timestamp + '.json')
-
-        # Write to JSON
-        with open(filename, 'w') as f:
-            f.write(json.dumps(city))
-
-    else:
-        # Get filename
-        filename = city.filename
-
-        # Handle full city object case
-        # Convert to dictionary object for editing
-        d = city.cityObject.to_dict()
-
-        # Add UNIX timestamp to JSON
-        d['objects']['timestamp'] = city.timestamp
-
-        # Write dictionary to JSON
-        with open(filename, 'w') as f:
-            f.write(json.dumps(d))
-
-    log.info("City data written at filename = {}.".format(os.path.abspath(filename)))

@@ -59,20 +59,30 @@ def search(city):
                 lmt = lmt + 1 #RZ
             mov = ("CELL", x, y, newid)
         visited.append(mov)
-        scr = scores(city, mov)[0]
+        [ scr , best ] = scores(city, mov) # KL - minor optimization to avoid duplicate calls to score()
         if best_score == None or scr > best_score:
             best_score = scr
-            best_scores = scores(city, mov)[1]
+            best_scores = best
             best_move = mov
 
+    # Determine our suggested city based on this move
     suggested_city = move(city, best_move)
-    key, data = utils.diff_cities(suggested_city, prev_city = city)
-    final_city = ML.predict(suggested_city, key, data)
+
+    # Get correct format
+    move_type, move_data = convert_move_format(best_move)
+
+    # Get previous city's height
+    previous_city_heights = { cell.get_pos() : cell.get_height() for cell in city.cells.values() }
+
+    # Run the ML prediction on this suggested city
+    final_city = ML.predict(suggested_city, previous_city_heights, move_type, move_data)
+
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
     final_city.updateAIMov(best_move)
     final_city.updateScores(best_scores)
-    return (final_city, best_move, objective.get_metrics(final_city))
+
+    return final_city, best_move, objective.get_metrics(final_city)
 
 def move(city, mov):
     """Helper method to change a city in some minor yet optimal way.
@@ -87,13 +97,17 @@ def move(city, mov):
     Raises:
         ValueError: if we make a bad move
     """
+    # Make a copy and update values accordingly
     new_city = city.copy()
     if mov[0] == "DENSITY":
         new_city.change_density(mov[1], mov[2])
+
     elif mov[0] == "CELL":
         new_city.change_cell(mov[1], mov[2], mov[3])
+
     else:
         raise ValueError("Bad move!")
+
     return new_city
 
 def scores(city, mov = None):
@@ -108,15 +122,36 @@ def scores(city, mov = None):
     """
     if mov is not None: #RZ 170615
         # Make the move
-        the_city = city.copy()
-        new_city = move(the_city, mov)
+        new_city = move(city, mov)
 
-        # Need to run our ML prediction here
-        # Run our black box predictor on this city with given changes
-        key, data = utils.diff_cities(new_city, prev_city = the_city)
-        final_city = ML.predict(new_city, key, data)
+        # Get correct format
+        move_type, move_data = convert_move_format(mov)
+
+        # Get previous city's height
+        previous_city_heights = { cell.get_pos() : cell.get_height() for cell in city.cells.values() }
+
+        # Run the ML prediction on this suggested city
+        final_city = ML.predict(new_city, previous_city_heights, move_type, move_data)
 
         # Return the evaluated metrics score
         return objective.evaluate(final_city)
     else:
-        return objective.evaluate(city) #RZ 170615
+        return objective.evaluate(city) #RZ 170615 - no move to make here
+
+def convert_move_format(move):
+    """Quick util method to convert between the two move formats being used.
+    
+    Args:
+        move (tuple): either ("DENSITY", idx, val) OR ("CELL", x, y, new_type)
+    
+    Returns:
+        2-tuple: move_type, move_data to be used later on - list format
+    """
+    # Get the custom move structure
+    move_type = move[0]
+    if move_type == "DENSITY":
+        move_data = [ move[1] ]
+    else:
+        move_data = [ ( move[1] , move[2] ) ]
+
+    return move_type, move_data
