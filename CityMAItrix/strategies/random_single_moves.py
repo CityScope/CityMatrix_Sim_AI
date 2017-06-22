@@ -52,6 +52,7 @@ def search(city):
             x = y = newid = -1
             lmt = 0 #RZ limit the while loop
             while ((x == -1 or y == -1 or newid == -1) \
+                or x < 4 or x > 9 or y < 4 or y > 9 or newid == 6 # Focus center of city
                 or ("CELL", x, y, newid) in visited)  \
                 and lmt < 256 * 6 : #RZ possible moves
                 x = randint(0, city.width - 1)
