@@ -57,6 +57,8 @@ class City(object):
         self.animBlink = self.meta['animBlink']
         self.startFlag = self.meta['startFlag']
         self.scores = self.meta['scores']
+        self.dockID = self.meta['dockID']
+        self.dockRotation = self.meta['dockRotation']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -100,6 +102,8 @@ class City(object):
         self.meta["animBlink"] = self.animBlink
         self.meta["startFlag"] = self.startFlag
         self.meta["scores"] = self.scores
+        self.meta["dockID"] = self.dockID
+        self.meta["dockRotation"] = self.dockRotation
 
         result = {
             "objects": self.meta,
@@ -120,6 +124,8 @@ class City(object):
         self.AIWeights = other_city.AIWeights
         self.AIStep = other_city.AIStep
         self.startFlag = other_city.startFlag
+        self.dockID = other_city.dockID
+        self.dockRotation = other_city.dockRotation
         #self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
         #self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
         #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
