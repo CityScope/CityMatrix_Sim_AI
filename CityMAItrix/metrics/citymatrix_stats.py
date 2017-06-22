@@ -33,20 +33,24 @@ def LUM(populations):
     probs = map(lambda x: (x / tot) * np.log10(x / tot) if x != 0 else 0, populations)
     return -sum(probs) / np.log10(len(populations))
 
+
+pdvp_min = 0.0
+pdvp_max = 0.5 #1.0
 def pop_diversity_perf(city):
     pop_dict = id_pop_dict(city)
     residential_diversity = LUM([pop_dict[0], pop_dict[1], pop_dict[2]])
     office_diversity = LUM([pop_dict[3], pop_dict[4], pop_dict[5]])
     living_working_diversity = LUM([pop_dict[0] + pop_dict[1] + pop_dict[2],
                                  pop_dict[3] + pop_dict[4] + pop_dict[5]])
-    return (residential_diversity + office_diversity +
+    raw_total_diversity = (residential_diversity + office_diversity +
             living_working_diversity) / 3
+    return normalize(raw_total_diversity, pdvp_min, pdvp_max)
 
 #energy_per_sqm = [0.8, 1.0, 1.2, 2.0, 2.5, 3.0, 0]
 energy_per_sqm = [-0.2, 0.0, 0.2, -0.4, 0.0, 0.4, 0.0] #RZ 170617 
 floor_area = 1562.5 # square meters
-ep_min = 0
-ep_max = 500000 # need to determine this
+ep_min = -200000
+ep_max = 100000 # need to determine this
 def energy_perf(city):
     tot = 0
     for cell in city.cells.values():
@@ -54,14 +58,17 @@ def energy_perf(city):
 
     return normalize(tot, ep_min, ep_max)
 
-tp_min = 0
-tp_max = 100 # need to determine this
+tp_min = 18000.0 * 5.0
+tp_max = 20000.0 * 5.0 # need to determine this
 def traffic_perf(city):
     traffics = [cell.data["traffic"] for cell in city.cells.values()]
-    return normalize(sum(traffics) / len(traffics), tp_min, tp_max)
+    #return sum(traffics)
+    #return normalize(sum(traffics), tp_min, tp_max)
+    return (1.0 - normalize(sum(traffics), tp_min, tp_max)) #RZ 170622
+    #return (1.0 - normalize(sum(traffics) / len(traffics), tp_min, tp_max))
 
-sp_min = 0
-sp_max = 500 # need to determine this
+sp_min = -500
+sp_max = 0 # need to determine this
 def solar_perf(city):
     solars = [cell.data["solar"] for cell in city.cells.values()]
-    return normalize(sum(solars) / len(solars), sp_min, sp_max)
+    return (1.0 - normalize(sum(solars) / len(solars), sp_min, sp_max))

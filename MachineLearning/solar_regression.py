@@ -32,6 +32,8 @@ def push_5x5_deltas(city, deltas, x, y):
                 pass # 0 value here
             else:
                 city.cells[(i, j)].data["solar"] += deltas[counter]
+                #city.cells[(i, j)].data["solar"] -= deltas[counter] #RZ 170622 - negate solar delta - no effect!
+                #city.cells[(i, j)].data["solar"] += deltas[counter] * 0.0001 #RZ 170622 - reduce delta intensity - no effect!
             counter += 1
 
     return city
@@ -46,6 +48,7 @@ def deltas(block):
             heights.append(c.get_height())
 
     model_output = model.predict(heights)[0]
+    #model_output = - model.predict(heights)[0] #RZ 170622 - negate solar delta - no effect!
 
     '''
 
@@ -76,6 +79,8 @@ def update_city(old_city, new_city, x, y):
     add_new = deltas(get_5x5_block(new_city, x, y))
 
     change = np.subtract(add_new, remove_old) # Kevin - switched order for subtract operation...
+    #change = np.subtract(remove_old, add_new) #RZ 170622 - switched order - no effect!
+    #change = np.addition(remove_old, add_new) #RZ 170622 - negate solar delta - no effect!
     # print(change)
 
     push_5x5_deltas(old_city, change, x, y)
