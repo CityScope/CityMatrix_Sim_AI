@@ -3,7 +3,7 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-20 23:28:06
+Last modified time: 2017-06-21 23:47:36
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -246,8 +246,16 @@ while True:
 """
 #RZ 170614
 Notes for socket error in windows 10:
-run flowing in cmd:
+run following in cmd:
+
 FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
+
+#KL 170621
+Notes for socket error in Mac OSX:
+run following in Terminal:
+
+lsof -i :7000
+kill -9 <PID given by previous command>
 
 #RZ 170615
 Notes for udp ports:

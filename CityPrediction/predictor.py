@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-20 23:18:44
+Last modified time: 2017-06-21 23:29:47
 Description:
     - Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
     all features. Right now, these features are traffic, wait (not right now) AND solar radiation.
@@ -39,12 +39,8 @@ def traffic_predict(input_city):
     # Taken https://stackoverflow.com/questions/3391843/how-to-transform-negative-elements-to-zero-without-a-loop
     traffic_output = traffic_model.predict([ features ])[0].clip(min = 0) # Type = np array, 1 x 512
 
-    # Only care about traffic values right now
-    result_data = features
-    result_data[::2] = traffic_output[::2]
-
     # Write prediction back to the cityiograph.City structure and return
-    new_city = input_city.update_traffic_wait_values(result_data)
+    new_city = input_city.update_traffic_wait_values(traffic_output)
 
     return new_city
 
@@ -79,7 +75,7 @@ def predict(input_city, previous_city_heights, move_type, move_data):
             density array that have a new value
     
     Returns:
-        TYPE: Description
+        cityiograph.City: output with prediction values
     '''
     # First, do full traffic prediction
     traffic_city = traffic_predict(input_city)
@@ -91,11 +87,14 @@ def predict(input_city, previous_city_heights, move_type, move_data):
         indices = move_data # List of indices in density array where we have a change - likely length 1
         # Find locations with that density value
         for i in indices:
-            for c in input_city.cells.values():
+            for c in traffic_city.cells.values():
                 if c.type_id == i:
                     locations.append(c.get_pos())
 
     elif move_type == "CELL":
         locations = move_data # Already have changed locations from data
 
-    return solar_predict(traffic_city, previous_city_heights, locations)
+    # Run solar prediction at these new locations
+    final_city =  solar_predict(traffic_city, previous_city_heights, locations)
+
+    return final_city
