@@ -76,7 +76,9 @@ def search(city):
     previous_city_heights = { cell.get_pos() : cell.get_height() for cell in city.cells.values() }
 
     # Run the ML prediction on this suggested city
+    a = suggested_city.get_data_matrix('traffic')
     final_city = ML.predict(suggested_city, previous_city_heights, move_type, move_data)
+    b = final_city.get_data_matrix('traffic')
 
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))

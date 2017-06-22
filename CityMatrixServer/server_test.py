@@ -3,7 +3,7 @@ Filename: server_test.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-04-11 23:06:29
 Last modified by: kalyons11
-Last modified time: 2017-06-20 23:17:55
+Last modified time: 2017-06-21 23:17:12
 Description:
     - Quick script to test the functionality of our prediciton server. Make minor tweaks to cities
      to test our code.
@@ -43,16 +43,16 @@ city = City(json_string)
 log.debug("Successfully loaded city.")
 
 # Make some changes for testing purposes
-x = np.random.randint(0, 16)
-y = np.random.randint(0, 16)
-t = np.random.randint(0, 6)
-print("change", x, y, t)
-city.change_cell(x, y, t)
+# x = np.random.randint(0, 16)
+# y = np.random.randint(0, 16)
+# t = np.random.randint(0, 6)
+# print("change", x, y, t)
+# city.change_cell(x, y, t)
 
-# d_new = np.random.randint(0, 30)
-# i = np.random.randint(0, 6)
-# print(d_new, "@", i)
-# city.densities[i] = d_new
+d_new = np.random.randint(0, 30)
+i = np.random.randint(0, 6)
+print(d_new, "@", i)
+city.densities[i] = d_new
 
 # city.densities = [30, 30, 30, 1, 2, 30]
 
@@ -105,10 +105,10 @@ log.debug(two)
 '''
 
 # Get solar info and vis
-solar_matrix = ml.get_data_matrix('solar')
+solar_matrix = ml.get_data_matrix('traffic')
 plt.subplot(312)
 plt.imshow(solar_matrix.T, cmap = 'hot', interpolation = 'nearest')
-solar_matrix2 = ai.get_data_matrix('solar')
+solar_matrix2 = ai.get_data_matrix('traffic')
 plt.subplot(313)
 plt.imshow(solar_matrix2.T, cmap = 'hot', interpolation = 'nearest')
 # plt.matshow(solar_matrix.T, cmap = 'hot', norm=LogNorm(vmin=300, vmax=5000))

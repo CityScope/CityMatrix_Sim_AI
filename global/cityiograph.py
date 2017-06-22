@@ -195,6 +195,7 @@ class City(object):
         for cell in self.cells.values():
             if cell.type_id == idx:
                 cell.density = new_density
+                cell.update_pop()
 
         self.densities[idx] = new_density
 
@@ -214,7 +215,7 @@ class City(object):
         else:
             cell.density = self.densities[cell.type_id]
 
-        cell.population = density_to_pop(cell.type_id, cell.density)
+        cell.update_pop()
 
     def write_to_file(self, timestamp):
         """Helper method to write a city to a local filestore for later use.
@@ -273,11 +274,11 @@ class City(object):
         """
         i = 0
         new_city = self.copy()
-        for x in range(self.width):
-            for y in range(self.height):
+        for x in range(new_city.width):
+            for y in range(new_city.height):
                 cell = new_city.cells.get((x, y))
-                cell.data["traffic"] = int(round(data_array[i]))
-                cell.data["wait"] = int(round(data_array[i + 1]))
+                cell.data["traffic"] = round(data_array[i], 2) # Rounding to 2 decimals for some precision, without too much
+                cell.data["wait"] = round(data_array[i + 1], 2)
                 i += 2  
         return new_city
 
@@ -329,6 +330,11 @@ class Cell(object):
             except:
                 self.density = 0 # Accounting for odd ID case error - Kevin, 5/19/2017
 
+        self.update_pop()
+
+    def update_pop(self):
+        """Helper method to update the actual population value of a cell - used in feature extraction.
+        """
         self.population = density_to_pop(self.type_id, self.density)
 
     def get_pos(self):
