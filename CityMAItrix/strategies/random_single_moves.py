@@ -11,7 +11,7 @@ from CityPrediction import predictor as ML
 log = logging.getLogger('__main__')
 density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
-id_range = (0, 6)
+id_range = (0, 5)
 iterations = 50 #RZ speed: about 150 iterations per second
 
 ''' --- METHOD DEFINITIONS --- '''
@@ -52,9 +52,9 @@ def search(city):
             x = y = newid = -1
             lmt = 0 #RZ limit the while loop
             while ((x == -1 or y == -1 or newid == -1) \
-                or x < 4 or x > 9 or y < 4 or y > 9 or newid == 6 # Focus center of city
+                or x < 4 or x > 9 or y < 4 or y > 9 or y == 8 or y == 8 # Focus center of city and no road cell
                 or ("CELL", x, y, newid) in visited)  \
-                and lmt < 256 * 6 : #RZ possible moves
+                and lmt < 256 * 6 * 2 : #RZ possible moves * 2
                 x = randint(0, city.width - 1)
                 y = randint(0, city.height - 1)
                 newid = randint(id_range[0], id_range[1])
