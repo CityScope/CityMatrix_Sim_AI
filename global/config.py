@@ -3,7 +3,6 @@ Filename: config.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-11 21:00:13
 Last modified by: kalyons11
-Last modified time: 2017-06-25 13:47:28
 Description:
     - Configuration file for our project. Note: all filenames are relative to the file in which they
         are used.

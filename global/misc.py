@@ -3,7 +3,6 @@ Filename: misc.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-15 20:09:56
 Last modified by: kalyons11
-Last modified time: 2017-06-15 20:36:32
 Description:
     - Misc methods/definitions that have been cleaned as a result of reformatting.
 TODO:

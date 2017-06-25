@@ -3,7 +3,6 @@ Filename: server_test.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-04-11 23:06:29
 Last modified by: kalyons11
-Last modified time: 2017-06-21 23:17:12
 Description:
     - Quick script to test the functionality of our prediciton server. Make minor tweaks to cities
      to test our code.

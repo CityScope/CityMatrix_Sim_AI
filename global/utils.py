@@ -3,7 +3,6 @@ Filename: utils.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-05-12 23:13:20
 Last modified by: kalyons11
-Last modified time: 2017-06-20 23:15:28
 Description:
     - Simple utils script to be used alongside our server, among other files. Various
         tasks, including model serialization and math operations.
