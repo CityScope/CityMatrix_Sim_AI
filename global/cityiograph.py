@@ -244,11 +244,12 @@ class City(object):
                             result.append( (x, y) )
                 return { "type" : "CELL" , "data" : result }
 
-    def update_traffic_wait_values(self, data_array):
+    def update_values(self, data_array, mode):
         """Given some new data, we want to push this onto the current city and return a copy.
         
         Args:
             data_array (nparray (self.width * self.height * 2, )): traffic/wait array
+            mode (str): describes the type of data copying we are looking for - traffic or solar
         
         Returns:
             cityiograph.City: resulting city with this new data
@@ -258,9 +259,16 @@ class City(object):
         for x in range(new_city.width):
             for y in range(new_city.height):
                 cell = new_city.cells.get((x, y))
-                cell.data["traffic"] = round(data_array[i], 2) # Rounding to 2 decimals for some precision, without too much
-                cell.data["wait"] = round(data_array[i + 1], 2)
-                i += 2  
+                if mode == 'traffic':
+                    cell.data["traffic"] = round(data_array[i], 2) # Rounding to 2 decimals for some precision, without too much
+                    cell.data["wait"] = round(data_array[i + 1], 2)
+                    i += 2
+                elif mode == 'solar':
+                    cell.data["solar"] = round(data_array[i], 2)
+                    i += 1
+                else:
+                    raise ValueError("Invalid mode string detected.")
+
         return new_city
 
     def copy_solar_values(self, solar_city):
