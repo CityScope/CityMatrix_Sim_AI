@@ -3,7 +3,7 @@ Filename: config.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-11 21:00:13
 Last modified by: kalyons11
-Last modified time: 2017-06-20 21:04:27
+Last modified time: 2017-06-25 13:47:28
 Description:
     - Configuration file for our project. Note: all filenames are relative to the file in which they
         are used.
@@ -39,7 +39,7 @@ CITY_HEIGHT_FACTOR = 8. / 3 # Used for solar radiation analysis
 
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'
-LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_model.pkl' # Pickle file for traffic predictor
+LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_solar_model.pkl' # Pickle file for traffic predictor
 SOLAR_MODEL_FILENAME = MODEL_DIR + 'solar_model.pkl' # Pickle file for solar predictor
 
 # Log variables

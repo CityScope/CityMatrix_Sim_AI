@@ -3,7 +3,7 @@ Filename: predictor.py
 Author: Kevin <mailto:kalyons@mit.edu>
 Created: 2017-06-01 20:17:36
 Last modified by: kalyons11
-Last modified time: 2017-06-21 23:29:47
+Last modified time: 2017-06-25 13:59:55
 Description:
     - Generic black box ML predictor that takes in a city and runs the necessary ML predictions on it for
     all features. Right now, these features are traffic, wait (not right now) AND solar radiation.

@@ -27,36 +27,29 @@ class City(object):
     
     Attributes:
         AIMov (list): list data describing the move suggested by an AI for a given city 
-        AIStep (int): indexer used by GH to show AI progress
-        AIWeights (list): list of weights corresponding to metrics used by AI
-        animBlink (int): describes the current blink state for GH
         cells (dict): (x, y) -> cityiograph.Cell
         densities (list): list of densities for each cell type id in the city
+        dockID (TYPE): Description
+        dockRotation (TYPE): Description
         height (int): city dimensionality
         json_obj (dict): full JSON object describing the city
         meta (dict): contains meta information about the city, not the grid
         population (int): total population of the city
         scores (list): list of objective scores for the city
-        slider1 (int): data from table
-        slider2 (int): data from table
-        startFlag (int): 1 = restart process with fresh input city; copy solar values
-        toggle1 (unknown): -
         width (int): city dimensionality
     """
     def __init__(self, json_string):
+        """Class init method.
+        
+        Args:
+            json_string (str): string from JSON file that describes this city
+        """
         self.json_obj = json.loads(json_string)
         self.meta = self.json_obj['objects']
 
         self.densities = self.meta['densities']
-        self.AIStep = self.meta['AIStep']
-        self.slider1 = self.meta['slider1']
-        self.slider2 = self.meta['slider2']
-        self.toggle1 = self.meta['toggle1']
-        self.AIWeights = self.meta['AIWeights']
-        self.AIMov = self.meta['AIMov']
-        self.animBlink = self.meta['animBlink']
-        self.startFlag = self.meta['startFlag']
-        self.scores = self.meta['scores']
+        self.dockID = self.meta['dockID']
+        self.dockRotation = self.meta['dockRotation']
 
         self.cells = dict_from_cells(
             cells_from_json(self.json_obj['grid'], self.densities))
@@ -90,16 +83,8 @@ class City(object):
         '''
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
-
-        self.meta["AIStep"] = self.AIStep # RZ
-        self.meta["slider1"] = self.slider1 # RZ
-        self.meta["slider2"] = self.slider2 # RZ
-        self.meta["toggle1"] = self.toggle1 # RZ
-        self.meta["AIWeights"] = self.AIWeights # RZ
-        self.meta["AIMov"] = self.AIMov #RZ
-        self.meta["animBlink"] = self.animBlink
-        self.meta["startFlag"] = self.startFlag
-        self.meta["scores"] = self.scores
+        self.meta["dockID"] = self.dockID
+        self.meta["dockRotation"] = self.dockRotation
 
         result = {
             "objects": self.meta,
@@ -114,12 +99,8 @@ class City(object):
         Args:
             other_city (cityiograph.City): -
         '''
-        self.slider1 = other_city.slider1
-        self.slider2 = other_city.slider2
-        self.toggle1 = other_city.toggle1
-        self.AIWeights = other_city.AIWeights
-        self.AIStep = other_city.AIStep
-        self.startFlag = other_city.startFlag
+        self.dockID = other_city.dockID
+        self.dockRotation = other_city.dockRotation
         #self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
         #self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
         #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
@@ -301,6 +282,7 @@ class Cell(object):
     Attributes:
         data (dict): contains ML attributes of city
         density (int): -
+        height (float): height of cell for solar prediction
         json_obj (dict): full data object
         magnitude (int): ?
         population (int): number of people who live on this cell
@@ -310,6 +292,12 @@ class Cell(object):
         y (int): -
     """
     def __init__(self, json_data, density_array):
+        """Class init method.
+        
+        Args:
+            json_data (dict): contains all data for this cell
+            density_array (list): list indexed by building type -> density value
+        """
         self.json_obj = json_data
         self.type_id = json_data['type']
         self.x = json_data['x']
@@ -331,11 +319,17 @@ class Cell(object):
                 self.density = 0 # Accounting for odd ID case error - Kevin, 5/19/2017
 
         self.update_pop()
+        self.update_height()
 
     def update_pop(self):
         """Helper method to update the actual population value of a cell - used in feature extraction.
         """
         self.population = density_to_pop(self.type_id, self.density)
+
+    def update_height(self):
+        """Helper method to update the actual height value of a cell - used in feature extraction.
+        """
+        self.height = density_to_height(self.type_id, self.density)
 
     def get_pos(self):
         """Basic helper method to get location of a cell.
@@ -344,14 +338,6 @@ class Cell(object):
             2-tuple: (x, y) location
         """
         return (self.x, self.y)
-
-    def get_height(self):
-        """Get the relative height of a building. Used for solar prediction.
-        
-        Returns:
-            float: scaled density of building
-        """
-        return float(self.density * CITY_HEIGHT_FACTOR)
 
     def equals(self, other_cell):
         """True if type, x and y are the same.
@@ -427,6 +413,20 @@ def density_to_pop(type_id, density):
     if type_id not in range(len(POP_ARR)):
         return 0
     return density * POP_ARR[type_id]
+
+def density_to_height(type_id, density):
+    """Converts the raw floor density to the height of a building - used in solar prediction.
+    
+    Args:
+        type_id (int): -
+        density (int): density value for this type id
+    
+    Returns:
+        float: height of a cell
+    """
+    if type_id not in range(len(POP_ARR)):
+        return 0
+    return density * 3.5
 
 def cell_features(cell):
     '''Get the 2 input features for a given cell.
