@@ -83,7 +83,6 @@ while True:
         animBlink = 1
     else:
         animBlink = 0
-    #print("animBlink: {}".format(animBlink))
 
     #RZ 170614 print to check received city
     if PRINT_CITY_RECEIVED:
