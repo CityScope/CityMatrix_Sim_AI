@@ -66,43 +66,7 @@ def write_dict(result_dict, timestamp):
 
     # Write dictionary
     with open(filename, 'w') as f:
-        f.write(json.dumps(result_dict))
-
-def compute_city(input_city):
-    """Main server method that runs full ML and AI prediction on a given city.
-    
-    Args:
-        input_city (cityiograph.City): -
-    
-    Returns:
-        dict: 2-city dictionary for ML and AI cities
-    """
-    # ML first
-    ml_city = ML.predict(input_city)
-
-    # Compute ML scores
-    mlCityScores = Strategy.scores(ml_city)[1]
-    ml_city.updateScores(mlCityScores)
-
-    # Still run our normal AI on this new ML city
-    ai_city, move, ai_metrics_list = Strategy.search(ml_city)
-
-    # Update animation
-    ml_city.animBlink = animBlink
-    ai_city.animBlink = animBlink
-
-    # Get metrics
-    ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-    ai_metrics = metrics_dictionary(ai_metrics_list)
-    ml_city.updateMeta(input_city)
-    ai_city.updateMeta(input_city)
-    ml_dict = ml_city.to_dict()
-    ml_dict['objects']['metrics'] = ml_metrics
-    ai_dict = ai_city.to_dict()
-    ai_dict['objects']['metrics'] = ai_metrics
-
-    # Save 2-city dictionary
-    return { 'predict' : ml_dict , 'ai' : ai_dict }
+        f.write(json.dumps(result_dict))    
 
 ''' --- MAIN SERVER LOGIC --- '''
 
@@ -142,9 +106,36 @@ while True:
             # Check if this city is different from the previous one
             if not previous_city.equals(input_city):
                 # Run full ML/AI prediction
-                result = compute_city(input_city)
+                # ML first
+                ml_city = ML.predict(input_city)
+
+                # Update previous value
+                previous_city = ml_city
+
+                # Compute ML scores
+                mlCityScores = Strategy.scores(ml_city)[1]
+                ml_city.updateScores(mlCityScores)
+
+                # Still run our normal AI on this new ML city
+                ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+                # Update animation
+                ml_city.animBlink = animBlink
+                ai_city.animBlink = animBlink
+
+                # Get metrics
+                ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
+                ai_metrics = metrics_dictionary(ai_metrics_list)
+                ml_city.updateMeta(input_city)
+                ai_city.updateMeta(input_city)
+                ml_dict = ml_city.to_dict()
+                ml_dict['objects']['metrics'] = ml_metrics
+                ai_dict = ai_city.to_dict()
+                ai_dict['objects']['metrics'] = ai_metrics
 
                 # Save result and send back to GH/Unity
+                result = { 'predict' : ml_dict , 'ai' : ai_dict }
+                
                 write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
@@ -202,9 +193,36 @@ while True:
         else:
             # This is the first city
             # Run full ML/AI prediction
-            result = compute_city(input_city)
+            # ML first
+            ml_city = ML.predict(input_city)
+
+            # Update previous value
+            previous_city = ml_city
+
+            # Compute ML scores
+            mlCityScores = Strategy.scores(ml_city)[1]
+            ml_city.updateScores(mlCityScores)
+
+            # Still run our normal AI on this new ML city
+            ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+            # Update animation
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
+
+            # Get metrics
+            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
+            ai_metrics = metrics_dictionary(ai_metrics_list)
+            ml_city.updateMeta(input_city)
+            ai_city.updateMeta(input_city)
+            ml_dict = ml_city.to_dict()
+            ml_dict['objects']['metrics'] = ml_metrics
+            ai_dict = ai_city.to_dict()
+            ai_dict['objects']['metrics'] = ai_metrics
 
             # Save result and send back to GH/Unity
+            result = { 'predict' : ml_dict , 'ai' : ai_dict }
+            
             write_dict(result, timestamp)
             server.send_data(result)
             unity_server.send_data(result)

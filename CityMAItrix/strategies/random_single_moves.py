@@ -11,7 +11,7 @@ from CityPrediction import predictor as ML
 log = logging.getLogger('__main__')
 density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
-id_range = (0, 6)
+id_range = (0, 5)
 iterations = 50 #RZ speed: about 150 iterations per second
 
 ''' --- METHOD DEFINITIONS --- '''
@@ -30,7 +30,7 @@ def search(city):
                                         x (int), y (int) and new type id for that cell
                  scores (list): AI metrics scores
     """
-    visited = []
+    visited = set() # KL 1706625 changing to set to get O(1) search lookups
     best_score = None
     best_scores = None #RZ 170615 passing score array to json
     best_move = None
@@ -52,15 +52,16 @@ def search(city):
             x = y = newid = -1
             lmt = 0 #RZ limit the while loop
             while ((x == -1 or y == -1 or newid == -1) \
+                or x < 4 or x > 9 or y < 4 or y > 9 or y == 8 or y == 8 # Focus center of city and no road cell
                 or ("CELL", x, y, newid) in visited)  \
-                and lmt < 256 * 6 : #RZ possible moves
+                and lmt < 256 * 6 * 2 : #RZ possible moves * 2
                 x = randint(0, city.width - 1)
                 y = randint(0, city.height - 1)
                 newid = randint(id_range[0], id_range[1])
                 lmt = lmt + 1 #RZ
             mov = ("CELL", x, y, newid)
-        visited.append(mov)
-        [ scr , best ] = scores(city, mov) # KL - minor optimization to avoid duplicate calls to score()
+        visited.add(mov)
+        [ scr , best ] = scores(city, mov) # KL - minor optimization to avoid duplicate calls to score method
         if best_score == None or scr > best_score:
             best_score = scr
             best_scores = best
@@ -124,5 +125,6 @@ def scores(city, mov = None):
 
         # Return the evaluated metrics score
         return objective.evaluate(final_city)
+
     else:
         return objective.evaluate(city) #RZ 170615 - no move to make here

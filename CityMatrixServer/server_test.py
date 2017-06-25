@@ -104,10 +104,11 @@ log.debug(two)
 '''
 
 # Get solar info and vis
-solar_matrix = ml.get_data_matrix('traffic')
+solar_matrix = ml.get_data_matrix('solar')
 plt.subplot(312)
 plt.imshow(solar_matrix.T, cmap = 'hot', interpolation = 'nearest')
-solar_matrix2 = ai.get_data_matrix('traffic')
+
+solar_matrix2 = ai.get_data_matrix('solar')
 plt.subplot(313)
 plt.imshow(solar_matrix2.T, cmap = 'hot', interpolation = 'nearest')
 # plt.matshow(solar_matrix.T, cmap = 'hot', norm=LogNorm(vmin=300, vmax=5000))

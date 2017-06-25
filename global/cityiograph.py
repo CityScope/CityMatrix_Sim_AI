@@ -27,15 +27,22 @@ class City(object):
     
     Attributes:
         AIMov (list): list data describing the move suggested by an AI for a given city 
+        AIStep (int): indexer used by GH to show AI progress
+        AIWeights (list): list of weights corresponding to metrics used by AI
+        animBlink (int): describes the current blink state for GH
         cells (dict): (x, y) -> cityiograph.Cell
         densities (list): list of densities for each cell type id in the city
-        dockID (TYPE): Description
-        dockRotation (TYPE): Description
+        dockID (int): ?
+        dockRotation (int): ?
         height (int): city dimensionality
         json_obj (dict): full JSON object describing the city
         meta (dict): contains meta information about the city, not the grid
         population (int): total population of the city
         scores (list): list of objective scores for the city
+        slider1 (int): data from table
+        slider2 (int): data from table
+        startFlag (int): 1 = restart process with fresh input city; copy solar values
+        toggle1 (unknown): -
         width (int): city dimensionality
     """
     def __init__(self, json_string):
@@ -48,6 +55,15 @@ class City(object):
         self.meta = self.json_obj['objects']
 
         self.densities = self.meta['densities']
+        self.AIStep = self.meta['AIStep']
+        self.slider1 = self.meta['slider1']
+        self.slider2 = self.meta['slider2']
+        self.toggle1 = self.meta['toggle1']
+        self.AIWeights = self.meta['AIWeights']
+        self.AIMov = self.meta['AIMov']
+        self.animBlink = self.meta['animBlink']
+        self.startFlag = self.meta['startFlag']
+        self.scores = self.meta['scores']
         self.dockID = self.meta['dockID']
         self.dockRotation = self.meta['dockRotation']
 
@@ -83,6 +99,16 @@ class City(object):
         '''
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
+        
+        self.meta["AIStep"] = self.AIStep # RZ
+        self.meta["slider1"] = self.slider1 # RZ
+        self.meta["slider2"] = self.slider2 # RZ
+        self.meta["toggle1"] = self.toggle1 # RZ
+        self.meta["AIWeights"] = self.AIWeights # RZ
+        self.meta["AIMov"] = self.AIMov #RZ
+        self.meta["animBlink"] = self.animBlink
+        self.meta["startFlag"] = self.startFlag
+        self.meta["scores"] = self.scores
         self.meta["dockID"] = self.dockID
         self.meta["dockRotation"] = self.dockRotation
 
@@ -99,6 +125,12 @@ class City(object):
         Args:
             other_city (cityiograph.City): -
         '''
+        self.slider1 = other_city.slider1
+        self.slider2 = other_city.slider2
+        self.toggle1 = other_city.toggle1
+        self.AIWeights = other_city.AIWeights
+        self.AIStep = other_city.AIStep
+        self.startFlag = other_city.startFlag
         self.dockID = other_city.dockID
         self.dockRotation = other_city.dockRotation
         # self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
@@ -111,7 +143,7 @@ class City(object):
         Args:
             mov (unknown): move representation
         """
-        pass # self.AIMov = mov
+        self.AIMov = mov
 
     #RZ 170615
     def updateScores(self, scores):
@@ -120,7 +152,7 @@ class City(object):
         Args:
             scores (list): -
         """
-        pass # self.scores = scores
+        self.scores = scores
 
     def to_json(self):
         """Converts the current city object to a JSON string.
@@ -177,6 +209,7 @@ class City(object):
             if cell.type_id == idx:
                 cell.density = new_density
                 cell.update_pop()
+                cell.update_height()
 
         self.densities[idx] = new_density
 
@@ -188,7 +221,7 @@ class City(object):
             y (int): y location
             new_id (int): the new type id for this paricular cell
         """
-        cell = self.cells[(x, y)]
+        cell = self.get_cell((x, y))
         cell.type_id = new_id
 
         if cell.type_id == ROAD_ID:
@@ -197,6 +230,7 @@ class City(object):
             cell.density = self.densities[cell.type_id]
 
         cell.update_pop()
+        cell.update_height()
 
     def write_to_file(self, timestamp):
         """Helper method to write a city to a local filestore for later use.
@@ -386,7 +420,7 @@ def density_to_height(type_id, density):
     """
     if type_id not in range(len(POP_ARR)):
         return 0
-    return density * 3.5
+    return density * DENSITY_TO_HEIGHT_FACTOR
 
 def cell_features(cell, mode):
     '''Get the 2 input features for a given cell.
@@ -397,6 +431,9 @@ def cell_features(cell, mode):
     
     Returns:
         list: input features for this cell
+    
+    Raises:
+        ValueError: for invalid mode key
     '''
     if mode == 'traffic':
         feats = [ cell.population ]
@@ -417,11 +454,14 @@ def cell_results(cell, mode):
     
     Returns:
         list: output features for this cell
+    
+    Raises:
+        ValueError: for invalid mode key
     '''
     if mode == 'traffic':
         return [ cell.data["traffic"], cell.data["wait"] ]
     elif mode == 'solar':
-        return [ cell.data["solar"] ]
+        return cell.data["solar"]
     else:
         raise ValueError("Invalid mode string detected.")
 
@@ -441,7 +481,7 @@ def get_features(city, mode):
             cell = city.cells.get((i, j))
             features.append(cell_features(cell, mode))
     
-    return np.array(features)
+    return np.array(features).flatten()
 
 def get_results(city, mode):
     '''Get the output feature vector for a given city.
@@ -459,4 +499,4 @@ def get_results(city, mode):
             cell = city.cells.get((i, j))
             results.append(cell_results(cell, mode))
     
-    return np.array(results)
+    return np.array(results).flatten()

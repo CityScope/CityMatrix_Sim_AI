@@ -80,7 +80,6 @@ def restart(message):
     Args:
         message (str): string describing the error message
     '''
-
     did_restart = False
     try:
         subprocess.Popen([PYTHON_VERSION, SERVER_FILENAME, "FALSE"])
@@ -98,7 +97,6 @@ def notify(message, did_restart):
         message (str): string describing the error message
         did_restart (bool): bool indiciating success of restart operation
     '''
-
     try:
         if not DEBUG: # Only do this in release mode for the server
             # Retreive data from credentials file

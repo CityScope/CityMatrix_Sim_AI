@@ -20,7 +20,7 @@ log = logging.getLogger('__main__')
 
 # Load traffic model file
 traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
-solar_model = pickle.load(open(SOLAR_MODEL_FILENAME), 'rb')
+solar_model = pickle.load(open(SOLAR_MODEL_FILENAME, 'rb'))
 
 def predict(input_city):
     '''Generic traffic/solar predictor.
@@ -33,25 +33,23 @@ def predict(input_city):
     '''
     # Make running copy of city
     output_city = input_city.copy()
-    
+
     # Let's run traffic first
     # Extract feature matrix from this city
-    features = get_features(input_city, 'traffic')
+    traffic_features = get_features(input_city, 'traffic')
 
     # Make traffic prediction using linear model
-    traffic_output = traffic_model.predict([ features ])[0] # Type = np array, 1 x 512
+    traffic_output = traffic_model.predict([ traffic_features ])[0] # Type = np array (512, )
 
     # Write prediction back to the cityiograph.City structure
     output_city.update_values(data_array = traffic_output, mode = 'traffic')
 
     # Now, let's run solar
     # Extract feature matrix from this city
-    features = get_features(traffic_city, 'solar')
+    solar_features = get_features(input_city, 'solar')
 
     # Make solar prediction using linear model
-    solar_output = solar_model.predict([ features ])[0] # Type = np array, 1 x 256
-    print(solar_output.shape)
-    sys.exit(0)
+    solar_output = solar_model.predict([ solar_features ])[0] # Type = np array (256, )
 
     # Write prediction back to the cityiograph.City structure
     output_city.update_values(data_array = solar_output, mode = 'solar')

@@ -34,12 +34,12 @@ CITY_SIZE = 16
 ROAD_ID = 6 # ID of a road cell on our grid matrix
 POP_ARR = [5, 8, 16, 16, 23, 59] # Array representing the number of people per floor in each building type
 EDGE_COST = 1 # Used in graph creation'
-CITY_HEIGHT_FACTOR = 8. / 3 # Used for solar radiation analysis
+DENSITY_TO_HEIGHT_FACTOR = 3.5 # Used for solar radiation analysis
 
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'
-LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_solar_model.pkl' # Pickle file for traffic predictor
-SOLAR_MODEL_FILENAME = MODEL_DIR + 'solar_model.pkl' # Pickle file for solar predictor
+LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_traffic_model.pkl' # Pickle file for traffic predictor
+SOLAR_MODEL_FILENAME = MODEL_DIR + 'linear_solar_model.pkl' # Pickle file for solar predictor
 
 # Log variables
 INPUT_CITIES_DIRECTORY = '../CityPrediction/input_cities/' # Directory to save incoming cities, before simulation
