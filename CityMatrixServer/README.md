@@ -29,7 +29,7 @@ Before you begin the server for the first time, there are several steps you will
 	$ python server.py
 	```
 
-It should now begin waiting to receive new cities from the Grasshopper client.
+The server should now begin waiting to receive new cities from the Grasshopper client.
 
 ## Common Problems
 
@@ -72,9 +72,10 @@ There is a simple solution for this, depending on the operating system where you
 	```
 	$ sudo kill -9 <PID>
 	```
-You may be required to enter your password to complete this operation.
+	You may be required to enter your password to complete this operation.
 
--
+<hr />
+
 Once you complete these steps on your machine, you can restart the server.
 
 ## Current Configurations
