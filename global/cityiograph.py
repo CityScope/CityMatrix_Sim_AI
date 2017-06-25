@@ -428,35 +428,49 @@ def density_to_height(type_id, density):
         return 0
     return density * 3.5
 
-def cell_features(cell):
+def cell_features(cell, mode):
     '''Get the 2 input features for a given cell.
     
     Args:
-        cell (cityiograph.Cell): Description
+        cell (cityiograph.Cell): -
+        mode (str): describes the type of feature extraction we are looking for - traffic or solar
     
     Returns:
         list: input features for this cell
     '''
-    feats = [ cell.population ]
-    feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    if mode == 'traffic':
+        feats = [ cell.population ]
+        feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    elif mode == 'solar':
+        feats = [ cell.height ]
+    else:
+        raise ValueError("Invalid mode string detected.")
+    
     return feats
 
-def cell_results(cell):
+def cell_results(cell, mode):
     '''Get the 2 output features for a given cell.
     
     Args:
-        cell (cityiograph.Cell): Description
+        cell (cityiograph.Cell): -
+        mode (str): describes the type of feature extraction we are looking for - traffic or solar
     
     Returns:
         list: output features for this cell
     '''
-    return [ cell.data["traffic"], cell.data["wait"] ]
+    if mode == 'traffic':
+        return [ cell.data["traffic"], cell.data["wait"] ]
+    elif mode == 'solar':
+        return [ cell.data["solar"] ]
+    else:
+        raise ValueError("Invalid mode string detected.")
 
-def get_features(city):
+def get_features(city, mode):
     '''Get the input feature vector for a given city.
     
     Args:
         city (cityiograph.City): -
+        mode (str): describes the type of feature extraction we are looking for - traffic or solar
     
     Returns:
         nparray: input features for this city
@@ -465,14 +479,16 @@ def get_features(city):
     for i in range(city.width):
         for j in range(city.height):
             cell = city.cells.get((i, j))
-            features += cell_features(cell)
+            features.append(cell_features(cell, mode))
+    
     return np.array(features)
 
-def get_results(city):
+def get_results(city, mode):
     '''Get the output feature vector for a given city.
     
     Args:
         city (cityiograph.City): -
+        mode (str): describes the type of feature extraction we are looking for - traffic or solar
     
     Returns:
         nparray: output features for this city
@@ -481,5 +497,6 @@ def get_results(city):
     for i in range(city.width):
         for j in range(city.height):
             cell = city.cells.get((i, j))
-            results += cell_results(cell)
+            results.append(cell_results(cell, mode))
+    
     return np.array(results)
