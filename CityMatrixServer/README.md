@@ -9,11 +9,12 @@ This is the main UDP server that we have built to handle all of our city-related
 
 Before you begin the server for the first time, there are several steps you will need to complete.
 
-1. Open `global/config.py` and be sure to change some key settings for the server. The following variables are especially important.
+1. Open `global/config.py` and be sure to verify all key settings for the server. The following variables are **especially** important.
 	- `SERVER_OS` - Operating system of the prediction server, either MAC or WIN
 	- `DEBUG` - Set to `False` if you are just playing around; `True` for production run
 	- `INPUT_CITIES_DIRECTORY` - Directory to save incoming cities, before prediction
 	- `PREDICTED_CITIES_DIRECTORY` - Directory to save outgoing cities, after prediction
+	- `MODEL_DIR`, `LINEAR_MODEL_FILENAME` & `SOLAR_MODEL_FILENAME` - Important local relative paths to .pkl files that contain our sklearn estimator objects to run prediction
 
 2. Run the setup script for the server with the following commands:
 
