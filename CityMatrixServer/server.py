@@ -228,24 +228,3 @@ while True:
 
             log.info("New ml_city and ai_city data successfully sent to GH.\n")
             log.info("Waiting to receive new city...")
-
-"""
-#RZ 170614
-Notes for socket error in windows 10:
-run following in cmd:
-
-FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
-
-#KL 170621
-Notes for socket error in Mac OSX:
-run following in Terminal:
-
-lsof -i :7000
-kill -9 <PID given by previous command>
-
-#RZ 170615
-Notes for udp ports:
-7000 - GH CV send to python server
-7001 - python server send to unity
-7002 - python server send to GH VIZ
-"""

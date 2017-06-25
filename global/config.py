@@ -42,8 +42,8 @@ LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_traffic_model.pkl' # Pickle file for
 SOLAR_MODEL_FILENAME = MODEL_DIR + 'linear_solar_model.pkl' # Pickle file for solar predictor
 
 # Log variables
-INPUT_CITIES_DIRECTORY = '../CityPrediction/input_cities/' # Directory to save incoming cities, before simulation
-PREDICTED_CITIES_DIRECTORY = '../CityPrediction/predicted_cities/' # Directory to save outgoing cities, after simulation
+INPUT_CITIES_DIRECTORY = '../CityPrediction/input_cities/' # Directory to save incoming cities, before prediction
+PREDICTED_CITIES_DIRECTORY = '../CityPrediction/predicted_cities/' # Directory to save outgoing cities, after prediction
 LOGGER_FILENAME = 'output.log' # Log file
 
 # Simulator variables
