@@ -68,6 +68,42 @@ def write_dict(result_dict, timestamp):
     with open(filename, 'w') as f:
         f.write(json.dumps(result_dict))
 
+def compute_city(input_city):
+    """Main server method that runs full ML and AI prediction on a given city.
+    
+    Args:
+        input_city (cityiograph.City): -
+    
+    Returns:
+        dict: 2-city dictionary for ML and AI cities
+    """
+    # ML first
+    ml_city = ML.predict(input_city)
+
+    # Compute ML scores
+    mlCityScores = Strategy.scores(ml_city)[1]
+    ml_city.updateScores(mlCityScores)
+
+    # Still run our normal AI on this new ML city
+    ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+    # Update animation
+    ml_city.animBlink = animBlink
+    ai_city.animBlink = animBlink
+
+    # Get metrics
+    ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
+    ai_metrics = metrics_dictionary(ai_metrics_list)
+    ml_city.updateMeta(input_city)
+    ai_city.updateMeta(input_city)
+    ml_dict = ml_city.to_dict()
+    ml_dict['objects']['metrics'] = ml_metrics
+    ai_dict = ai_city.to_dict()
+    ai_dict['objects']['metrics'] = ai_metrics
+
+    # Save 2-city dictionary
+    return { 'predict' : ml_dict , 'ai' : ai_dict }
+
 ''' --- MAIN SERVER LOGIC --- '''
 
 log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
@@ -102,92 +138,13 @@ while True:
         # Write to local file for later use
         input_city.write_to_file(timestamp)
 
-        #RZ 170613 for resetting the solar by pressing "startFlag" button in GH CV
-        if input_city.startFlag == 1 or previous_city is None:
-            log.info("First/reset city received @ timestamp {}.".format(timestamp))
-            # Save the previous city to be this incoming city
-            previous_city = input_city
+        if previous_city is not None:
+            # Check if this city is different from the previous one
+            if not previous_city.equals(input_city):
+                # Run full ML/AI prediction
+                result = compute_city(input_city)
 
-            # Only traffic in this case, as we already have the solar values
-            ml_city = ML.traffic_predict(input_city)
-
-            # Compute ML scores
-            mlCityScores = Strategy.scores(ml_city)[1]
-            ml_city.updateScores(mlCityScores)
-
-            # Still run our normal AI on this new ML city
-            ai_city, move, ai_metrics_list = Strategy.search(ml_city)
-
-            # Update animation
-            ml_city.animBlink = animBlink
-            ai_city.animBlink = animBlink
-
-            # Get metrics
-            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            ai_metrics = metrics_dictionary(ai_metrics_list)
-            ml_city.updateMeta(input_city)
-            ai_city.updateMeta(input_city)
-            ml_dict = ml_city.to_dict()
-            ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ai_city.to_dict()
-            ai_dict['objects']['metrics'] = ai_metrics
-
-            # Send resulting 2-city dictionary (predict/ai) back to GH
-            result = { 'predict' : ml_dict , 'ai' : ai_dict }
-            write_dict(result, timestamp)
-            server.send_data(result)
-            unity_server.send_data(result)
-
-            log.info("First/reset ml_city and ai_city data successfully sent to GH.\n")
-
-        else:
-            # This means that this is not the first city
-            # We need to compare it to the previous city and get the moves that were made
-            move_dictionary = previous_city.get_city_moves(input_city)
-
-            # Get the type of the change
-            move_type = move_dictionary["type"]
-
-            if move_type is not "NONE":
-                # We have some change in the city, in the data key
-                move_data = move_dictionary["data"]
-
-                # We need to copy all solar data to this input city before we begin, though
-                input_city.copy_solar_values(previous_city)
-
-                # First, need to get the building heights on the previous city
-                # Create dictionary mapping (x , y) location -> height
-                previous_city_heights = { cell.get_pos() : cell.get_height() for cell in previous_city.cells.values() }
-
-                # Now, run the full ML prediction (traffic AND solar) on this city
-                ml_city = ML.predict(input_city, previous_city_heights, move_type, move_data)
-
-                # Set the previous city to be this new value ***
-                previous_city = ml_city
-
-                # Compute ML scores
-                mlCityScores = Strategy.scores(ml_city)[1]
-                ml_city.updateScores(mlCityScores)
-
-                # Run our normal AI on this new ML city
-                ai_city, move, ai_metrics_list = Strategy.search(ml_city)
-
-                # Update animation
-                ml_city.animBlink = animBlink
-                ai_city.animBlink = animBlink
-
-                # Get metrics
-                ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-                ai_metrics = metrics_dictionary(ai_metrics_list)
-                ml_city.updateMeta(input_city)
-                ai_city.updateMeta(input_city)
-                ml_dict = ml_city.to_dict()
-                ml_dict['objects']['metrics'] = ml_metrics
-                ai_dict = ai_city.to_dict()
-                ai_dict['objects']['metrics'] = ai_metrics
-
-                # Send resulting 2-city dictionary (predict/ai) back to GH
-                result = { 'predict' : ml_dict , 'ai' : ai_dict }
+                # Save result and send back to GH/Unity
                 write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
@@ -241,6 +198,19 @@ while True:
                     print("scores: {}".format(ai_city.scores))
                 
                 log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+
+        else:
+            # This is the first city
+            # Run full ML/AI prediction
+            result = compute_city(input_city)
+
+            # Save result and send back to GH/Unity
+            write_dict(result, timestamp)
+            server.send_data(result)
+            unity_server.send_data(result)
+
+            log.info("New ml_city and ai_city data successfully sent to GH.\n")
+            log.info("Waiting to receive new city...")
 
 """
 #RZ 170614

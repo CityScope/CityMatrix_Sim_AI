@@ -69,14 +69,8 @@ def search(city):
     # Determine our suggested city based on this move
     suggested_city = move(city, best_move)
 
-    # Get correct format
-    move_type, move_data = convert_move_format(best_move)
-
-    # Get previous city's height
-    previous_city_heights = { cell.get_pos() : cell.get_height() for cell in city.cells.values() }
-
     # Run the ML prediction on this suggested city
-    final_city = ML.predict(suggested_city, previous_city_heights, move_type, move_data)
+    final_city = ML.predict(suggested_city)
 
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
@@ -125,34 +119,10 @@ def scores(city, mov = None):
         # Make the move
         new_city = move(city, mov)
 
-        # Get correct format
-        move_type, move_data = convert_move_format(mov)
-
-        # Get previous city's height
-        previous_city_heights = { cell.get_pos() : cell.get_height() for cell in city.cells.values() }
-
-        # Run the ML prediction on this suggested city
-        final_city = ML.predict(new_city, previous_city_heights, move_type, move_data)
+        # Run the ML prediction on this new city
+        final_city = ML.predict(new_city)
 
         # Return the evaluated metrics score
         return objective.evaluate(final_city)
     else:
         return objective.evaluate(city) #RZ 170615 - no move to make here
-
-def convert_move_format(move):
-    """Quick util method to convert between the two move formats being used.
-    
-    Args:
-        move (tuple): either ("DENSITY", idx, val) OR ("CELL", x, y, new_type)
-    
-    Returns:
-        2-tuple: move_type, move_data to be used later on - list format
-    """
-    # Get the custom move structure
-    move_type = move[0]
-    if move_type == "DENSITY":
-        move_data = [ move[1] ]
-    else:
-        move_data = [ ( move[1] , move[2] ) ]
-
-    return move_type, move_data

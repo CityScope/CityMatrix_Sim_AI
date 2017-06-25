@@ -48,10 +48,10 @@ log.debug("Successfully loaded city.")
 # print("change", x, y, t)
 # city.change_cell(x, y, t)
 
-d_new = np.random.randint(0, 30)
-i = np.random.randint(0, 6)
-print(d_new, "@", i)
-city.densities[i] = d_new
+# d_new = np.random.randint(0, 30)
+# i = np.random.randint(0, 6)
+# print(d_new, "@", i)
+# city.densities[i] = d_new
 
 # city.densities = [30, 30, 30, 1, 2, 30]
 

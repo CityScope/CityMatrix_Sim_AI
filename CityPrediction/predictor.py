@@ -31,6 +31,9 @@ def predict(input_city):
     Returns:
         cityiograph.City: new city instance with traffic ML prediction scores applied
     '''
+    # Make running copy of city
+    output_city = input_city.copy()
+    
     # Let's run traffic first
     # Extract feature matrix from this city
     features = get_features(input_city, 'traffic')
@@ -39,7 +42,7 @@ def predict(input_city):
     traffic_output = traffic_model.predict([ features ])[0] # Type = np array, 1 x 512
 
     # Write prediction back to the cityiograph.City structure
-    traffic_city = input_city.update_values(data_array = traffic_output, mode = 'traffic')
+    output_city.update_values(data_array = traffic_output, mode = 'traffic')
 
     # Now, let's run solar
     # Extract feature matrix from this city
@@ -51,6 +54,6 @@ def predict(input_city):
     sys.exit(0)
 
     # Write prediction back to the cityiograph.City structure
-    final_city = traffic_city.update_values(data_array = solar_output, mode = 'solar')
+    output_city.update_values(data_array = solar_output, mode = 'solar')
 
-    return final_city
+    return output_city

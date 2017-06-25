@@ -101,9 +101,9 @@ class City(object):
         '''
         self.dockID = other_city.dockID
         self.dockRotation = other_city.dockRotation
-        #self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
-        #self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
-        #self.animBlink = other_city.animBlink #RZ this will be handled in server.py
+        # self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
+        # self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
+        # self.animBlink = other_city.animBlink #RZ this will be handled in server.py
 
     def updateAIMov(self, mov):
         """Quick method from Ryan to update AI move.
@@ -111,7 +111,7 @@ class City(object):
         Args:
             mov (unknown): move representation
         """
-        self.AIMov = mov
+        pass # self.AIMov = mov
 
     #RZ 170615
     def updateScores(self, scores):
@@ -120,7 +120,7 @@ class City(object):
         Args:
             scores (list): -
         """
-        self.scores = scores
+        pass # self.scores = scores
 
     def to_json(self):
         """Converts the current city object to a JSON string.
@@ -212,53 +212,20 @@ class City(object):
         with open(filename, 'w') as f:
             f.write(self.to_json())
 
-    def get_city_moves(self, other):
-        """Get the moves that were made between one city (self) and other (other).
-        
-        Args:
-            other (cityiograph.City): -
-        
-        Returns:
-            dict: contains information about the type of move and corresponding data
-        """
-        # First, check if they are exactly equal
-        if self.equals(other):
-            return { "type" : "NONE" }
-
-        else:
-            # Need to compare density arrays and cell types
-            result = []
-            if other.densities != self.densities: # Density changes - note indices
-                for i, d in enumerate(other.densities):
-                    if self.densities[i] != d:
-                        result.append(i)
-                return { "type" : "DENSITY" , "data" : result }
-            else:
-                # We likely have some cell mismatch(es) - need to find
-                # Return locations (x, y)
-                for x in range(other.width):
-                    for y in range(other.height):
-                        old = other.cells.get((x, y))
-                        new = self.cells.get((x, y))
-                        if not old.equals(new):
-                            result.append( (x, y) )
-                return { "type" : "CELL" , "data" : result }
-
     def update_values(self, data_array, mode):
-        """Given some new data, we want to push this onto the current city and return a copy.
+        """Given some new data, we want to push this onto the current city.
         
         Args:
             data_array (nparray (self.width * self.height * 2, )): traffic/wait array
             mode (str): describes the type of data copying we are looking for - traffic or solar
         
-        Returns:
-            cityiograph.City: resulting city with this new data
+        Raises:
+            ValueError: if an invalid mode string is passed
         """
         i = 0
-        new_city = self.copy()
-        for x in range(new_city.width):
-            for y in range(new_city.height):
-                cell = new_city.cells.get((x, y))
+        for x in range(self.width):
+            for y in range(self.height):
+                cell = self.cells.get((x, y))
                 if mode == 'traffic':
                     cell.data["traffic"] = round(data_array[i], 2) # Rounding to 2 decimals for some precision, without too much
                     cell.data["wait"] = round(data_array[i + 1], 2)
@@ -268,21 +235,6 @@ class City(object):
                     i += 1
                 else:
                     raise ValueError("Invalid mode string detected.")
-
-        return new_city
-
-    def copy_solar_values(self, solar_city):
-        """Helper method to copy solar radiation values from an old city to a new blank one (self).
-        
-        Args:
-            solar_city (cityiograph.City): -
-        """
-        # Simply iterate over all cells and update self accordingly
-        for x in range(self.width):
-            for y in range(self.height):
-                self_cell = self.get_cell( (x , y) )
-                solar_cell = solar_city.get_cell( (x , y) )
-                self_cell.data['solar'] = solar_cell.data['solar']
 
 class Cell(object):
     """General representation of a single block within an instance of a cityiograph.City.
