@@ -50,8 +50,7 @@ There is a simple solution for this, depending on the operating system where you
 2. Run the following command:
 
 	```
-	$ FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr
-	:7000') DO taskKill.exe /PID %P /F
+	FOR /F "tokens=4 delims= " %P IN ('netstat -a -n -o ^| findstr :7000') DO taskKill.exe /PID %P /F
 	```
 
 **For Mac OSX users:**
