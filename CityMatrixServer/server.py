@@ -134,7 +134,6 @@ while True:
 
                 # Save result and send back to GH/Unity
                 result = { 'predict' : ml_dict , 'ai' : ai_dict }
-                
                 write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
@@ -221,7 +220,6 @@ while True:
 
             # Save result and send back to GH/Unity
             result = { 'predict' : ml_dict , 'ai' : ai_dict }
-            
             write_dict(result, timestamp)
             server.send_data(result)
             unity_server.send_data(result)

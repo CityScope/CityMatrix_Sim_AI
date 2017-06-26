@@ -10,6 +10,8 @@ TODO:
     - None at this time.
 '''
 
+import os
+
 # Environment configs
 SERVER_OS = 'MAC' # Operating system of the prediction server, either MAC or WIN
 PYTHON_VERSION = 'python3.5' # Version we are running the server on - used for restart command
@@ -38,8 +40,8 @@ DENSITY_TO_HEIGHT_FACTOR = 3.5 # Used for solar radiation analysis
 
 # Machine learning variables
 MODEL_DIR = '../CityPrediction/model_files/'
-LINEAR_MODEL_FILENAME = MODEL_DIR + 'linear_traffic_model.pkl' # Pickle file for traffic predictor
-SOLAR_MODEL_FILENAME = MODEL_DIR + 'linear_solar_model.pkl' # Pickle file for solar predictor
+LINEAR_MODEL_FILENAME = os.path.join(MODEL_DIR, 'linear_traffic_model.pkl') # Pickle file for traffic predictor
+SOLAR_MODEL_FILENAME = os.path.join(MODEL_DIR, 'linear_solar_model.pkl') # Pickle file for solar predictor
 
 # Log variables
 INPUT_CITIES_DIRECTORY = '../CityPrediction/input_cities/' # Directory to save incoming cities, before prediction
