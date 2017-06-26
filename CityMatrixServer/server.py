@@ -98,12 +98,15 @@ while True:
 
     # Ensure that there was no error parsing the city json packet
     if input_city != None:
-        # Write to local file for later use
-        input_city.write_to_file(timestamp)
 
         if previous_city is not None:
             # Check if this city is different from the previous one
             if not previous_city.equals(input_city):
+                # new city received, write to local file
+
+                # Write to local file for later use
+                input_city.write_to_file(timestamp)
+                
                 # Run full ML/AI prediction
                 # ML first
                 ml_city = ML.predict(input_city)
@@ -142,6 +145,8 @@ while True:
                 log.info("Waiting to receive new city...")
 
             elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+                #RZ 170626 same city received and not the first city, update meta data for GH UI, do not write to local file
+
                 #RZ 170614 update city.animBlink
                 ml_city.animBlink = animBlink
                 ai_city.animBlink = animBlink
@@ -190,6 +195,10 @@ while True:
 
         else:
             # This is the first city
+
+            # Write to local file for later use
+            input_city.write_to_file(timestamp)
+            
             # Run full ML/AI prediction
             # ML first
             ml_city = ML.predict(input_city)
