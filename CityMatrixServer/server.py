@@ -102,9 +102,7 @@ while True:
         if previous_city is not None:
             # Check if this city is different from the previous one
             if not previous_city.equals(input_city):
-                # new city received, write to local file
-
-                # Write to local file for later use
+                # New city received - write to local file for later use
                 input_city.write_to_file(timestamp)
                 
                 # Run full ML/AI prediction
@@ -195,7 +193,6 @@ while True:
 
         else:
             # This is the first city
-
             # Write to local file for later use
             input_city.write_to_file(timestamp)
             
