@@ -32,13 +32,13 @@ CITY_SIZE = 16
 ''' --- CLASS/METHOD DEFINITIONS --- '''
 
 def unique_city_generator(city_directory = BASE_DIR):
-    """Summary
+    """Generator instance to give us cities that are different based on equals().
 
     Args:
-    city_directory (TYPE, optional): Description
+        city_directory (str, optional): directory (relative or absolute) with .json city *output* files
 
     Yields:
-    TYPE: Description
+        cityiograph.City: unique City instance that can be used for analysis
     """
     prev_city = None
 
@@ -66,7 +66,7 @@ def unique_city_generator(city_directory = BASE_DIR):
             continue
 
 def ai_move_analysis():
-    """Summary
+    """Looking the the trends in the city.AIMov parameter.
     """
     # Create generator object
     gen = unique_city_generator()
