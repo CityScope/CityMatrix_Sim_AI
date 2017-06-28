@@ -32,38 +32,38 @@ CITY_SIZE = 16
 ''' --- CLASS/METHOD DEFINITIONS --- '''
 
 def unique_city_generator(city_directory = BASE_DIR):
-	"""Summary
-	
-	Args:
-	    city_directory (TYPE, optional): Description
-	
-	Yields:
-	    TYPE: Description
-	"""
-	prev_city = None
+    """Summary
 
-	for city_path in glob.glob(city_directory + '*.json'):
-		# Read file
-		with open(city_path, 'r') as f:
-			full_json_string = f.read()
+    Args:
+    city_directory (TYPE, optional): Description
 
-		# Get only the AI city
-		ai_string = json.dumps(json.loads(full_json_string)['ai'])
-		current_city = cityiograph.City(ai_string)
+    Yields:
+    TYPE: Description
+    """
+    prev_city = None
 
-		if prev_city is None:
-			# First time, just yield
-			prev_city = current_city
-			yield current_city
+    for city_path in glob.glob(city_directory + '*.json'):
+        # Read file
+        with open(city_path, 'r') as f:
+            full_json_string = f.read()
 
-		elif not prev_city.equals(current_city):
-			# Different cities - yield new
-			prev_city = current_city
-			yield current_city
+        # Get only the AI city
+        ai_string = json.dumps(json.loads(full_json_string)['ai'])
+        current_city = cityiograph.City(ai_string)
 
-		else:
-			# Equal
-			continue
+        if prev_city is None:
+            # First time, just yield
+            prev_city = current_city
+            yield current_city
+
+        elif not prev_city.equals(current_city):
+            # Different cities - yield new
+            prev_city = current_city
+            yield current_city
+
+        else:
+            # Equal
+            continue
 
 def ai_move_analysis():
     """Summary
