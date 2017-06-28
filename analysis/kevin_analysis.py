@@ -4,9 +4,9 @@ Author: Kevin Andrew Lyons
 Date: 2017-06-27 21:52:26
 Last modified by: kalyons11
 Description:
-	- Quick script to analyze results from CityMatrix user tests.
+    - Quick script to analyze results from CityMatrix user tests.
 TODO:
-	- None at this time.
+    - None at this time.
 """
 
 ''' --- IMPORTS --- '''
@@ -66,78 +66,78 @@ def unique_city_generator(city_directory = BASE_DIR):
 			continue
 
 def ai_move_analysis():
-	"""Summary
-	"""
-	# Create generator object
-	gen = unique_city_generator()
+    """Summary
+    """
+    # Create generator object
+    gen = unique_city_generator()
 
-	# Keep track of AI moves
-	moves = []
-	density_indices = []
-	density_values = []
-	move_dict = defaultdict(int)
-	cell_types = []
+    # Keep track of AI moves
+    moves = []
+    density_indices = []
+    density_values = []
+    move_dict = defaultdict(int)
+    cell_types = []
 
-	while True:
-		try:
-			city = next(gen)
-			move_type = city.AIMov[0]
-			moves.append(move_type)
-			if move_type == 'DENSITY':
-				density_indices.append(city.AIMov[1])
-				density_values.append(city.AIMov[2])
-			elif move_type == 'CELL':
-				x, y = city.AIMov[1], city.AIMov[2]
-				move_dict[(x , y)] += 1
-				cell_types.append(city.AIMov[3])
-		except StopIteration:
-			break
+    while True:
+        try:
+            city = next(gen)
+            move_type = city.AIMov[0]
+            moves.append(move_type)
+            if move_type == 'DENSITY':
+                density_indices.append(city.AIMov[1])
+                density_values.append(city.AIMov[2])
+            elif move_type == 'CELL':
+                x, y = city.AIMov[1], city.AIMov[2]
+                move_dict[(x , y)] += 1
+                cell_types.append(city.AIMov[3])
+        except StopIteration:
+            break
 
-	# Analyze distribution
-	# unique, counts = np.unique(moves, return_counts = True)
-	# counts = counts / counts.sum()
-	# move_dict = dict(zip(unique, counts * 100))
-	# print(move_dict)
+    # Analyze distribution
+    # unique, counts = np.unique(moves, return_counts = True)
+    # counts = counts / counts.sum()
+    # move_dict = dict(zip(unique, counts * 100))
+    # print(move_dict)
 
-	# Create histogram
-	# plt.hist(density_indices)
-	# plt.title("Density Index Changes")
-	# plt.xlabel("Index")
-	# plt.ylabel("Frequency in Data")
-	# plt.show()
+    # Create histogram
+    # plt.hist(density_indices)
+    # plt.title("Density Index Changes")
+    # plt.xlabel("Index")
+    # plt.ylabel("Frequency in Data")
+    # plt.show()
 
-	# Create another hist
-	# plt.hist(density_values)
-	# plt.title("Density Values")
-	# plt.xlabel("Value")
-	# plt.ylabel("Frequency in Data")
-	# plt.show()
+    # Create another hist
+    # plt.hist(density_values)
+    # plt.title("Density Values")
+    # plt.xlabel("Value")
+    # plt.ylabel("Frequency in Data")
+    # plt.show()
 
-	# Analyze move locations
-	# First, load into heatmap
-	# heatmap = np.zeros((CITY_SIZE, CITY_SIZE))
-	# for k, v in move_dict.items():
-	# 	x, y = k
-	# 	heatmap[y, x] = v
+    # Analyze move locations
+    # First, load into heatmap
+    # heatmap = np.zeros((CITY_SIZE, CITY_SIZE))
+    # for k, v in move_dict.items():
+    # 	x, y = k
+    # 	heatmap[y, x] = v
 
-	# Show the heatmap
-	# plt.imshow(heatmap, cmap = 'hot', interpolation = 'nearest')
-	# plt.title("AI Cell Change Location Heatmap", fontsize = 20)
-	# plt.show()
+    # Show the heatmap
+    # plt.imshow(heatmap, cmap = 'hot', interpolation = 'nearest')
+    # plt.title("AI Cell Change Location Heatmap", fontsize = 20)
+    # plt.show()
 
-	# Create hist for cell types
-	plt.hist(cell_types)
-	plt.title("Cell Type ID's")
-	plt.xlabel("Type ID")
-	plt.ylabel("Frequency in Data")
-	plt.show()
+    # Create hist for cell types
+    plt.hist(cell_types)
+    plt.title("Cell Type ID's")
+    plt.xlabel("Type ID")
+    plt.ylabel("Frequency in Data")
+    plt.show()
 
 ''' -- AUTOMAIN --- '''
 
 if __name__ == '__main__':
-	print("Starting process.")
-	start = time.time()
+    print("Starting process.")
+    start = time.time()
 
-	ai_move_analysis()
+    ai_move_analysis()
 
-	print("Process complete. Took {} seconds.".format(time.time() - start))
+    print("Process complete. Took {} seconds.".format(time.time() - start))
