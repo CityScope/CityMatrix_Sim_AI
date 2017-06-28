@@ -15,6 +15,7 @@ import sys
 import os
 import time
 import numpy as np
+import pandas as pd
 import json
 import tqdm
 import glob
@@ -26,17 +27,18 @@ import cityiograph
 
 ''' --- CONFIGURATIONS --- '''
 
-BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/predicted_cities/'
+BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/'
 CITY_SIZE = 16
 
 ''' --- CLASS/METHOD DEFINITIONS --- '''
 
-def unique_city_generator(city_directory = BASE_DIR):
+def unique_city_generator(city_directory, key = 'ai'):
     """Generator instance to give us cities that are different based on equals().
-
+    
     Args:
-        city_directory (str, optional): directory (relative or absolute) with .json city *output* files
-
+        city_directory (str): directory (relative or absolute) with .json city *output* files
+        key (str, optional): describes whether we want predict/ai city from result
+    
     Yields:
         cityiograph.City: unique City instance that can be used for analysis
     """
@@ -48,26 +50,80 @@ def unique_city_generator(city_directory = BASE_DIR):
             full_json_string = f.read()
 
         # Get only the AI city
-        ai_string = json.dumps(json.loads(full_json_string)['ai'])
-        current_city = cityiograph.City(ai_string)
+        d = json.loads(full_json_string)[key]
+        j_string = json.dumps(d)
+        current_city = cityiograph.City(j_string)
 
         if prev_city is None:
             # First time, just yield
             prev_city = current_city
-            yield current_city
+            yield current_city, d
 
         elif not prev_city.equals(current_city):
             # Different cities - yield new
             prev_city = current_city
-            yield current_city
+            yield current_city, d
 
         else:
             # Equal
             continue
 
 def ai_move_analysis():
-    """Looking the the trends in the city.AIMov parameter.
+    """Looking the city's AI params.
     """
+    # Iterate over the tests
+    for test in glob.glob(BASE_DIR + '*'):
+        print("Working on test = {}...".format(test))
+        # Create gen
+        gen = unique_city_generator(test + '/')
+
+        # Keep track of weights
+        # weights = []
+        # total_scores = []
+        metric_names = [ "Density" , "Diversity" , "Energy" , "Traffic" , "Solar" ]
+        df = pd.DataFrame(columns = metric_names)
+
+        while True:
+            try:
+                city, d = next(gen)
+                # total_scores.append(sum(city.scores))
+                # Get dict of scores
+                city_metrics = d["objects"]["metrics"]
+                metrics_dict = { k : city_metrics[k][0] * city_metrics[k][1] for k in city_metrics }
+                df = df.append(pd.Series(metrics_dict), ignore_index = True)
+
+            except StopIteration:
+                break
+
+        # Here...
+
+        '''
+        # Plot scores
+        x = np.arange(len(total_scores))
+        plt.figure(figsize = (8, 8))
+        plt.plot(x, total_scores, lw = 3, color = 'green')
+        plt.title("sum(city.scores), {}".format(test.replace(BASE_DIR, '')))
+        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_total_scores.png')
+        
+        # Convert to np
+        weights = np.array(weights)
+
+        # Plot columns
+        x = np.arange(weights.shape[0])
+        fig = plt.figure(figsize = (8, 12))
+        colormap = plt.cm.gist_ncar
+        colors = [ colormap(i) for i in np.linspace(0, 1, 5) ]
+
+        for i, col in enumerate(weights.T):
+            # Make plot
+            ax = fig.add_subplot(int('51' + str(i + 1)))
+            ax.plot(x, col, label = metric_names[i], lw = 1, marker = 'o', color = colors[i])
+        
+        # Save
+        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_ai_weights.png')
+        '''
+
+    ''' 
     # Create generator object
     gen = unique_city_generator()
 
@@ -131,6 +187,8 @@ def ai_move_analysis():
     plt.xlabel("Type ID")
     plt.ylabel("Frequency in Data")
     plt.show()
+    
+    '''
 
 ''' -- AUTOMAIN --- '''
 
