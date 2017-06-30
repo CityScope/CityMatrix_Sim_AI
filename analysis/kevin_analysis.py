@@ -81,23 +81,80 @@ def ai_move_analysis():
         # weights = []
         # total_scores = []
         metric_names = [ "Density" , "Diversity" , "Energy" , "Traffic" , "Solar" ]
-        df = pd.DataFrame(columns = metric_names)
+        # df = pd.DataFrame(columns = metric_names)
+        prev_move_suggested = None
+        prev_city = None
+        rates = []
+        accept_count = 0
+        idx = 0
 
-        while True:
+        while True:    
             try:
                 city, d = next(gen)
+
+                if prev_city == None:
+                    # First time - just update value
+                    prev_city = city
+                    prev_move = tuple(city.AIMov)[ : -1 ]
+
+                else:
+                    # Get the difference between this one and prev
+                    this_move = city.get_move(prev_city)
+                    
+                    if this_move == prev_move_suggested:
+                        # We have an acceptance!
+                        # print("omg")
+                        accept_count += 1
+
+                    else:
+                        # Nope
+                        # print("AI suggested = {}. User did = {}.".format(prev_move_suggested, this_move))
+                        pass
+
+                    # Add to y array
+                    new_rate = float(accept_count) / idx * 100
+                    rates.append(new_rate)
+
+                    # Also, append this current move to the set
+                    prev_move_suggested = tuple(city.AIMov)[ : -1 ]
+
+                    # Update prev instance
+                    prev_city = city
+
                 # total_scores.append(sum(city.scores))
                 # Get dict of scores
-                city_metrics = d["objects"]["metrics"]
-                metrics_dict = { k : city_metrics[k][0] * city_metrics[k][1] for k in city_metrics }
-                df = df.append(pd.Series(metrics_dict), ignore_index = True)
+                # city_metrics = d["objects"]["metrics"]
+                # metrics_dict = { k : city_metrics[k][0] * city_metrics[k][1] for k in city_metrics }
+                # df = df.append(pd.Series(metrics_dict), ignore_index = True)
+
+                idx += 1
 
             except StopIteration:
                 break
 
-        # Here...
+        # Plot the rates
+        plt.figure(figsize = (12, 8))
+        plt.title(test.replace(BASE_DIR, ''), fontsize = 20)
+        plt.xlabel("City Time Instance")
+        plt.ylabel("Acceptance Rate (%)")
+        plt.ylim([0, 100])
+        plt.plot(rates)
+        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_ai_accept.png')
 
         '''
+        # Plot the columns over time
+        plt.figure(figsize = (12, 8))
+        i = 1
+        for column in df:
+            plt.subplot(int('32' + str(i)))
+            df[column].plot()
+            plt.title(column)
+            i += 1
+
+        plt.tight_layout(pad=3)
+        plt.suptitle(test.replace(BASE_DIR, ''), fontsize = 20)
+        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_each_score.png')
+
         # Plot scores
         x = np.arange(len(total_scores))
         plt.figure(figsize = (8, 8))
@@ -123,7 +180,7 @@ def ai_move_analysis():
         plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_ai_weights.png')
         '''
 
-    ''' 
+    '''
     # Create generator object
     gen = unique_city_generator()
 
@@ -187,7 +244,6 @@ def ai_move_analysis():
     plt.xlabel("Type ID")
     plt.ylabel("Frequency in Data")
     plt.show()
-    
     '''
 
 ''' -- AUTOMAIN --- '''

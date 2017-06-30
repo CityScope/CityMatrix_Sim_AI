@@ -270,6 +270,30 @@ class City(object):
                 else:
                     raise ValueError("Invalid mode string detected.")
 
+    def get_move(self, other):
+        """Get the difference between the current city and another, according to either cell or density changes.
+        
+        Args:
+            other (cityiograph.City): the other instance in question
+        """
+        if self.densities != other.densities:
+            # Density change
+            # Get the index where they are not equivalent
+            for i, v in enumerate(self.densities):
+                if v != other.densities[i]:
+                    return ( 'DENSITY', i )
+
+        else:
+            # Cell change
+            # Get the location
+            for x in range(self.width):
+                for y in range(self.height):
+                    self_cell = self.get_cell((x, y))
+                    other_cell = other.get_cell((x, y))
+                    if not self_cell.equals(other_cell):
+                        return ( 'CELL' , x , y)
+
+
 class Cell(object):
     """General representation of a single block within an instance of a cityiograph.City.
     

@@ -2,8 +2,6 @@
 
 ## 1. AI Move Choice
 
-*Note: We are using data from [this archive on Dropbox](https://www.dropbox.com/home/CityMatrixSim_Data/citymatrix%20user%20test%20log/Server%20Data/Archive?preview=CityMatrix_log_170622_pre-test_001-002.zip) for this section.*
-
 Here are the types of moves the AI is suggesting.
 
 - **DENSITY CHANGE**: 52.03 %
@@ -25,7 +23,7 @@ And here are the cell types that the AI tends to suggest.
 
 ![Alt](data/ai_change_cell_types_hist.png)
 
-## 2. AI Scores/Weights
+## 2. AI Weights
 
 First, let's examine the `city.AIWeights` parameter in three user tests cases.
 
@@ -47,6 +45,8 @@ metric_names = [ "Density" , "Diversity" , "Energy" , "Traffic" , "Solar" ]
 
 ![Alt](data/log_170623_pre-test_003_predicted_cities_ai_weights.png)
 
+## 3. AI Total Scores
+
 Now, let's take a look at the **total score value for the city** over time.
 
 ![Alt](data/log_170622_pre-test_001_predicted_cities_total_scores.png)
@@ -55,4 +55,28 @@ Now, let's take a look at the **total score value for the city** over time.
 
 ![Alt](data/log_170623_pre-test_003_predicted_cities_total_scores.png)
 
-Now, we can take a look at each score value over time. This is equivalent to the metric * weight for that particular score element. Again, the plot order is based on the ```metric_names``` array from above.
+## 4. AI Individual Scores
+
+Now, we can take a look at each score value over time. This is equivalent to the metric * weight for that particular score element.
+
+![Alt](data/log_170622_pre-test_001_predicted_cities_each_score.png)
+
+![Alt](data/log_170622_pre-test_002_predicted_cities_each_score.png)
+
+![Alt](data/log_170623_pre-test_003_predicted_cities_each_score.png)
+
+## 5. AI Acceptance
+
+Finally, we want to look at the **AI suggestion acceptance ratio** through the time of our tests. That is, we would like to understand how often the user **accepts** the move suggested by the AI on a previous step.
+
+We define the acceptance rate *R* as the number of times the user follows the previous `city.AIMov` parameter over the total number of cities. We can track this metric throughout the progress of the test to examine user behavior.
+
+![Alt](data/log_170622_pre-test_001_predicted_cities_ai_accept.png)
+
+![Alt](data/log_170622_pre-test_002_predicted_cities_ai_accept.png)
+
+![Alt](data/log_170623_pre-test_003_predicted_cities_ai_accept.png)
+
+## 6. More to come...
+
+Stay tuned for more analysis!!!
