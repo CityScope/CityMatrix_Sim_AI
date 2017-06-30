@@ -275,6 +275,9 @@ class City(object):
         
         Args:
             other (cityiograph.City): the other instance in question
+        
+        Returns:
+            tuple: descibes change type and data about WHERE that change takes place (i.e. density index, cell loc)
         """
         if self.densities != other.densities:
             # Density change
