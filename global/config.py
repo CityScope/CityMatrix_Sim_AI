@@ -23,6 +23,11 @@ RECEIVE_IP = "127.0.0.1"
 RECEIVE_PORT = 7000
 SEND_IP = "127.0.0.1"
 SEND_PORT = 7002
+
+UNITY_SERVER_NAME = 'UnityServer'
+UNITY_RECEIVE_PORT = 7009
+UNITY_SEND_PORT = 7001
+
 FORCE_PREDICTION = False # If we want to ignore diff feature and always predict for debugging purposes
 AUTO_RESTART = not DEBUG # Do we want to restart the server if it goes down?
 EMAIL_LIST = [ 'kalyons@mit.edu' , 'popabczhang@gmail.com' ] # List of e-mails we want to notify if the server crashes

@@ -195,6 +195,7 @@ class City(object):
             for y in range(self.height):
                 cell = self.get_cell((x, y))
                 result.append(cell.data[key])
+
         result = np.array(result).reshape(self.height, self.width)
         return result
 
@@ -226,6 +227,7 @@ class City(object):
 
         if cell.type_id == ROAD_ID:
             cell.density = 0
+        
         else:
             cell.density = self.densities[cell.type_id]
 
@@ -264,9 +266,11 @@ class City(object):
                     cell.data["traffic"] = round(data_array[i], 2) # Rounding to 2 decimals for some precision, without too much
                     cell.data["wait"] = round(data_array[i + 1], 2)
                     i += 2
+                
                 elif mode == 'solar':
                     cell.data["solar"] = round(data_array[i], 2)
                     i += 1
+                
                 else:
                     raise ValueError("Invalid mode string detected.")
 
@@ -294,8 +298,7 @@ class City(object):
                     self_cell = self.get_cell((x, y))
                     other_cell = other.get_cell((x, y))
                     if not self_cell.equals(other_cell):
-                        return ( 'CELL' , x , y)
-
+                        return ( 'CELL' , x , y )
 
 class Cell(object):
     """General representation of a single block within an instance of a cityiograph.City.
@@ -326,6 +329,7 @@ class Cell(object):
         try:
             self.rot = json_data['rot']
             self.magnitude = json_data['magnitude']
+        
         except:
             self.rot = 0
             self.magnitude = 0
@@ -333,9 +337,11 @@ class Cell(object):
 
         if self.type_id == ROAD_ID:
             self.density = 0
+        
         else:
             try:
                 self.density = density_array[self.type_id]
+            
             except:
                 self.density = 0 # Accounting for odd ID case error - Kevin, 5/19/2017
 
@@ -386,6 +392,7 @@ class Cell(object):
             "rot": self.rot,
             "data": self.data
         }
+        
         return result
 
 ''' --- GLOBAL HELPER METHODS --- '''
@@ -419,6 +426,7 @@ def dict_from_cells(cells):
     cell_dict = {}
     for cell in cells:
         cell_dict[cell.get_pos()] = cell
+    
     return cell_dict
 
 def density_to_pop(type_id, density):
@@ -433,6 +441,7 @@ def density_to_pop(type_id, density):
     """
     if type_id not in range(len(POP_ARR)):
         return 0
+    
     return density * POP_ARR[type_id]
 
 def density_to_height(type_id, density):
@@ -447,6 +456,7 @@ def density_to_height(type_id, density):
     """
     if type_id not in range(len(POP_ARR)):
         return 0
+    
     return density * DENSITY_TO_HEIGHT_FACTOR
 
 def cell_features(cell, mode):
@@ -465,8 +475,10 @@ def cell_features(cell, mode):
     if mode == 'traffic':
         feats = [ cell.population ]
         feats.append(0) if (cell.type_id == ROAD_ID) else feats.append(1)
+    
     elif mode == 'solar':
         feats = [ cell.height ]
+    
     else:
         raise ValueError("Invalid mode string detected.")
     
@@ -487,8 +499,10 @@ def cell_results(cell, mode):
     '''
     if mode == 'traffic':
         return [ cell.data["traffic"], cell.data["wait"] ]
+    
     elif mode == 'solar':
         return cell.data["solar"]
+    
     else:
         raise ValueError("Invalid mode string detected.")
 

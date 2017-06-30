@@ -19,25 +19,28 @@ from utils import *
 import city_udp, predictor as ML
 from strategies import random_single_moves as Strategy
 from objective import objective
-log = logging.getLogger('__main__')
-result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
-animBlink = 0 #RZ 170614
-PRINT_CITY_RECEIVED = False
-PRINT_CITY_TO_SEND = True
-previous_city = None
 
 ''' --- CONFIGURATIONS --- '''
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
 
-# Create instance of our server
+# Create instances of our servers
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
-unity_server = city_udp.City_UDP("Unity_Test_Sever", receive_port = 7009, send_port = 7001)
+unity_server = city_udp.City_UDP(UNITY_SERVER_NAME, receive_port = UNITY_RECEIVE_PORT, send_port = UNITY_SEND_PORT)
 
-# Close all ports if server closed
+# Other instance vars
+log = logging.getLogger('__main__')
+result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+animBlink = 0 #RZ 170614
+PRINT_CITY_RECEIVED = False
+PRINT_CITY_TO_SEND = True
+previous_city = None # For comparison purposes
+
 @atexit.register
 def register():
+    """Helper method to close all ports if server is stopped for some reason.
+    """
     server.close()
     log.warning("Closing all ports for {}.".format(SERVER_NAME))
 
@@ -81,6 +84,7 @@ while True:
     #RZ 170614 alter animBlink after received a city from GH CV
     if animBlink == 0:
         animBlink = 1
+    
     else:
         animBlink = 0
 
@@ -96,9 +100,8 @@ while True:
         print("startFlag: {}".format(city.startFlag))
         print("AIMov: {}".format(city.AIMov))
 
-    # Ensure that there was no error parsing the city json packet
-    if input_city != None:
-
+    # Ensure that there was no error parsing the city JSON packet
+    if input_city is not None:
         if previous_city is not None:
             # Check if this city is different from the previous one
             if not previous_city.equals(input_city):
