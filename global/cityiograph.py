@@ -95,7 +95,8 @@ class City(object):
         cells_equal = all(
             [c.equals(other.cells.get(pos)) for pos, c in self.cells.items()])
         return cells_equal and (self.densities == other.densities) \
-            and (self.width == other.width) and (self.height == other.height)
+            and (self.width == other.width) and (self.height == other.height) \
+            and self.AIWeights == other.AIWeights
 
     def to_dict(self):
         '''Converts this city to a dictionary object for storage and other purposes.
@@ -268,7 +269,12 @@ class City(object):
         Returns:
             tuple: descibes change type and data about WHERE that change takes place (i.e. density index, cell loc)
         """
-        if self.densities != other.densities:
+        if self.AIWeights != other.AIWeights:
+            # Weights change
+            # Just a UI change - return
+            return ( 'UI' , None )
+
+        elif self.densities != other.densities:
             # Density change
             # Get the index where they are not equivalent
             for i, v in enumerate(self.densities):

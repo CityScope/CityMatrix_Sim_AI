@@ -7,6 +7,7 @@ class ObjectiveFunction(object):
         return [sum(outputs),outputs]
 
     def get_metrics(self, city):
+        self.update_weights(city.AIWeights)
         return [(name, fun(city), weight) for name, fun, weight in self.metrics]
 
     def add_metric(self, name, metric, weight):
@@ -16,7 +17,7 @@ class ObjectiveFunction(object):
     def update_weights(self, weights):
         for i in range(5):
             self.metrics[i] = self.metrics[i][:2] + (weights[i],)
-        #print("updated self.metrics: {}".format(self.metrics))
+        # print("updated self.metrics: {}".format(self.metrics))
 
 from metrics import citymatrix_stats as Metrics
 

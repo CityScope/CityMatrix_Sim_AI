@@ -56,6 +56,8 @@ log.debug("Successfully loaded city.")
 
 # city.densities = [30, 30, 30, 1, 2, 30]
 
+city.AIWeights = np.random.dirichlet(np.ones(5), size = 1)[0].tolist()
+
 # Send that city to our UDP server
 server.send_city(city)
 log.debug("Sent city!!!")
