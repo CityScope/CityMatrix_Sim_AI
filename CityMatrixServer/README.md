@@ -34,6 +34,8 @@ The server should now begin waiting to receive new cities from the Grasshopper c
 
 ## Common Problems
 
+### 1. Port Collision Error
+
 Sometimes, the UDP server runs into a port error, with a message that looks something like this:
 
 ```
@@ -74,6 +76,30 @@ There is a simple solution for this, depending on the operating system where you
 	```
 	You may be required to enter your password to complete this operation.
 
+<hr />
+
+Once you complete these steps on your machine, you can restart the server.
+
+### 2. Socket Message Length Error
+
+Sometimes, the UDP server runs into a message length error, with a message that looks something like this:
+
+```
+...
+socket.error: [Errno 40] Message too long
+...
+```
+
+**For Mac OSX users:**
+
+1. Open Terminal.
+2. Run the following comand:
+
+	```
+	$ sudo sysctl -w net.inet.udp.maxdgram=65535
+	```
+	You may be required to enter your password to complete this operation.
+	
 <hr />
 
 Once you complete these steps on your machine, you can restart the server.

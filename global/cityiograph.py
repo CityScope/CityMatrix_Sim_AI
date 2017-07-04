@@ -37,7 +37,7 @@ class City(object):
         height (int): city dimensionality
         json_obj (dict): full JSON object describing the city
         meta (dict): contains meta information about the city, not the grid
-        population (int): total population of the city
+        score (float): total score for this city - default = 0
         scores (list): list of objective scores for the city
         slider1 (int): data from table
         slider2 (int): data from table
@@ -63,7 +63,7 @@ class City(object):
         self.AIMov = self.meta['AIMov']
         self.animBlink = self.meta['animBlink']
         self.startFlag = self.meta['startFlag']
-        self.scores = self.meta['scores']
+        self.score = self.meta['score']
         self.dockID = self.meta['dockID']
         self.dockRotation = self.meta['dockRotation']
 
@@ -72,9 +72,9 @@ class City(object):
         self.width = max(map(lambda c: c.x, self.cells.values())) + 1
         self.height = max(map(lambda c: c.y, self.cells.values())) + 1
 
-        self.population = 0
-        for c in self.cells.values():
-            self.population += c.population
+    @property
+    def population(self):
+        return sum([ c.population for c in self.cells.values() ])
 
     def equals(self, other):
         '''Determines if this city object is equivalent to another. Need all cells, densities and 
@@ -108,13 +108,13 @@ class City(object):
         self.meta["AIMov"] = self.AIMov #RZ
         self.meta["animBlink"] = self.animBlink
         self.meta["startFlag"] = self.startFlag
-        self.meta["scores"] = self.scores
+        self.meta["score"] = self.score
         self.meta["dockID"] = self.dockID
         self.meta["dockRotation"] = self.dockRotation
 
         result = {
             "objects": self.meta,
-            "grid": [c.to_dict() for c in self.cells.values()]
+            "grid": [ c.to_dict() for c in self.cells.values() ]
         }
 
         return result
@@ -209,8 +209,6 @@ class City(object):
         for cell in self.cells.values():
             if cell.type_id == idx:
                 cell.density = new_density
-                cell.update_pop()
-                cell.update_height()
 
         self.densities[idx] = new_density
 
@@ -230,9 +228,6 @@ class City(object):
         
         else:
             cell.density = self.densities[cell.type_id]
-
-        cell.update_pop()
-        cell.update_height()
 
     def write_to_file(self, timestamp):
         """Helper method to write a city to a local filestore for later use.
@@ -345,18 +340,13 @@ class Cell(object):
             except:
                 self.density = 0 # Accounting for odd ID case error - Kevin, 5/19/2017
 
-        self.update_pop()
-        self.update_height()
+    @property
+    def population(self):
+        return density_to_pop(self.type_id, self.density)
 
-    def update_pop(self):
-        """Helper method to update the actual population value of a cell - used in feature extraction.
-        """
-        self.population = density_to_pop(self.type_id, self.density)
-
-    def update_height(self):
-        """Helper method to update the actual height value of a cell - used in feature extraction.
-        """
-        self.height = density_to_height(self.type_id, self.density)
+    @property
+    def height(self):
+        return density_to_height(self.type_id, self.density)
 
     def get_pos(self):
         """Basic helper method to get location of a cell.
