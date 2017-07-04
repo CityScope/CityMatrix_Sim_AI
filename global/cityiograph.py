@@ -106,7 +106,6 @@ class City(object):
         '''
         self.meta["densities"] = self.densities
         self.meta["population"] = self.population
-        
         self.meta["AIStep"] = self.AIStep # RZ
         self.meta["slider1"] = self.slider1 # RZ
         self.meta["slider2"] = self.slider2 # RZ

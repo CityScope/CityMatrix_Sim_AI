@@ -102,7 +102,10 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Save result and send back to GH/Unity
-                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
                 write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
@@ -126,7 +129,10 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Send resulting 2-city dictionary (predict/ai) back to GH
-                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
                 server.send_data(result)
                 unity_server.send_data(result)
 
@@ -179,7 +185,10 @@ while True:
             ai_city.updateMeta(input_city)
 
             # Save result and send back to GH/Unity
-            result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+            if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+            else:
+                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
             write_dict(result, timestamp)
             server.send_data(result)
             unity_server.send_data(result)
