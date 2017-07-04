@@ -47,8 +47,8 @@ def pop_diversity_perf(city):
 #energy_per_sqm = [0.8, 1.0, 1.2, 2.0, 2.5, 3.0, 0]
 energy_per_sqm = [-0.2, 0.0, 0.2, -0.4, 0.0, 0.4, 0.0] #RZ 170617 
 floor_area = 1562.5 # square meters
-ep_min = -400000
-ep_max = 400000 # need to determine this
+ep_min = -300000
+ep_max = 300000 # need to determine this
 def energy_perf(city):
     tot = 0
     for cell in city.cells.values():
@@ -56,7 +56,7 @@ def energy_perf(city):
     return normalize(tot, ep_min, ep_max)
 
 tp_min = 500
-tp_max = 1500 # need to determine this
+tp_max = 1300 # need to determine this
 def traffic_perf(city):
     #traffics = [cell.data["traffic"] for cell in city.cells.values()] #RZ 170703
     #RZ 170703
@@ -66,13 +66,14 @@ def traffic_perf(city):
             traffics.append(cell.data["traffic"])
     return 1 - normalize(sum(traffics) / len(traffics), tp_min, tp_max)
 
-sp_min = 1200
+sp_min = 1000
 sp_max = 1300 # need to determine this
 def solar_perf(city):
     #solars = [cell.data["solar"] for cell in city.cells.values()] #RZ 170703
     #RZ 170703
     solars = []
     for cell in city.cells.values():
-        if cell.type_id >= 0 or cell.type_id <= 5:
+        if (cell.type_id >= -1 or cell.type_id <= 5) \
+        and (cell.x >= 4 and cell.x <= 12 and cell.y >= 4 and cell.y <= 12) :
             solars.append(cell.data["solar"])
     return normalize(sum(solars) / len(solars), sp_min, sp_max)
