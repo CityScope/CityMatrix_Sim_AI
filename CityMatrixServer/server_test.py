@@ -83,6 +83,8 @@ plt.imshow(np.array(types).reshape(CITY_SIZE, CITY_SIZE), cmap = 'hot', interpol
 ml = City(json.dumps(data['predict']))
 ai = City(json.dumps(data['ai']))
 
+print(ai.metrics, ai.score)
+
 '''
 
 pp = pprint.PrettyPrinter(indent=4)

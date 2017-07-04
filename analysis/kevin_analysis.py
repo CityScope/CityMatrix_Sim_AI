@@ -49,7 +49,7 @@ def unique_city_generator(city_directory, key = 'ai'):
         with open(city_path, 'r') as f:
             full_json_string = f.read()
 
-        # Get only the AI city
+        # Get only the city described by `key`
         d = json.loads(full_json_string)[key]
         j_string = json.dumps(d)
         current_city = cityiograph.City(j_string)

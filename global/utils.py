@@ -129,3 +129,17 @@ def notify(message, did_restart):
     except Exception as e:
         log.exception(e)
         log.warning("Unable to notify users via e-mail.")
+
+def write_dict(result_dict, timestamp):
+    """Helper method to write our output prediction dictionary to JSON.
+    
+    Args:
+        result_dict (dict): output from ML/AI work
+        timestamp (str): -
+    """
+    # Get filename
+    filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predictions_' + timestamp + '.json')
+
+    # Write dictionary
+    with open(filename, 'w') as f:
+        f.write(json.dumps(result_dict))

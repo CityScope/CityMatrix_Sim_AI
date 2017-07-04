@@ -14,7 +14,9 @@ import numpy as np
 import collections
 import logging
 
+sys.path.append('../CityMAItrix/')
 from config import *
+from objective import objective
 
 ''' --- CONFIGURATIONS --- '''
 
@@ -76,6 +78,10 @@ class City(object):
     def population(self):
         return sum([ c.population for c in self.cells.values() ])
 
+    @property
+    def metrics(self):
+        return metrics_dictionary(objective.get_metrics(self))
+
     def equals(self, other):
         '''Determines if this city object is equivalent to another. Need all cells, densities and 
             densities to be equal.
@@ -111,6 +117,7 @@ class City(object):
         self.meta["score"] = self.score
         self.meta["dockID"] = self.dockID
         self.meta["dockRotation"] = self.dockRotation
+        self.meta["metrics"] = self.metrics
 
         result = {
             "objects": self.meta,
@@ -136,23 +143,6 @@ class City(object):
         # self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
         # self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
         # self.animBlink = other_city.animBlink #RZ this will be handled in server.py
-
-    def updateAIMov(self, mov):
-        """Quick method from Ryan to update AI move.
-        
-        Args:
-            mov (unknown): move representation
-        """
-        self.AIMov = mov
-
-    #RZ 170615
-    def updateScores(self, scores):
-        """Quick method from Ryan to update AI score values.
-        
-        Args:
-            scores (list): -
-        """
-        self.scores = scores
 
     def to_json(self):
         """Converts the current city object to a JSON string.
@@ -531,3 +521,14 @@ def get_results(city, mode):
             results.append(cell_results(cell, mode))
     
     return np.array(results).flatten()
+
+def metrics_dictionary(metrics):
+    '''Helper method to convert list of tuples to dictionary for JSON submission.
+    
+    Args:
+        metrics (list): list of tuples (name, value, weight)
+    
+    Returns:
+        dict: dictionary mapping metric name -> value and weight
+    '''
+    return { name : { "weight" : weight , "metric" : value } for name, value, weight in metrics }

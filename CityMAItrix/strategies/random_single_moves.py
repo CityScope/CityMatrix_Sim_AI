@@ -75,8 +75,8 @@ def search(city):
 
     # Update AI params based on this move - changes from Ryan
     log.info("AI search complete. Best score = {}. Best move = {}.".format(best_score, best_move))
-    final_city.updateAIMov(best_move)
-    final_city.updateScores(best_scores)
+    final_city.AIMov = best_move
+    final_city.score = scr
 
     return final_city, best_move, objective.get_metrics(final_city)
 

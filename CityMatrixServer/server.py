@@ -42,34 +42,7 @@ def register():
     """Helper method to close all ports if server is stopped for some reason.
     """
     server.close()
-    log.warning("Closing all ports for {}.".format(SERVER_NAME))
-
-''' --- GLOBAL HELPER METHODS --- '''
-
-def metrics_dictionary(metrics):
-    '''Helper method to convert list of tuples to dictionary for JSON submission.
-    
-    Args:
-        metrics (list): list of tuples (name, value, weight)
-    
-    Returns:
-        dict: dictionary mapping metric name -> value and weight
-    '''
-    return { name : [ value , weight ] for name, value, weight in metrics }
-
-def write_dict(result_dict, timestamp):
-    """Helper method to write our output prediction dictionary to JSON.
-    
-    Args:
-        result_dict (dict): output from ML/AI work
-        timestamp (str): -
-    """
-    # Get filename
-    filename = os.path.join(PREDICTED_CITIES_DIRECTORY, 'city_predictions_' + timestamp + '.json')
-
-    # Write dictionary
-    with open(filename, 'w') as f:
-        f.write(json.dumps(result_dict))    
+    log.warning("Closing all ports for {}.".format(SERVER_NAME))    
 
 ''' --- MAIN SERVER LOGIC --- '''
 
@@ -116,28 +89,20 @@ while True:
                 previous_city = ml_city
 
                 # Compute ML scores
-                mlCityScores = Strategy.scores(ml_city)[1]
-                ml_city.updateScores(mlCityScores)
+                mlCityScores = Strategy.scores(ml_city)
+                ml_city.score = mlCityScores[0]
 
                 # Still run our normal AI on this new ML city
                 ai_city, move, ai_metrics_list = Strategy.search(ml_city)
 
-                # Update animation
+                # Update city data
                 ml_city.animBlink = animBlink
                 ai_city.animBlink = animBlink
-
-                # Get metrics
-                ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-                ai_metrics = metrics_dictionary(ai_metrics_list)
                 ml_city.updateMeta(input_city)
                 ai_city.updateMeta(input_city)
-                ml_dict = ml_city.to_dict()
-                ml_dict['objects']['metrics'] = ml_metrics
-                ai_dict = ai_city.to_dict()
-                ai_dict['objects']['metrics'] = ai_metrics
 
                 # Save result and send back to GH/Unity
-                result = { 'predict' : ml_dict , 'ai' : ai_dict }
+                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
                 write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
@@ -160,14 +125,8 @@ while True:
                 ml_city.updateMeta(input_city)
                 ai_city.updateMeta(input_city)
 
-                # Now, update dictionaries
-                ml_dict = ml_city.to_dict()
-                ml_dict['objects']['metrics'] = ml_metrics
-                ai_dict = ai_city.to_dict()
-                ai_dict['objects']['metrics'] = ai_metrics
-
                 # Send resulting 2-city dictionary (predict/ai) back to GH
-                result = { 'predict' : ml_dict , 'ai' : ai_dict }
+                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
                 server.send_data(result)
                 unity_server.send_data(result)
 
@@ -181,7 +140,7 @@ while True:
                     print("startFlag: {}".format(ml_city.startFlag))
                     print("AIMov: {}".format(ml_city.AIMov))
                     print("animBlink: {}".format(ml_city.animBlink))
-                    print("scores: {}".format(ml_city.scores))
+                    print("score: {}".format(ml_city.score))
                     print("ai_city to send: ")
                     print("densities: {}".format(ai_city.densities))
                     print("slider1: {}".format(ai_city.slider1))
@@ -190,7 +149,7 @@ while True:
                     print("startFlag: {}".format(ai_city.startFlag))
                     print("AIMov: {}".format(ai_city.AIMov))
                     print("animBlink: {}".format(ai_city.animBlink))
-                    print("scores: {}".format(ai_city.scores))
+                    print("score: {}".format(ai_city.score))
                 
                 log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
 
@@ -207,28 +166,20 @@ while True:
             previous_city = ml_city
 
             # Compute ML scores
-            mlCityScores = Strategy.scores(ml_city)[1]
-            ml_city.updateScores(mlCityScores)
+            mlCityScores = Strategy.scores(ml_city)
+            ml_city.score = mlCityScores[0]
 
             # Still run our normal AI on this new ML city
             ai_city, move, ai_metrics_list = Strategy.search(ml_city)
 
-            # Update animation
+            # Update city data
             ml_city.animBlink = animBlink
             ai_city.animBlink = animBlink
-
-            # Get metrics
-            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            ai_metrics = metrics_dictionary(ai_metrics_list)
             ml_city.updateMeta(input_city)
             ai_city.updateMeta(input_city)
-            ml_dict = ml_city.to_dict()
-            ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ai_city.to_dict()
-            ai_dict['objects']['metrics'] = ai_metrics
 
             # Save result and send back to GH/Unity
-            result = { 'predict' : ml_dict , 'ai' : ai_dict }
+            result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
             write_dict(result, timestamp)
             server.send_data(result)
             unity_server.send_data(result)
