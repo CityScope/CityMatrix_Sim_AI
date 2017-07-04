@@ -47,10 +47,8 @@ def search(city, queue = set()):
                 or ("DENSITY", idx) in visited)  \
                 and lmt < 6 * 30 : #RZ possible moves
                 idx = randint(id_range[0], id_range[1]) #TOTO magic number here?
-                print(idx)
                 dens = randint(density_range[0], density_range[1])
                 lmt = lmt + 1 #RZ
-                print(lmt)
             mov = ("DENSITY", idx, dens)
         else:
             x = y = newid = -1

@@ -51,7 +51,6 @@ log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".form
 
 # Constantly loop and wait for new city packets to reach our UDP server
 while True:
-    print(AI_move_queue)
     # Get city from server and note timestamp
     input_city = server.receive_city()
     timestamp = str(int(time.time()))
