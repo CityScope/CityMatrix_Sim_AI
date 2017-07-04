@@ -60,7 +60,7 @@ log.debug("Successfully loaded city.")
 
 # city.AIStep = 19
 
-city.toggle1 = 1
+# city.toggle1 = 1
 
 # Send that city to our UDP server
 server.send_city(city)

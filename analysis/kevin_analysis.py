@@ -246,12 +246,18 @@ def ai_move_analysis():
     plt.show()
     '''
 
+def latest_analysis():
+    """New analysis method
+    """
+    pass
+
 ''' -- AUTOMAIN --- '''
 
 if __name__ == '__main__':
     print("Starting process.")
     start = time.time()
 
-    ai_move_analysis()
+    # ai_move_analysis()
+    latest_analysis()
 
     print("Process complete. Took {} seconds.".format(time.time() - start))

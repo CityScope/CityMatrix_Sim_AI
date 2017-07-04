@@ -44,11 +44,13 @@ def search(city, queue = set()):
             idx = dens = -1
             lmt = 0 #RZ limit the while loop, it will cause dead loop when density_change_chance is high
             while ((dens == -1 or idx == -1)  \
-                or ("DENSITY", idx, dens) in visited)  \
+                or ("DENSITY", idx) in visited)  \
                 and lmt < 6 * 30 : #RZ possible moves
-                idx = randint(id_range[0], id_range[1] - 1) #TOTO magic number here?
+                idx = randint(id_range[0], id_range[1]) #TOTO magic number here?
+                print(idx)
                 dens = randint(density_range[0], density_range[1])
                 lmt = lmt + 1 #RZ
+                print(lmt)
             mov = ("DENSITY", idx, dens)
         else:
             x = y = newid = -1
@@ -62,7 +64,11 @@ def search(city, queue = set()):
                 newid = randint(id_range[0], id_range[1])
                 lmt = lmt + 1 #RZ
             mov = ("CELL", x, y, newid)
-        visited.add(mov)
+        # Add this move to the visited set
+        if mov[0] == 'DENSITY':
+            visited.add(mov[:-1])
+        else:
+            visited.add(mov)
         [ scr , best ] = scores(city, mov) # KL - minor optimization to avoid duplicate calls to score method
         if best_score == None or scr > best_score:
             best_score = scr

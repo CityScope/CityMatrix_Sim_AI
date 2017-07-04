@@ -101,6 +101,8 @@ while True:
                 ai_city, move, ai_metrics_list = Strategy.search(ml_city)
 
                 # Add this move to the queue
+                if move[0] == 'DENSITY':
+                    move = move[:-1]
                 AI_move_queue.add(move)
 
                 # Update city data
@@ -139,6 +141,8 @@ while True:
                 ai_city, move, ai_metrics_list = Strategy.search(ml_city, queue = AI_move_queue)
 
                 # Add this move to the queue
+                if move[0] == 'DENSITY':
+                    move = move[:-1]
                 AI_move_queue.add(move)
 
                 # Update city data
@@ -225,6 +229,8 @@ while True:
             ai_city, move, ai_metrics_list = Strategy.search(ml_city)
 
             # Add this move to the queue
+            if move[0] == 'DENSITY':
+                move = move[:-1]
             AI_move_queue.add(move)
 
             # Update city data
