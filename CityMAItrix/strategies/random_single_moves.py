@@ -1,6 +1,7 @@
 import sys
 import logging
 import utils
+import copy
 from objective import objective
 from random import *
 sys.path.extend(['../', '../../CityPrediction/'])
@@ -16,11 +17,12 @@ iterations = 150 #RZ speed: about 150 iterations per second
 
 ''' --- METHOD DEFINITIONS --- '''
 
-def search(city):
+def search(city, queue = set()):
     """Random single moves AI search algorithm.
     
     Args:
         city (cityiograph.City): the city for which we would like to optimize our metrics
+        visited (set, optional): describes previously visited states in our prediction
     
     Returns:
         3-tuple: suggested_city (cityiograph.City): -
@@ -30,7 +32,7 @@ def search(city):
                                         x (int), y (int) and new type id for that cell
                  scores (list): AI metrics scores
     """
-    visited = set() # KL 1706625 changing to set to get O(1) search lookups
+    visited = copy.copy(queue)
     best_score = None
     best_scores = None #RZ 170615 passing score array to json
     best_move = None

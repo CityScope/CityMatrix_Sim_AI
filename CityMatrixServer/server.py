@@ -36,6 +36,7 @@ animBlink = 0 #RZ 170614
 PRINT_CITY_RECEIVED = False
 PRINT_CITY_TO_SEND = True
 previous_city = None # For comparison purposes
+AI_move_queue = set() # KL - keep track of previous moves that have been used
 
 @atexit.register
 def register():
@@ -50,6 +51,7 @@ log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".form
 
 # Constantly loop and wait for new city packets to reach our UDP server
 while True:
+    print(AI_move_queue)
     # Get city from server and note timestamp
     input_city = server.receive_city()
     timestamp = str(int(time.time()))
@@ -80,6 +82,9 @@ while True:
             if not previous_city.equals(input_city):
                 # New city received - write to local file for later use
                 input_city.write_to_file(timestamp)
+
+                # Clear queue
+                AI_move_queue = set()
                 
                 # Run full ML/AI prediction
                 # ML first
@@ -94,6 +99,9 @@ while True:
 
                 # Still run our normal AI on this new ML city
                 ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+                # Add this move to the queue
+                AI_move_queue.add(move)
 
                 # Update city data
                 ml_city.animBlink = animBlink
@@ -111,6 +119,44 @@ while True:
                 unity_server.send_data(result)
 
                 log.info("New ml_city and ai_city data successfully sent to GH.\n")
+                log.info("Waiting to receive new city...")
+
+            elif input_city.toggle1 != previous_city.toggle1:
+                # We have a change in toggle value - we need to send along a new prediction
+                # Do not write to file
+                # Run full ML/AI prediction
+                # ML first
+                ml_city = ML.predict(input_city)
+
+                # Update previous value
+                previous_city = ml_city
+
+                # Compute ML scores
+                mlCityScores = Strategy.scores(ml_city)
+                ml_city.score = mlCityScores[0]
+
+                # Still run our normal AI on this new ML city
+                ai_city, move, ai_metrics_list = Strategy.search(ml_city, queue = AI_move_queue)
+
+                # Add this move to the queue
+                AI_move_queue.add(move)
+
+                # Update city data
+                ml_city.animBlink = animBlink
+                ai_city.animBlink = animBlink
+                ml_city.updateMeta(input_city)
+                ai_city.updateMeta(input_city)
+
+                # Save result and send back to GH/Unity
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                write_dict(result, timestamp)
+                server.send_data(result)
+                unity_server.send_data(result)
+
+                log.info("Same city received, but new toggle value. New ml_city and ai_city data successfully sent to GH.\n")
                 log.info("Waiting to receive new city...")
 
             elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
@@ -177,6 +223,9 @@ while True:
 
             # Still run our normal AI on this new ML city
             ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+            # Add this move to the queue
+            AI_move_queue.add(move)
 
             # Update city data
             ml_city.animBlink = animBlink
