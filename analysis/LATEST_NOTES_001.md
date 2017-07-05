@@ -62,7 +62,9 @@ We bucket the rates into `BIN_SIZE = 5` groups to look at the rates over time.
 
 So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* = `BIN_SIZE`, to be
 
-<div style="text-align:center"><img width="15%" src="https://latex.codecogs.com/gif.latex?%5Cfrac%7B%5Csum_%7Bi%20%3D%20a%7D%5Eb%20M%5Bi%5D%7D%7Bb%20-%20a%7D" /></div>
+<p align="center">
+  <img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7B%5Csum_%7Bi%20%3D%20a%7D%5Eb%20M%5Bi%5D%7D%7Bb%20-%20a%7D" alt="Sublime's custom image"/>
+</p>
 
 where *M[i]* = 1 if the user accepts the AI at time *i*, else 0.
 
