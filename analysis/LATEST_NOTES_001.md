@@ -52,13 +52,13 @@ Now, let's take a look at the **total score value for the city** over time. Agai
 
 ## AI Acceptance Rate
 
-Here, we look at the **AI acceptance rate**. We consider the AI move to be **accepted** if the user makes that same move in the next 3 steps.
+Here, we look at the **AI acceptance rate**. We consider the AI move to be **accepted** if the user makes that same move in the next 3 steps. [(back to top)](#quick-links)
 
 For a `'DENSITY'` type move, we only look at the index in the density array, not the actual value. This deals with small errors on the toggle.
 
-We use a `MOVE_THRESHOLD = 3` to deal with the cities that are sent in between moves by the GH client.
+We use a `MOVE_THRESHOLD = 5` to deal with the cities that are sent in between moves by the GH client.
 
-We bucket the rates into `BIN_SIZE = 5` groups to look at the rates over time.
+We bucket the rates into `BIN_SIZE = 15` groups to look at the rates over time.
 
 So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* = `BIN_SIZE`, to be
 

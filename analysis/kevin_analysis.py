@@ -30,8 +30,8 @@ import cityiograph
 BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/'
 CITY_SIZE = 16
 METRIC_NAMES = [ "Density" , "Diversity" , "Energy" , "Traffic" , "Solar" ]
-MOVE_THRESHOLD = 3
-BIN_SIZE = 5
+MOVE_THRESHOLD = 5
+BIN_SIZE = 15
 
 ''' --- GLOBAL HELPER METHODS --- '''
 
@@ -492,6 +492,7 @@ def ai_acceptance():
 
             else:
                 move = city.get_move(prev)
+                prev = city
 
                 # Trim our set if needed
                 if len(move_set) == MOVE_THRESHOLD + 1:
@@ -541,6 +542,6 @@ if __name__ == '__main__':
     # get_density_info()
     # ai_weight_track()
     # scores()
-    ai_acceptance()
+    # ai_acceptance()
 
     print("Process complete. Took {} seconds.".format(time.time() - start))
