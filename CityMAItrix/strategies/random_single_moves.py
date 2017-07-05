@@ -10,7 +10,7 @@ from CityPrediction import predictor as ML
 ''' --- CONFIGURATIONS --- '''
 
 log = logging.getLogger('__main__')
-density_change_chance = 0.5 #RZ equal chance: (6*30)/(256*6)=0.1172
+density_change_chance = 0.25 #RZ equal chance: (6*30)/(256*6)=0.1172
 density_range = (1, 30)
 id_range = (0, 5)
 iterations = 150 #RZ speed: about 150 iterations per second
@@ -43,9 +43,9 @@ def search(city, queue = set()):
         if r <= density_change_chance:
             idx = dens = -1
             lmt = 0 #RZ limit the while loop, it will cause dead loop when density_change_chance is high
-            while ((dens == -1 or idx == -1)  \
-                or ("DENSITY", idx) in visited)  \
-                and lmt < 6 * 30 : #RZ possible moves
+            while ((dens == -1 or idx == -1) \
+                or ("DENSITY", idx) in visited) \
+                and lmt < 6 * 30 * 4 : #RZ possible moves * 4
                 idx = randint(id_range[0], id_range[1]) #TOTO magic number here?
                 dens = randint(density_range[0], density_range[1])
                 lmt = lmt + 1 #RZ
@@ -54,9 +54,9 @@ def search(city, queue = set()):
             x = y = newid = -1
             lmt = 0 #RZ limit the while loop
             while ((x == -1 or y == -1 or newid == -1) \
-                or x < 4 or x > 12 or y < 4 or y > 12 or x == 8 or y == 8 # Focus center of city and no road cell
-                or ("CELL", x, y, newid) in visited)  \
-                and lmt < 256 * 6 * 2 : #RZ possible moves * 2
+                or x < 4 or x > 12 or y < 4 or y > 12 or x == 8 or y == 8 \
+                or ("CELL", x, y, newid) in visited) \
+                and lmt < 256 * 6 * 4 : #RZ possible moves * 4      # Focus center of city and no road cell
                 x = randint(0, city.width - 1)
                 y = randint(0, city.height - 1)
                 newid = randint(id_range[0], id_range[1])
