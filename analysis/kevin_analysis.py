@@ -30,6 +30,8 @@ import cityiograph
 BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/'
 CITY_SIZE = 16
 METRIC_NAMES = [ "Density" , "Diversity" , "Energy" , "Traffic" , "Solar" ]
+MOVE_THRESHOLD = 3
+BIN_SIZE = 5
 
 ''' --- GLOBAL HELPER METHODS --- '''
 
@@ -463,6 +465,71 @@ def scores():
 
         # break # Debug only
 
+def ai_acceptance():
+    # Outer vars
+
+
+    # Iterate over the tests
+    for i, test in enumerate(glob.glob(BASE_DIR + '*')):
+        test_string = test.replace(BASE_DIR, '').replace('/', '|')
+        print("Working on test = {}...".format(test))
+        # Create gen
+        gen = unique_city_generator(test + '/')
+
+        # Tracker vars
+        times = []
+        prev = None
+        move_set = []
+        move_indicator = []
+        
+        for city, d, fname in gen:
+            time = get_time(fname)
+            times.append(time)
+
+            if prev is None:
+                prev = city
+                move_indicator.append(0)
+
+            else:
+                move = city.get_move(prev)
+
+                # Trim our set if needed
+                if len(move_set) == MOVE_THRESHOLD + 1:
+                    del move_set[0]
+
+                if move not in move_set:
+                    move_set.append(move)
+                    move_indicator.append(0)
+
+                else:
+                    move_indicator.append(1)
+
+        times = np.array(times)
+        x_times = (times - times[0]) / 60
+
+        move_indicator = np.array(move_indicator)
+
+        # Sum it into bins
+        bin_count, remainder = divmod(move_indicator.shape[0], BIN_SIZE)
+        first = move_indicator[ : bin_count * BIN_SIZE ]
+        last = move_indicator[ bin_count * BIN_SIZE : ]
+        first = first.reshape(-1, BIN_SIZE)
+        first_sum = first.sum(axis = 1) / BIN_SIZE
+        last_sum = [ last.sum() / remainder ]
+        first_repeat = np.repeat(first_sum, BIN_SIZE)
+        last_repeat = np.repeat(last_sum, remainder)
+        all_sums = np.concatenate((first_repeat, last_repeat), axis = 0)
+
+        # Plot it
+        plt.figure(figsize = (10, 8))
+        plt.plot(x_times, all_sums)
+        plt.ylim([0, 1.1])
+        plt.title("Test = {}. AI acceptance rate vs time (minutes).".format(test_string), fontsize = 15)
+        plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.92, wspace=1, hspace=0.3)
+        plt.savefig('data_new/' + test_string + '_ai_acceptance.png')
+
+        # break # Debug only
+
 ''' -- AUTOMAIN --- '''
 
 if __name__ == '__main__':
@@ -474,5 +541,6 @@ if __name__ == '__main__':
     # get_density_info()
     # ai_weight_track()
     # scores()
+    ai_acceptance()
 
     print("Process complete. Took {} seconds.".format(time.time() - start))
