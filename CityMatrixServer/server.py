@@ -31,7 +31,6 @@ unity_server = city_udp.City_UDP(UNITY_SERVER_NAME, receive_port = UNITY_RECEIVE
 
 # Other instance vars
 log = logging.getLogger('__main__')
-result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
 animBlink = 0 #RZ 170614
 PRINT_CITY_RECEIVED = False
 PRINT_CITY_TO_SEND = True
@@ -162,7 +161,7 @@ while True:
                 log.info("Same city received, but new toggle value. New ml_city and ai_city data successfully sent to GH.\n")
                 log.info("Waiting to receive new city...")
 
-            elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+            else:
                 #RZ 170626 same city received and not the first city, update meta data for GH UI, do not write to local file
 
                 #RZ 170614 update city.animBlink
