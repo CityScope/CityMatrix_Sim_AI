@@ -31,36 +31,36 @@ SEND_PORT = 9001
 # Serializes a Keras model to a JSON and h5 data file
 def serialize_model(model, root_filename=ROOT_FILENAME):
 
-	# Convert to JSON
-	model_in_json = model.to_json()
+    # Convert to JSON
+    model_in_json = model.to_json()
 
-	# Write to file
-	with open(root_filename + ".json", "w") as json_file:
-		json_file.write(model_in_json)
+    # Write to file
+    with open(root_filename + ".json", "w") as json_file:
+        json_file.write(model_in_json)
 
     # Save weights
-	model.save_weights(root_filename + ".h5")
+    model.save_weights(root_filename + ".h5")
 
-	print("Successfully serialized model to local files {}.".format(root_filename))
+    print("Successfully serialized model to local files {}.".format(root_filename))
 
 # Deserialze data in .json and .h5 files into a Keras model that can be used for ML prediction
 def deserialize_model(root_filename=ROOT_FILENAME):
 
-	# Read JSON string
-	json_file = open(root_filename + '.json', 'r')
-	model_in_json = json_file.read()
-	json_file.close()
+    # Read JSON string
+    json_file = open(root_filename + '.json', 'r')
+    model_in_json = json_file.read()
+    json_file.close()
 
-	# Load model with architecture and weights
-	model = model_from_json(model_in_json)
-	model.load_weights(root_filename + '.h5')
+    # Load model with architecture and weights
+    model = model_from_json(model_in_json)
+    model.load_weights(root_filename + '.h5')
 
-	# Compile the model with loss, optimizer and metrics
-	model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+    # Compile the model with loss, optimizer and metrics
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
-	# Return the final model
-	print("Successfully deserialized our model.")
-	return model
+    # Return the final model
+    print("Successfully deserialized our model.")
+    return model
 
 # Load model and server
 model = deserialize_model()
@@ -69,31 +69,31 @@ server = city_udp.City_UDP("Neural_Network_Model_Server", receive_port=RECEIVE_P
 # Constantly loop and wait
 while LISTENING:
 
-	# Breifly sleep
-	time.sleep(0.1)
+    # Breifly sleep
+    time.sleep(0.1)
 
-	# Constantly wait for new cities to be received via UDP
-	# Taken directly from Alex's code for regression_server.py
-	# Updated for neural network standards
+    # Constantly wait for new cities to be received via UDP
+    # Taken directly from Alex's code for regression_server.py
+    # Updated for neural network standards
 
-	print("Waiting to receive city...")
+    print("Waiting to receive city...")
 
-	incoming_city = server.receive_city()
-	print("City received!")
+    incoming_city = server.receive_city()
+    print("City received!")
 
-	# Extract feature matrix from this city
-	features = traffic_regression.get_features(incoming_city)
-	features = features.reshape((-1, 16, 16, 2))
+    # Extract feature matrix from this city
+    features = traffic_regression.get_features(incoming_city)
+    features = features.reshape((-1, 16, 16, 2))
 
-	# Make traffic and wait prediction using CNN
-	predicted_city = model.predict(features)[0]
-	result_list = predicted_city.reshape(512).tolist()
+    # Make traffic and wait prediction using CNN
+    predicted_city = model.predict(features)[0]
+    result_list = predicted_city.reshape(512).tolist()
 
-	# Write prediction back to the cityiograph.City structure
-	outgoing_city = incoming_city
-	traffic_regression.output_to_city(outgoing_city, result_list)
+    # Write prediction back to the cityiograph.City structure
+    outgoing_city = incoming_city
+    traffic_regression.output_to_city(outgoing_city, result_list)
 
-	print("Updated city sent!")
+    print("Updated city sent!")
 
-	# Send the city back to Grasshopper script via UDP
-	server.send_city(outgoing_city)
+    # Send the city back to Grasshopper script via UDP
+    server.send_city(outgoing_city)

@@ -3,7 +3,6 @@ Filename: server.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-01 21:27:53
 Last modified by: kalyons11
-Last modified time: 2017-06-11 23:35:17
 Description:
     - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
         provides output to Grasshopper.
@@ -11,30 +10,41 @@ TODO:
     - None at this time.
 '''
 
-# Import local scripts for all key functionality, both ML and AI
+''' --- IMPORTS --- '''
+
 import sys, logging
+
 sys.path.extend(['../global/', '../CityPrediction/', '../CityMAItrix/'])
 from utils import *
-import city_udp, simulator, predictor as ML
+import city_udp, predictor as ML
 from strategies import random_single_moves as Strategy
 from objective import objective
-log = logging.getLogger('__main__')
-result = None #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
+
+''' --- CONFIGURATIONS --- '''
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2: AUTO_RESTART = False
 
-# Create instance of our server
+# Create instances of our servers
 server = city_udp.City_UDP(SERVER_NAME, receive_port = RECEIVE_PORT, send_port = SEND_PORT)
+unity_server = city_udp.City_UDP(UNITY_SERVER_NAME, receive_port = UNITY_RECEIVE_PORT, send_port = UNITY_SEND_PORT)
 
-# Close all ports if server closed
+# Other instance vars
+log = logging.getLogger('__main__')
+animBlink = 0 #RZ 170614
+PRINT_CITY_RECEIVED = False
+PRINT_CITY_TO_SEND = True
+previous_city = None # For comparison purposes
+AI_move_queue = set() # KL - keep track of previous moves that have been used
+
 @atexit.register
 def register():
+    """Helper method to close all ports if server is stopped for some reason.
+    """
     server.close()
-    log.warning("Closing all ports for {}.".format(SERVER_NAME))
+    log.warning("Closing all ports for {}.".format(SERVER_NAME))    
 
-# Create instance of our simulator, if needed
-if DO_SIMULATE: sim = simulator.CitySimulator(SIM_NAME, log)
+''' --- MAIN SERVER LOGIC --- '''
 
 log.info("{} listening on ip: {}, port: {}. Waiting to receive new city...".format(SERVER_NAME, RECEIVE_IP, RECEIVE_PORT))
 
@@ -44,59 +54,197 @@ while True:
     input_city = server.receive_city()
     timestamp = str(int(time.time()))
 
-    # Only consider new city if it is different from most recent
-    if input_city != None:
-        key, data = diff_cities(input_city)
-        if FORCE_PREDICTION or key is not CityChange.NO:
-            # First, write new city to local file
-            log.info("New city received @ timestamp {}.".format(timestamp))
-            inputSimCity = simulator.SimCity(input_city, timestamp)
-            write_city(inputSimCity)
+    #RZ 170614 alter animBlink after received a city from GH CV
+    if animBlink == 0:
+        animBlink = 1
+    
+    else:
+        animBlink = 0
 
-            # Run our black box predictor on this city with given changes
-            ml_city = ML.predict(input_city, key, data)
+    #RZ 170614 print to check received city
+    if PRINT_CITY_RECEIVED:
+        print("\nReceived City: ")
+        print("densities: {}".format(city.densities))
+        print("population: {}".format(city.population))
+        print("slider1: {}".format(city.slider1))
+        print("slider2: {}".format(city.slider2))
+        print("toggle1: {}".format(city.toggle1))
+        print("AIWeights: {}".format(city.AIWeights))
+        print("startFlag: {}".format(city.startFlag))
+        print("AIMov: {}".format(city.AIMov))
 
-            # Run our AI on this city
-            ai_city, move, ai_metrics_list = Strategy.search(input_city)
+    # Ensure that there was no error parsing the city JSON packet
+    if input_city is not None:
+        if previous_city is not None:
+            # Check if this city is different from the previous one
+            if not previous_city.equals(input_city):
+                # New city received - write to local file for later use
+                input_city.write_to_file(timestamp)
 
-            # Now, we need to send 2 city objects back to GH
-            # First, get metrics dicts for cities
-            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            ai_metrics = metrics_dictionary(ai_metrics_list)
+                # Clear queue
+                AI_move_queue = set()
+                
+                # Run full ML/AI prediction
+                # ML first
+                ml_city = ML.predict(input_city)
 
-            # Now, update dictionaries
-            ml_dict = ml_city.to_dict()
-            ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ai_city.to_dict()
-            ai_dict['objects']['metrics'] = ai_metrics
+                # Update previous value
+                previous_city = ml_city
 
-            # Save result locally and send
-            result = { 'predict' : ml_dict , 'ai' : ai_dict }
-            write_city(result, timestamp = timestamp)
+                # Compute ML scores
+                mlCityScores = Strategy.scores(ml_city)
+                ml_city.score = mlCityScores[0]
+
+                # Still run our normal AI on this new ML city
+                ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+                # Add this move to the queue
+                if move[0] == 'DENSITY':
+                    move = move[:-1]
+                AI_move_queue.add(move)
+
+                # Update city data
+                ml_city.animBlink = animBlink
+                ai_city.animBlink = animBlink
+                ml_city.updateMeta(input_city)
+                ai_city.updateMeta(input_city)
+
+                # Save result and send back to GH/Unity
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                write_dict(result, timestamp)
+                server.send_data(result)
+                unity_server.send_data(result)
+
+                log.info("New ml_city and ai_city data successfully sent to GH.\n")
+                log.info("Waiting to receive new city...")
+
+            elif input_city.toggle1 != previous_city.toggle1:
+                # We have a change in toggle value - we need to send along a new prediction
+                # Do not write to file
+                # Run full ML/AI prediction
+                # ML first
+                ml_city = ML.predict(input_city)
+
+                # Update previous value
+                previous_city = ml_city
+
+                # Compute ML scores
+                mlCityScores = Strategy.scores(ml_city)
+                ml_city.score = mlCityScores[0]
+
+                # Still run our normal AI on this new ML city
+                ai_city, move, ai_metrics_list = Strategy.search(ml_city, queue = AI_move_queue)
+
+                # Add this move to the queue
+                if move[0] == 'DENSITY':
+                    move = move[:-1]
+                AI_move_queue.add(move)
+
+                # Update city data
+                ml_city.animBlink = animBlink
+                ai_city.animBlink = animBlink
+                ml_city.updateMeta(input_city)
+                ai_city.updateMeta(input_city)
+
+                # Save result and send back to GH/Unity
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                write_dict(result, timestamp)
+                server.send_data(result)
+                unity_server.send_data(result)
+
+                log.info("Same city received, but new toggle value. New ml_city and ai_city data successfully sent to GH.\n")
+                log.info("Waiting to receive new city...")
+
+            else:
+                #RZ 170626 same city received and not the first city, update meta data for GH UI, do not write to local file
+
+                #RZ 170614 update city.animBlink
+                ml_city.animBlink = animBlink
+                ai_city.animBlink = animBlink
+
+                # Then, get metrics dicts for cities
+                ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
+                ai_metrics = metrics_dictionary(ai_metrics_list)
+
+                #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
+                ml_city.updateMeta(input_city)
+                ai_city.updateMeta(input_city)
+
+                # Send resulting 2-city dictionary (predict/ai) back to GH
+                if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+                else:
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+                server.send_data(result)
+                unity_server.send_data(result)
+
+                #RZ 170614 print to check city to send
+                if PRINT_CITY_TO_SEND:
+                    print("\nml_city to send: ")
+                    print("densities: {}".format(ml_city.densities))
+                    print("slider1: {}".format(ml_city.slider1))
+                    print("slider2: {}".format(ml_city.slider2))
+                    print("AIWeights: {}".format(ml_city.AIWeights))
+                    print("startFlag: {}".format(ml_city.startFlag))
+                    print("AIMov: {}".format(ml_city.AIMov))
+                    print("animBlink: {}".format(ml_city.animBlink))
+                    print("score: {}".format(ml_city.score))
+                    print("ai_city to send: ")
+                    print("densities: {}".format(ai_city.densities))
+                    print("slider1: {}".format(ai_city.slider1))
+                    print("slider2: {}".format(ai_city.slider2))
+                    print("AIWeights: {}".format(ai_city.AIWeights))
+                    print("startFlag: {}".format(ai_city.startFlag))
+                    print("AIMov: {}".format(ai_city.AIMov))
+                    print("animBlink: {}".format(ai_city.animBlink))
+                    print("score: {}".format(ai_city.score))
+                
+                log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")
+
+        else:
+            # This is the first city
+            # Write to local file for later use
+            input_city.write_to_file(timestamp)
+            
+            # Run full ML/AI prediction
+            # ML first
+            ml_city = ML.predict(input_city)
+
+            # Update previous value
+            previous_city = ml_city
+
+            # Compute ML scores
+            mlCityScores = Strategy.scores(ml_city)
+            ml_city.score = mlCityScores[0]
+
+            # Still run our normal AI on this new ML city
+            ai_city, move, ai_metrics_list = Strategy.search(ml_city)
+
+            # Add this move to the queue
+            if move[0] == 'DENSITY':
+                move = move[:-1]
+            AI_move_queue.add(move)
+
+            # Update city data
+            ml_city.animBlink = animBlink
+            ai_city.animBlink = animBlink
+            ml_city.updateMeta(input_city)
+            ai_city.updateMeta(input_city)
+
+            # Save result and send back to GH/Unity
+            if input_city.AIStep != 20: # KL - accounting for AI step case
+                    result = { 'predict' : ml_city.to_dict() , 'ai' : None }
+            else:
+                result = { 'predict' : ml_city.to_dict() , 'ai' : ai_city.to_dict() }
+            write_dict(result, timestamp)
             server.send_data(result)
-            log.info("Predicted city data successfully sent to GH.\n")
+            unity_server.send_data(result)
 
-            # Now, run the GAMA simulation "async" on this city and save the resulting JSON for later use
-            if DO_SIMULATE: sim.simulate(simCity)
-
+            log.info("New ml_city and ai_city data successfully sent to GH.\n")
             log.info("Waiting to receive new city...")
-
-        elif result is not None: #RZ This is necessary to check if ml_city and ai_city has been calculated onece or not
-            #RZ firstly, we need to update only the meta data of the 2 cities, including slider position and AI Step
-            ml_city.updateMeta(input_city) #RZ necessary, do not delete
-            ai_city.updateMeta(input_city) #RZ necessary, do not delete
-
-            # Then, get metrics dicts for cities
-            ml_metrics = metrics_dictionary(objective.get_metrics(ml_city))
-            ai_metrics = metrics_dictionary(ai_metrics_list)
-
-            # Now, update dictionaries
-            ml_dict = ml_city.to_dict()
-            ml_dict['objects']['metrics'] = ml_metrics
-            ai_dict = ai_city.to_dict()
-            ai_dict['objects']['metrics'] = ai_metrics
-
-            # Send result
-            result = { 'predict' : ml_dict , 'ai' : ai_dict }
-            server.send_data(result)
-            log.info("Same city received. Still sent some metadata to GH. Waiting to receive new city...")

@@ -1,4 +1,5 @@
-data/
+
+
 *.pyc
 *.p
 ! *credentials.p # Need this file for SMTP server setup

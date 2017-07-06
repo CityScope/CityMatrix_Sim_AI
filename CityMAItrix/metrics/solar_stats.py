@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def max_solar_radiation(city):
     return np.max([c.data["solar"] for c in city.cells.values()])
 
@@ -12,5 +11,3 @@ def avg_solar_radiation(city):
 
 def total_solar_radiation(city):
     return np.sum([c.data["solar"] for c in city.cells.values()])
-
-

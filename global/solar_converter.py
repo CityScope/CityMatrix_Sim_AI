@@ -1,12 +1,11 @@
 '''
-Filename: 
+Filename: solar_converter.py
 Author: kalyons11 <mailto:kalyons@mit.edu>
 Created: 2017-06-07 21:40:00
 Last modified by: kalyons11
-Last modified time: 2017-06-11 00:18:46
 Description:
     - Quick script to convert raw text data to pickle file containing solar radiation linear regression model.
-    	NOTE: This script did not work as expected. Keeping for reference.
+        NOTE: This script did not work as expected. Keeping for reference.
 TODO:
     - None at this time.
 '''
