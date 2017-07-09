@@ -1,26 +1,35 @@
-# CityMatrixSim Data Analysis - Alex/Ryan User Test 07/08/2017
+# CityMatrixSim Data Analysis - Alex/Ryan User Test 07/08/2017 *(Latest)*
 
 Here, we seek to analyze some key data metrics from our CityMAItrix Assistant. Use the quick links below to get from section to section.
 
 #### Quick Links
 
-1. [AI Move Type Choice](#ai-move-type-choice)
-2. [Density Move Index](#density-move-index)
-3. [Density Move Values](#density-move-values)
-4. [AI Weights](#ai-weights)
-5. [Individual City Scores](#individual-city-scores)
-6. [Total City Scores](#total-city-scores)
-7. [AI Acceptance Rate](#ai-acceptance-rate)
+1. [Configurations](#configurations)
+2. [AI Move Type Choice](#ai-move-type-choice)
+3. [Density Move Index](#density-move-index)
+4. [Density Move Values](#density-move-values)
+5. [AI Weights](#ai-weights)
+6. [Individual City Scores](#individual-city-scores)
+7. [Total City Scores](#total-city-scores)
+8. [AI Acceptance Rate](#ai-acceptance-rate)
+9. [Density ID Distribution](#density-id-distribution)
+
+## Configurations
+
+Here is some key information about this round of data analysis for clarity purposes.
+
+1. The data starts at epoch time `1499541483`, which corresponds to **Saturday, July 8, 2017 3:18:03 PM**.
+2. We now include the `ai` or `predict` key from the JSON data, whichever is available. (I look for `ai` first, then `predict` if needed.)
+3. For AI Acceptance, we only consider cases where `city.AIStep` is `20`. You will notice that change toward the end of this document. This is only for times > 3:48 PM, or > epoch `1499543294`.
+4. I removed the `N = 2` graph score smoothing here.
 
 ## AI Move Type Choice
 
 Here are the exact move type counts and corresponding percentages. [(back to top)](#quick-links)
 
-- Total Cities = 105 ***
-- CELL = 43 = 41 %
-- DENSITY = 62 = 59 %
-
-*****Note:** Only 105 / 282 (37.23%) of the cities in the output directory had an actual key for the AI city. The remaining cities all had `null` objects there as the AI did not act at that time.
+- Total Cities = 233
+- CELL = 171 = 73.4 % 
+- DENSITY = 62 = 26.6 %
 
 ## Density Move Index
 
@@ -42,7 +51,7 @@ We can take a look at the user's AI weighting values over time. [(back to top)](
 
 ## Individual City Scores
 
-Now, we can take a look at each score value over time. Here, I average over every *N = 2* data points to smooth out our score data. [(back to top)](#quick-links)
+Now, we can take a look at each score value over time. No smoothing here. [(back to top)](#quick-links)
 
 **No weights, just** `metric` **value from** `city.metrics` `dict` **.**
 
@@ -54,7 +63,7 @@ Now, we can take a look at each score value over time. Here, I average over ever
 
 ## Total City Scores
 
-Now, let's take a look at the **total score value for the city** over time. Again, I average over every *N = 2* data points to smooth out our score data. [(back to top)](#quick-links)
+Now, let's take a look at the **total score value for the city** over time. [(back to top)](#quick-links)
 
 ![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_total_score.png)
 
@@ -64,9 +73,9 @@ Here, we look at the **AI acceptance rate**. We consider the AI move to be **acc
 
 For a `'DENSITY'` type move, we only look at the index in the density array, not the actual value. This deals with small errors on the toggle.
 
-We use a `MOVE_THRESHOLD = 5` to deal with the cities that are sent in between moves by the GH client.
+We use a `MOVE_THRESHOLD = 3` to deal with the cities that are sent in between moves by the GH client.
 
-We bucket the rates into `BIN_SIZE = 15` groups to look at the rates over time.
+We bucket the rates into `BIN_SIZE = 5` groups to look at the rates over time.
 
 So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* = `BIN_SIZE`, to be
 
@@ -77,3 +86,11 @@ So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* 
 where *M[i]* = 1 if the user accepts the AI at time *i*, else 0.
 
 ![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_acceptance.png)
+
+## Density ID Distribution
+
+Here is the block count of each cell ID type over time.
+
+Still to come...
+
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_id_dist.png)

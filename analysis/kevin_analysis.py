@@ -2,16 +2,18 @@
 Quick script to analyze results from CityMatrix user tests.
 """
 
-import sys
-import os
-import time
+import datetime
 import glob
 import json
+import os
+import sys
+import time
 from collections import defaultdict
 
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 sys.path.append('../global/')
@@ -20,18 +22,16 @@ import cityiograph
 BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/current/'
 CITY_SIZE = 16
 METRIC_NAMES = ["Density", "Diversity", "Energy", "Traffic", "Solar"]
-MOVE_THRESHOLD = 5
-BIN_SIZE = 15
+MOVE_THRESHOLD = 3
+BIN_SIZE = 5
+MIN_TIME = 1499541483
 
 
-def unique_city_generator(city_directory, key='ai'):
+def unique_city_generator(city_directory):
     """Generator instance to give us cities that are different based on equals().
-
-    Args:
+        Args:
         city_directory (str): directory (relative or absolute) with
             .json city *output* files
-        key (str, optional): describes whether we want predict/ai
-            city from result
 
     Yields:
         3-tuple: unique City instance that can be used for analysis
@@ -41,20 +41,28 @@ def unique_city_generator(city_directory, key='ai'):
     good_count = 0
     total_count = 0
 
-    for city_path in tqdm(glob.glob(city_directory + '*.json')):
+    files = glob.glob(city_directory + '*.json')
+    files.sort()
+
+    for city_path in tqdm(files):
         total_count += 1
         # Read file
         with open(city_path, 'r') as f:
             full_json_string = f.read()
 
-        # Get only the city described by `key`
-        d = json.loads(full_json_string)[key]
+        # Get only the city described by ai or predict keys
+        d = json.loads(full_json_string)['ai']
         if d is None:
-            # null key
-            continue
+            # null AI -> use predict instead
+            d = json.loads(full_json_string)['predict']
         j_string = json.dumps(d)
         current_city = cityiograph.City(j_string)
         fname = os.path.basename(city_path)
+
+        # Validate time
+        the_city_time = get_time(fname)
+        if the_city_time < MIN_TIME:
+            continue
 
         if prev_city is None:
             # First time, just yield
@@ -294,7 +302,7 @@ def base_method():
         # Tracker vars
 
         for city, d, fname in gen:
-            pass
+            continue
 
         break  # Debug only
 
@@ -393,8 +401,10 @@ def ai_weight_track():
             times.append(time)
             weights.append(city.AIWeights)
 
-        times = np.array(times)
-        x_times = (times - times[0]) / 60
+        x_times = np.array(times)
+        # x_times = (times - times[0]) # / 60
+        x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
+        mpl_times = matplotlib.dates.date2num(x_times_dt)
 
         weights = np.array(weights)
 
@@ -404,12 +414,19 @@ def ai_weight_track():
             sub = fig.add_subplot(5, 1, i + 1)
             sub.set_title(METRIC_NAMES[i])
             sub.set_ylim([0, 1])
-            sub.plot(x_times, col)
 
-        plt.subplots_adjust(left=0.05, bottom=0.05,
-                            right=0.95, top=0.9, wspace=1, hspace=0.5)
+            plt.xticks(rotation=25)
+            ax = plt.gca()
+            xfmt = matplotlib.dates.DateFormatter('%I:%M:%S %p')
+            ax.xaxis.set_major_formatter(xfmt)
+
+            sub.plot(mpl_times, col)
+
+        plt.subplots_adjust(left=0.05, bottom=0.1,
+                            right=0.95, top=0.9, wspace=1, hspace=0.7)
         fig.suptitle("Test = {}. AI Weights vs time (minutes).".format(
             test_string), fontsize=15)
+        # plt.show()
         plt.savefig('data_new/' + test_string + '_ai_weights.png')
 
         # break # Debug only
@@ -437,42 +454,53 @@ def scores():
             # scores.append(city.scores)
             scores.append([city.metrics[k]['metric'] * city.metrics[k]['weight']
                            for k in city.metrics])
+            # scores.append([city.metrics[k]['metric'] for k in city.metrics])
 
-        times = np.array(times)
-        x_times = (times - times[0]) / 60
-
-        scores = np.array(scores)
+        x_times = np.array(times)
+        x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
+        mpl_times = matplotlib.dates.date2num(x_times_dt)
 
         '''
-        scores_avg = groupedAvg(scores, N=2)
-        x_times_avg = groupedAvg(x_times, N=2)
+        scores = np.array(scores)
 
         fig = plt.figure(figsize=(10, 12))
-        for i, col in enumerate(scores_avg.T):
+        for i, col in enumerate(scores.T):
             # Plot this score column
             sub = fig.add_subplot(5, 1, i + 1)
             sub.set_title(METRIC_NAMES[i])
             sub.set_ylim([0, 1])
-            sub.plot(x_times_avg, col)
 
-        plt.subplots_adjust(left=0.05, bottom=0.05,
-                            right=0.95, top=0.92, wspace=1, hspace=0.3)
+            plt.xticks(rotation=25)
+            ax = plt.gca()
+            xfmt = matplotlib.dates.DateFormatter('%I:%M:%S %p')
+            ax.xaxis.set_major_formatter(xfmt)
+
+            sub.plot(mpl_times, col)
+
+        plt.subplots_adjust(left=0.05, bottom=0.1,
+                            right=0.95, top=0.92, wspace=1, hspace=0.7)
         fig.suptitle("Test = {}. Individual scores vs time (minutes).".format(
             test_string), fontsize=15)
         plt.savefig('data_new/' + test_string + '_indi_scores_yes_weight.png')
+
+        # scores_avg = scores  # groupedAvg(scores, N=2)
+        # x_times_avg = x_times  # groupedAvg(x_times, N=2)
         '''
 
-        scores_avg = groupedAvg(scores, N=2)
-        x_times_avg = groupedAvg(x_times, N=2)
-
-        scores_avg_total = np.sum(scores_avg, axis=1)
+        scores_avg_total = np.sum(scores, axis=1)
         plt.figure(figsize=(10, 8))
-        plt.plot(x_times_avg, scores_avg_total)
-        plt.ylim([0, 1])
+        plt.plot(mpl_times, scores_avg_total)
+        plt.ylim([0, 1.5])
         plt.title("Test = {}. Total city score vs time (minutes).".format(
             test_string), fontsize=15)
-        plt.subplots_adjust(left=0.05, bottom=0.05,
+        plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.92, wspace=1, hspace=0.3)
+
+        plt.xticks(rotation=25)
+        ax = plt.gca()
+        xfmt = matplotlib.dates.DateFormatter('%I:%M:%S %p')
+        ax.xaxis.set_major_formatter(xfmt)
+
         plt.savefig('data_new/' + test_string + '_total_score.png')
 
         # break # Debug only
@@ -493,14 +521,19 @@ def ai_acceptance():
         prev = None
         move_set = []
         move_indicator = []
+        df = pd.DataFrame()
 
         for city, d, fname in gen:
-            time = get_time(fname)
-            times.append(time)
+            the_time = get_time(fname)
+            if the_time < 1499543294:  # Custom check
+                continue
+            times.append(the_time)
 
             if prev is None:
                 prev = city
                 move_indicator.append(0)
+                data = dict(time=str(the_time), indicator='0')
+                df = df.append(pd.Series(data), ignore_index=True)
 
             else:
                 move = city.get_move(prev)
@@ -513,12 +546,22 @@ def ai_acceptance():
                 if move not in move_set:
                     move_set.append(move)
                     move_indicator.append(0)
+                    data = dict(time=str(the_time), indicator='0')
+                    df = df.append(pd.Series(data), ignore_index=True)
 
                 else:
                     move_indicator.append(1)
+                    data = dict(time=str(the_time), indicator='1')
+                    df = df.append(pd.Series(data), ignore_index=True)
 
-        times = np.array(times)
-        x_times = (times - times[0]) / 60
+        # Save CSV
+        # df.to_csv(os.path.join(BASE_DIR, os.pardir, 'ryan_alex_accept.csv'))
+
+        # sys.exit(1)
+
+        x_times = np.array(times)
+        x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
+        mpl_times = matplotlib.dates.date2num(x_times_dt)
 
         move_indicator = np.array(move_indicator)
 
@@ -535,15 +578,82 @@ def ai_acceptance():
 
         # Plot it
         plt.figure(figsize=(10, 8))
-        plt.plot(x_times, all_sums)
+        plt.plot(mpl_times, all_sums)
         plt.ylim([0, 1.1])
         plt.title("Test = {}. AI acceptance rate vs time (minutes).".format(
             test_string), fontsize=15)
-        plt.subplots_adjust(left=0.05, bottom=0.05,
+        plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.92, wspace=1, hspace=0.3)
+
+        plt.xticks(rotation=25)
+        ax = plt.gca()
+        xfmt = matplotlib.dates.DateFormatter('%I:%M:%S %p')
+        ax.xaxis.set_major_formatter(xfmt)
+
+        # plt.show()
+        # sys.exit(1)
         plt.savefig('data_new/' + test_string + '_ai_acceptance.png')
 
         # break # Debug only
+
+
+def ai_step():
+    # Outer vars
+
+    # Iterate over the tests
+    for i, test in enumerate(glob.glob(BASE_DIR + '*')):
+        test_string = test.replace(BASE_DIR, '').replace('/', '|')
+        print("Working on test = {}...".format(test))
+        # Create gen
+        gen = unique_city_generator(test + '/')
+
+        # Tracker vars
+        times = []
+        steps = []
+
+        for city, d, fname in gen:
+            time = get_time(fname)
+            if time < 1499541483:
+                continue
+
+            times.append(datetime.datetime.fromtimestamp(time))
+            steps.append(city.AIStep)
+
+        time_nums = matplotlib.dates.date2num(times)
+
+        plt.subplots_adjust(bottom=0.2)
+        plt.xticks(rotation=25)
+        ax = plt.gca()
+        xfmt = matplotlib.dates.DateFormatter('%Y-%m-%d %H:%M:%S')
+        ax.xaxis.set_major_formatter(xfmt)
+        plt.plot(time_nums, steps)
+        plt.show()
+
+        break  # Debug only
+
+
+def id_dist():
+    # Outer vars
+
+    # Iterate over the tests
+    for i, test in enumerate(glob.glob(BASE_DIR + '*')):
+        test_string = test.replace(BASE_DIR, '').replace('/', '|')
+        print("Working on test = {}...".format(test))
+        # Create gen
+        gen = unique_city_generator(test + '/')
+
+        # Tracker vars
+        times = []
+
+        for city, d, fname in gen:
+            the_time = get_time(fname)
+            times.append(the_time)
+            type_array = [cell.type_id for cell in city.cells.values()]
+            vals, counts = np.unique(type_array, return_counts=True)
+            print(counts, vals)
+            sys.exit(1)
+
+        break  # Debug only
 
 
 if __name__ == '__main__':
@@ -555,6 +665,9 @@ if __name__ == '__main__':
     # get_density_info()
     # ai_weight_track()
     # scores()
-    ai_acceptance()
+    # ai_acceptance()
+    # base_method()
+    # ai_step()
+    id_dist()
 
     print("Process complete. Took {} seconds.".format(time.time() - start))
