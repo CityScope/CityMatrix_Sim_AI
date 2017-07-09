@@ -13,7 +13,9 @@ Author: Alex Aubuchon, Kevin Lyons
 import socket
 import json
 import logging
-from utils import *
+
+from cityiograph import City
+
 log = logging.getLogger('__main__')
 
 # Default values
