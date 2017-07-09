@@ -26,19 +26,19 @@ Here are the exact move type counts and corresponding percentages. [(back to top
 
 For **DENSITY** changes, this is the distribution of the density array index where it acts. [(back to top)](#quick-links)
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_density_indices.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_density_indices.png)
 
 ## Density Move Values
 
 And here are the values that the AI tends to suggest. [(back to top)](#quick-links)
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_density_values.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_density_values.png)
 
 ## AI Weights
 
 We can take a look at the user's AI weighting values over time. [(back to top)](#quick-links)
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_ai_weights.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_weights.png)
 
 ## Individual City Scores
 
@@ -46,17 +46,17 @@ Now, we can take a look at each score value over time. Here, I average over ever
 
 **No weights, just** `metric` **value from** `city.metrics` `dict` **.**
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_indi_scores_no_weight.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_indi_scores_no_weight.png)
 
 **Now, including weights.**
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_indi_scores_yes_weight.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_indi_scores_yes_weight.png)
 
 ## Total City Scores
 
 Now, let's take a look at the **total score value for the city** over time. Again, I average over every *N = 2* data points to smooth out our score data. [(back to top)](#quick-links)
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_total_score.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_total_score.png)
 
 ## AI Acceptance Rate
 
@@ -76,4 +76,4 @@ So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* 
 
 where *M[i]* = 1 if the user accepts the AI at time *i*, else 0.
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted cities_ai_acceptance.png)
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_acceptance.png)
