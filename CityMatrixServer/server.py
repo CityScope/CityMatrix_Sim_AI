@@ -1,16 +1,8 @@
-'''
-Filename: server.py
-Author: kalyons11 <mailto:kalyons@mit.edu>
-Created: 2017-06-01 21:27:53
-Last modified by: kalyons11
-Description:
-    - Our complete CityMatrixServer controller. Accepts incoming cities, runs ML + AI work, and
-        provides output to Grasshopper.
-TODO:
-    - None at this time.
-'''
+"""
+Our complete CityMatrixServer controller.
 
-''' --- IMPORTS --- '''
+Accepts incoming cities, runs ML + AI work, and provides output to Grasshopper.
+"""
 
 import sys
 import logging
@@ -18,13 +10,12 @@ import logging
 import atexit
 
 sys.path.extend(['../global/', '../CityPrediction/', '../CityMAItrix/'])
+import config
 from utils import *
 import city_udp
 import predictor as ML
 from strategies import random_single_moves as Strategy
 from objective import objective
-
-''' --- CONFIGURATIONS --- '''
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2:
