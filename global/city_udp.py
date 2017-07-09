@@ -10,13 +10,11 @@ Sends cities as byte-encoded strings.
 Author: Alex Aubuchon, Kevin Lyons
 """
 
-''' --- IMPORTS --- '''
-
-import socket, json, sys, logging
+import socket
+import json
+import logging
 from utils import *
 log = logging.getLogger('__main__')
-
-''' --- CONFIGURATIONS --- '''
 
 # Default values
 DEFAULT_SEND_IP = "127.0.0.1"
@@ -27,9 +25,10 @@ DEFAULT_BUFFER_SIZE = 1024 * 128 * 64
 
 ''' --- CLASS DEFINITIONS --- '''
 
+
 class City_UDP(socket.socket):
     """Our general, abstracted city UDP server class.
-    
+
     Attributes:
         buffer_size (int): -
         name (string): descriptor
@@ -38,9 +37,10 @@ class City_UDP(socket.socket):
         send_ip (str): -
         send_port (str): -
     """
-    def __init__(self, name, send_ip=DEFAULT_SEND_IP, send_port=DEFAULT_SEND_PORT, \
-                 receive_ip=DEFAULT_RECEIVE_IP, \
-                 receive_port=DEFAULT_RECEIVE_PORT, \
+
+    def __init__(self, name, send_ip=DEFAULT_SEND_IP, send_port=DEFAULT_SEND_PORT,
+                 receive_ip=DEFAULT_RECEIVE_IP,
+                 receive_port=DEFAULT_RECEIVE_PORT,
                  buffer_size=DEFAULT_BUFFER_SIZE):
         self.name = name
         self.send_ip = send_ip
@@ -53,7 +53,7 @@ class City_UDP(socket.socket):
 
     def send_city(self, city):
         """Send a city to another client as JSON.
-        
+
         Args:
             city (cityiograph.City): -
         """
@@ -63,7 +63,7 @@ class City_UDP(socket.socket):
 
     def send_data(self, data):
         """Send a generic data dictionary to another client as JSON.
-        
+
         Args:
             data (dict): some data mapping
         """
@@ -72,27 +72,29 @@ class City_UDP(socket.socket):
 
     def receive_city(self):
         """Receive city object from a client.
-        
+
         Returns:
             cityiograph.City: result city object
         """
-        try: data, addr = self.recvfrom(self.buffer_size)
+        try:
+            data, addr = self.recvfrom(self.buffer_size)
         except Exception as e:
             if type(e) == KeyboardInterrupt:
-                pass # Handle manual server stop case
+                pass  # Handle manual server stop case
             else:
                 log.exception("Error receiving data from socket.")
                 return None
         else:
             json_string = data.decode("utf-8")
-            try: return City(json_string)
-            except:
+            try:
+                return City(json_string)
+            except Exception:
                 log.exception("Invalid city JSON received.")
                 return None
-        
+
     def receive_data(self):
         """Receive a generic data dictionary from another client as JSON.
-        
+
         Returns:
             dict: some data mapping
         """
@@ -100,6 +102,6 @@ class City_UDP(socket.socket):
         json_string = data.decode("utf-8")
         try:
             return json.loads(json_string)
-        except:
+        except Exception:
             log.exception("Invalid JSON object received.")
             return None
