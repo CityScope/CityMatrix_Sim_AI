@@ -1,0 +1,2603 @@
+{
+	"grid": [{
+		"type": -1,
+		"x": 0,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1389
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1358
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1381
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1402
+		}
+	}, {
+		"type": -1,
+		"x": 4,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1372
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1371
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1384
+		}
+	}, {
+		"type": -1,
+		"x": 7,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1378
+		}
+	}, {
+		"type": -1,
+		"x": 9,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1393
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1384
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1359
+		}
+	}, {
+		"type": -1,
+		"x": 12,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1370
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1368
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 0,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1386
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1366
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1395
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1407
+		}
+	}, {
+		"type": -1,
+		"x": 4,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1378
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1373
+		}
+	}, {
+		"type": -1,
+		"x": 7,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1357
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1340
+		}
+	}, {
+		"type": -1,
+		"x": 9,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1354
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1349
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1349
+		}
+	}, {
+		"type": -1,
+		"x": 12,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1355
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1371
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1375
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 1,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1387
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1395
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1396
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1375
+		}
+	}, {
+		"type": -1,
+		"x": 4,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1353
+		}
+	}, {
+		"type": -1,
+		"x": 7,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1340
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1297
+		}
+	}, {
+		"type": -1,
+		"x": 9,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1258
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1233
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1244
+		}
+	}, {
+		"type": -1,
+		"x": 12,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1264
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1327
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1357
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 2,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1355
+		}
+	}, {
+		"type": 6,
+		"x": 0,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1413
+		}
+	}, {
+		"type": 6,
+		"x": 1,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": 6,
+		"x": 2,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1371
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1341
+		}
+	}, {
+		"type": 6,
+		"x": 4,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1127
+		}
+	}, {
+		"type": 6,
+		"x": 5,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1105
+		}
+	}, {
+		"type": 6,
+		"x": 6,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1079
+		}
+	}, {
+		"type": 6,
+		"x": 7,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1087
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1151
+		}
+	}, {
+		"type": 6,
+		"x": 9,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 842
+		}
+	}, {
+		"type": 6,
+		"x": 10,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 765
+		}
+	}, {
+		"type": 6,
+		"x": 11,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 764
+		}
+	}, {
+		"type": 6,
+		"x": 12,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 878
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1208
+		}
+	}, {
+		"type": 6,
+		"x": 14,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1356
+		}
+	}, {
+		"type": 6,
+		"x": 15,
+		"y": 3,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1339
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1388
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1352
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1363
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1250
+		}
+	}, {
+		"type": 0,
+		"x": 4,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": 0,
+		"x": 5,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": 0,
+		"x": 6,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1370
+		}
+	}, {
+		"type": 0,
+		"x": 7,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1350
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 922
+		}
+	}, {
+		"type": 1,
+		"x": 9,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1343
+		}
+	}, {
+		"type": 1,
+		"x": 10,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1386
+		}
+	}, {
+		"type": 1,
+		"x": 11,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1387
+		}
+	}, {
+		"type": 2,
+		"x": 12,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1119
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1295
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 4,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1331
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1382
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1376
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1365
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1248
+		}
+	}, {
+		"type": 0,
+		"x": 4,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1395
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1231
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1265
+		}
+	}, {
+		"type": 0,
+		"x": 7,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1330
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 907
+		}
+	}, {
+		"type": 1,
+		"x": 9,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1376
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 875
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 882
+		}
+	}, {
+		"type": 2,
+		"x": 12,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1374
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1118
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1284
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 5,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1347
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1397
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1354
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1293
+		}
+	}, {
+		"type": 0,
+		"x": 4,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1352
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 982
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 948
+		}
+	}, {
+		"type": 0,
+		"x": 7,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1355
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 916
+		}
+	}, {
+		"type": 1,
+		"x": 9,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1386
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 520
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 535
+		}
+	}, {
+		"type": 2,
+		"x": 12,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1373
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1134
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1345
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 6,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1358
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1380
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1377
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1296
+		}
+	}, {
+		"type": 0,
+		"x": 4,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1355
+		}
+	}, {
+		"type": 0,
+		"x": 5,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1378
+		}
+	}, {
+		"type": 0,
+		"x": 6,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1402
+		}
+	}, {
+		"type": 0,
+		"x": 7,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1023
+		}
+	}, {
+		"type": 1,
+		"x": 9,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1362
+		}
+	}, {
+		"type": 1,
+		"x": 10,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1391
+		}
+	}, {
+		"type": 1,
+		"x": 11,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1401
+		}
+	}, {
+		"type": 2,
+		"x": 12,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1380
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1176
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1343
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 7,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1340
+		}
+	}, {
+		"type": 6,
+		"x": 0,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": 6,
+		"x": 1,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": 6,
+		"x": 2,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1358
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1358
+		}
+	}, {
+		"type": 6,
+		"x": 4,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1331
+		}
+	}, {
+		"type": 6,
+		"x": 5,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1250
+		}
+	}, {
+		"type": 6,
+		"x": 6,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1245
+		}
+	}, {
+		"type": 6,
+		"x": 7,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1245
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1339
+		}
+	}, {
+		"type": 6,
+		"x": 9,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1018
+		}
+	}, {
+		"type": 6,
+		"x": 10,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 949
+		}
+	}, {
+		"type": 6,
+		"x": 11,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 949
+		}
+	}, {
+		"type": 6,
+		"x": 12,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1015
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1300
+		}
+	}, {
+		"type": 6,
+		"x": 14,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1353
+		}
+	}, {
+		"type": 6,
+		"x": 15,
+		"y": 8,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1350
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1354
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1359
+		}
+	}, {
+		"type": 3,
+		"x": 4,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1391
+		}
+	}, {
+		"type": 3,
+		"x": 5,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1375
+		}
+	}, {
+		"type": 3,
+		"x": 6,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1365
+		}
+	}, {
+		"type": 3,
+		"x": 7,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1353
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1150
+		}
+	}, {
+		"type": 4,
+		"x": 9,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1383
+		}
+	}, {
+		"type": 4,
+		"x": 10,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1387
+		}
+	}, {
+		"type": 4,
+		"x": 11,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1403
+		}
+	}, {
+		"type": 5,
+		"x": 12,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1394
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1200
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1358
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 9,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1372
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1360
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1376
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1345
+		}
+	}, {
+		"type": 3,
+		"x": 4,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1380
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1326
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": 3,
+		"x": 7,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1332
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1099
+		}
+	}, {
+		"type": 4,
+		"x": 9,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1115
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1122
+		}
+	}, {
+		"type": 5,
+		"x": 12,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1368
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1195
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1338
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 10,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1354
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1374
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1344
+		}
+	}, {
+		"type": 3,
+		"x": 4,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1356
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1199
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1241
+		}
+	}, {
+		"type": 3,
+		"x": 7,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1372
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1100
+		}
+	}, {
+		"type": 4,
+		"x": 9,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1377
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 761
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 767
+		}
+	}, {
+		"type": 5,
+		"x": 12,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1377
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1172
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1333
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 11,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1388
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1368
+		}
+	}, {
+		"type": 3,
+		"x": 4,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1371
+		}
+	}, {
+		"type": 3,
+		"x": 5,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1372
+		}
+	}, {
+		"type": 3,
+		"x": 6,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1383
+		}
+	}, {
+		"type": 3,
+		"x": 7,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1172
+		}
+	}, {
+		"type": 4,
+		"x": 9,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1354
+		}
+	}, {
+		"type": 4,
+		"x": 10,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": 4,
+		"x": 11,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": 5,
+		"x": 12,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1372
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1216
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1348
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 12,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1389
+		}
+	}, {
+		"type": 6,
+		"x": 0,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1403
+		}
+	}, {
+		"type": 6,
+		"x": 1,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1378
+		}
+	}, {
+		"type": 6,
+		"x": 2,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1363
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1395
+		}
+	}, {
+		"type": 6,
+		"x": 4,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": 6,
+		"x": 5,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1415
+		}
+	}, {
+		"type": 6,
+		"x": 6,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1407
+		}
+	}, {
+		"type": 6,
+		"x": 7,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1404
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1361
+		}
+	}, {
+		"type": 6,
+		"x": 9,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1397
+		}
+	}, {
+		"type": 6,
+		"x": 10,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1441
+		}
+	}, {
+		"type": 6,
+		"x": 11,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1421
+		}
+	}, {
+		"type": 6,
+		"x": 12,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1415
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1370
+		}
+	}, {
+		"type": 6,
+		"x": 14,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": 6,
+		"x": 15,
+		"y": 13,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1388
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1374
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1367
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1366
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1390
+		}
+	}, {
+		"type": -1,
+		"x": 4,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1394
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1381
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1359
+		}
+	}, {
+		"type": -1,
+		"x": 7,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1374
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1369
+		}
+	}, {
+		"type": -1,
+		"x": 9,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1392
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1381
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1392
+		}
+	}, {
+		"type": -1,
+		"x": 12,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1370
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1379
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1404
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 14,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1389
+		}
+	}, {
+		"type": -1,
+		"x": 0,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1359
+		}
+	}, {
+		"type": -1,
+		"x": 1,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1364
+		}
+	}, {
+		"type": -1,
+		"x": 2,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1394
+		}
+	}, {
+		"type": 6,
+		"x": 3,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1401
+		}
+	}, {
+		"type": -1,
+		"x": 4,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1385
+		}
+	}, {
+		"type": -1,
+		"x": 5,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1363
+		}
+	}, {
+		"type": -1,
+		"x": 6,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1353
+		}
+	}, {
+		"type": -1,
+		"x": 7,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1381
+		}
+	}, {
+		"type": 6,
+		"x": 8,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1406
+		}
+	}, {
+		"type": -1,
+		"x": 9,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1391
+		}
+	}, {
+		"type": -1,
+		"x": 10,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1396
+		}
+	}, {
+		"type": -1,
+		"x": 11,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1403
+		}
+	}, {
+		"type": -1,
+		"x": 12,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1390
+		}
+	}, {
+		"type": 6,
+		"x": 13,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1394
+		}
+	}, {
+		"type": -1,
+		"x": 14,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1413
+		}
+	}, {
+		"type": -1,
+		"x": 15,
+		"y": 15,
+		"rot": 0,
+		"data": {
+			"traffic": 0,
+			"wait": 0,
+			"solar": 1396
+		}
+	}],
+	"objects": {
+		"slider1": 0.0,
+		"slider2": 0.02,
+		"toggle1": 0,
+		"dockID": -1,
+		"dockRotation": 0,
+		"densities": [10, 25, 25, 5, 15, 15],
+		"AIStep": 20,
+		"startFlag": 0,
+		"AIWeights": [0.2, 0.2, 0.2, 0.2, 0.2],
+		"IDMax": 15,
+		"pop_young": 0,
+		"pop_mid": 0,
+		"pop_old": 0,
+		"AIMov": ["CELL", 0, 0, 0],
+		"animBlink": 0,
+		"score": 0.0,
+		"metrics": {
+			"density": {
+				"weight": 0.2,
+				"metric": 0.0
+			},
+			"diversity": {
+				"weight": 0.2,
+				"metric": 0.0
+			},
+			"energy": {
+				"weight": 0.2,
+				"metric": 0.0
+			},
+			"traffic": {
+				"weight": 0.2,
+				"metric": 0.0
+			},
+			"solar": {
+				"weight": 0.2,
+				"metric": 0.0
+			}
+		}
+	}
+}
