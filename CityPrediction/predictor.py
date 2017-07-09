@@ -10,24 +10,28 @@ TODO:
     - None at this time.
 '''
 
-import sys, numpy as np
-np.set_printoptions(threshold = np.nan)
+import sys
+
+import numpy as np
+np.set_printoptions(threshold=np.nan)
 sys.path.extend(['../global/'])
-import config
+
 from utils import *
-import solar_regression as solar
+from cityiograph import get_features
+
 log = logging.getLogger('__main__')
 
 # Load traffic model file
-traffic_model = pickle.load(open(LINEAR_MODEL_FILENAME, 'rb'))
-solar_model = pickle.load(open(SOLAR_MODEL_FILENAME, 'rb'))
+traffic_model = pickle.load(open(config.LINEAR_MODEL_FILENAME, 'rb'))
+solar_model = pickle.load(open(config.SOLAR_MODEL_FILENAME, 'rb'))
+
 
 def predict(input_city):
     '''Generic traffic/solar predictor.
-    
+
     Args:
         input_city (cityiograph.City): -
-    
+
     Returns:
         cityiograph.City: new city instance with traffic ML prediction scores applied
     '''
@@ -39,19 +43,21 @@ def predict(input_city):
     traffic_features = get_features(input_city, 'traffic')
 
     # Make traffic prediction using linear model
-    traffic_output = traffic_model.predict([ traffic_features ])[0] # Type = np array (512, )
+    traffic_output = traffic_model.predict([traffic_features])[
+        0]  # Type = np array (512, )
 
     # Write prediction back to the cityiograph.City structure
-    output_city.update_values(data_array = traffic_output, mode = 'traffic')
+    output_city.update_values(data_array=traffic_output, mode='traffic')
 
     # Now, let's run solar
     # Extract feature matrix from this city
     solar_features = get_features(input_city, 'solar')
 
     # Make solar prediction using linear model
-    solar_output = solar_model.predict([ solar_features ])[0] # Type = np array (256, )
+    solar_output = solar_model.predict([solar_features])[
+        0]  # Type = np array (256, )
 
     # Write prediction back to the cityiograph.City structure
-    output_city.update_values(data_array = solar_output, mode = 'solar')
+    output_city.update_values(data_array=solar_output, mode='solar')
 
     return output_city
