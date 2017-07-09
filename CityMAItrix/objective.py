@@ -1,10 +1,13 @@
+from metrics import citymatrix_stats as Metrics
+
+
 class ObjectiveFunction(object):
     def __init__(self):
         self.metrics = []
 
     def evaluate(self, city):
         outputs = [weight * fun(city) for name, fun, weight in self.metrics]
-        return [sum(outputs),outputs]
+        return [sum(outputs), outputs]
 
     def get_metrics(self, city):
         self.update_weights(city.AIWeights)
@@ -12,14 +15,13 @@ class ObjectiveFunction(object):
 
     def add_metric(self, name, metric, weight):
         self.metrics.append((name, metric, weight))
-        
-    #RZ 170615 update AIWeights before search
+
+    # RZ 170615 update AIWeights before search
     def update_weights(self, weights):
         for i in range(5):
             self.metrics[i] = self.metrics[i][:2] + (weights[i],)
         # print("updated self.metrics: {}".format(self.metrics))
 
-from metrics import citymatrix_stats as Metrics
 
 objective = ObjectiveFunction()
 objective.add_metric("Density",
