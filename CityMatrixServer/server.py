@@ -16,6 +16,7 @@ import city_udp
 import predictor as ML
 from strategies import random_single_moves as Strategy
 from objective import objective
+from cityiograph import *
 
 # Check input parameters for AUTO_RESTART value
 if len(sys.argv) == 2:
