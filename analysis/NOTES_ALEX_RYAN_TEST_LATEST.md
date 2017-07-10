@@ -18,18 +18,18 @@ Here, we seek to analyze some key data metrics from our CityMAItrix Assistant. U
 
 Here is some key information about this round of data analysis for clarity purposes.
 
-1. The data starts at epoch time `1499541483`, which corresponds to **Saturday, July 8, 2017 3:18:03 PM**.
+1. The data starts at epoch time `1499541716`, which corresponds to **Saturday, July 8, 2017 3:21:56 PM**.
 2. We now include the `ai` or `predict` key from the JSON data, whichever is available. (I look for `ai` first, then `predict` if needed.)
-3. For AI Acceptance, we only consider cases where `city.AIStep` is `20`. You will notice that change toward the end of this document. This is only for times > 3:48 PM, or > epoch `1499543294`.
-4. I removed the `N = 2` graph score smoothing here.
+3. For AI Acceptance, we only consider cases where `city.AIStep` is `20` **AND** we have access to the `ai` city key in the JSON. You will notice that change toward the end of this document. Note: This is only **defined** for times > Saturday, July 8, 2017 3:48:14 PM, or > epoch `1499543294`. It is 0 until that point.
+4. I removed the `N = 2` graph score smoothing here - no longer needed.
 
 ## AI Move Type Choice
 
 Here are the exact move type counts and corresponding percentages. [(back to top)](#quick-links)
 
-- Total Cities = 233
-- CELL = 171 = 73.4 % 
-- DENSITY = 62 = 26.6 %
+- Total Cities = 227
+- CELL = 168 = 74 % 
+- DENSITY = 59 = 26 %
 
 ## Density Move Index
 
@@ -73,7 +73,7 @@ Here, we look at the **AI acceptance rate**. We consider the AI move to be **acc
 
 For a `'DENSITY'` type move, we only look at the index in the density array, not the actual value. This deals with small errors on the toggle.
 
-We use a `MOVE_THRESHOLD = 3` to deal with the cities that are sent in between moves by the GH client.
+We use a `MOVE_THRESHOLD` to deal with the cities that are sent in between moves by the GH client.
 
 We bucket the rates into `BIN_SIZE = 5` groups to look at the rates over time.
 
@@ -85,12 +85,16 @@ So, we define the acceptance rate *R* over a time range *[a, b]*, where *b - a* 
 
 where *M[i]* = 1 if the user accepts the AI at time *i*, else 0.
 
-![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_acceptance.png)
+**`MOVE_THRESHOLD = 3`**
+
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_acceptance_3.png)
+
+**`MOVE_THRESHOLD = 5`**
+
+![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_ai_acceptance_5.png)
 
 ## Density ID Distribution
 
 Here is the block count of each cell ID type over time.
-
-Still to come...
 
 ![Alt](data_new/log_170708_self-test_001_Alex_predicted_cities_id_dist.png)

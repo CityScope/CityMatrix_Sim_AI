@@ -22,16 +22,20 @@ import cityiograph
 BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/current/'
 CITY_SIZE = 16
 METRIC_NAMES = ["Density", "Diversity", "Energy", "Traffic", "Solar"]
-MOVE_THRESHOLD = 3
+MOVE_THRESHOLD = 5
 BIN_SIZE = 5
-MIN_TIME = 1499541483
+MIN_TIME = 1499541716
+MIN_AI_TIME = 1499543294
 
 
-def unique_city_generator(city_directory):
+def unique_city_generator(city_directory, ai_only=False):
     """Generator instance to give us cities that are different based on equals().
-        Args:
+
+    Args:
         city_directory (str): directory (relative or absolute) with
             .json city *output* files
+        ai_only (bool, optional): used for AI acceptance - if we only want the
+            AI city option
 
     Yields:
         3-tuple: unique City instance that can be used for analysis
@@ -46,6 +50,13 @@ def unique_city_generator(city_directory):
 
     for city_path in tqdm(files):
         total_count += 1
+        fname = os.path.basename(city_path)
+
+        # Validate time
+        the_city_time = get_time(fname)
+        if the_city_time < MIN_TIME:
+            continue
+
         # Read file
         with open(city_path, 'r') as f:
             full_json_string = f.read()
@@ -54,15 +65,14 @@ def unique_city_generator(city_directory):
         d = json.loads(full_json_string)['ai']
         if d is None:
             # null AI -> use predict instead
-            d = json.loads(full_json_string)['predict']
+            if not ai_only:
+                d = json.loads(full_json_string)['predict']
+            else:
+                # Just ignore
+                yield None, None, fname
+                continue
         j_string = json.dumps(d)
         current_city = cityiograph.City(j_string)
-        fname = os.path.basename(city_path)
-
-        # Validate time
-        the_city_time = get_time(fname)
-        if the_city_time < MIN_TIME:
-            continue
 
         if prev_city is None:
             # First time, just yield
@@ -100,193 +110,10 @@ def get_time(filename):
     return int(final)
 
 
-def groupedAvg(myArray, N=2):
+def grouped_average(myArray, N=2):
     result = np.cumsum(myArray, 0)[N - 1::N] / float(N)
     result[1:] = result[1:] - result[:-1]
     return result
-
-
-def ai_move_analysis():
-    """Looking the city's AI params.
-    """
-    # Iterate over the tests
-    for test in glob.glob(BASE_DIR + '*'):
-        print("Working on test = {}...".format(test))
-        # Create gen
-        gen = unique_city_generator(test + '/')
-
-        # Keep track of weights
-        # weights = []
-        # total_scores = []
-        # metric_names = ["Density", "Diversity", "Energy", "Traffic", "Solar"]
-        # df = pd.DataFrame(columns = metric_names)
-        prev_move_suggested = None
-        prev_city = None
-        rates = []
-        accept_count = 0
-        idx = 0
-
-        while True:
-            try:
-                city, d = next(gen)
-
-                if prev_city is None:
-                    # First time - just update value
-                    prev_city = city
-                    # prev_move = tuple(city.AIMov)[: -1]
-
-                else:
-                    # Get the difference between this one and prev
-                    this_move = city.get_move(prev_city)
-
-                    if this_move == prev_move_suggested:
-                        # We have an acceptance!
-                        # print("omg")
-                        accept_count += 1
-
-                    else:
-                        # Nope
-                        # print("AI suggested = {}. User did = {}."
-                        #    .format(prev_move_suggested, this_move))
-                        pass
-
-                    # Add to y array
-                    new_rate = float(accept_count) / idx * 100
-                    rates.append(new_rate)
-
-                    # Also, append this current move to the set
-                    prev_move_suggested = tuple(city.AIMov)[: -1]
-
-                    # Update prev instance
-                    prev_city = city
-
-                # total_scores.append(sum(city.scores))
-                # Get dict of scores
-                # city_metrics = d["objects"]["metrics"]
-                # metrics_dict = { k : city_metrics[k][0] * city_metrics[k][1]
-                #    for k in city_metrics }
-                # df = df.append(pd.Series(metrics_dict), ignore_index = True)
-
-                idx += 1
-
-            except StopIteration:
-                break
-
-        # Plot the rates
-        plt.figure(figsize=(12, 8))
-        plt.title(test.replace(BASE_DIR, ''), fontsize=20)
-        plt.xlabel("City Time Instance")
-        plt.ylabel("Acceptance Rate (%)")
-        plt.ylim([0, 100])
-        plt.plot(rates)
-        plt.savefig('data/' + test.replace(BASE_DIR,
-                                           '').replace('/', '|') + '_ai_'
-                    'accept.png')
-
-        '''
-        # Plot the columns over time
-        plt.figure(figsize = (12, 8))
-        i = 1
-        for column in df:
-            plt.subplot(int('32' + str(i)))
-            df[column].plot()
-            plt.title(column)
-            i += 1
-
-        plt.tight_layout(pad=3)
-        plt.suptitle(test.replace(BASE_DIR, ''), fontsize = 20)
-        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_each_score.png')
-
-        # Plot scores
-        x = np.arange(len(total_scores))
-        plt.figure(figsize = (8, 8))
-        plt.plot(x, total_scores, lw = 3, color = 'green')
-        plt.title("sum(city.scores), {}".format(test.replace(BASE_DIR, '')))
-        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_total_scores.png')
-
-        # Convert to np
-        weights = np.array(weights)
-
-        # Plot columns
-        x = np.arange(weights.shape[0])
-        fig = plt.figure(figsize = (8, 12))
-        colormap = plt.cm.gist_ncar
-        colors = [ colormap(i) for i in np.linspace(0, 1, 5) ]
-
-        for i, col in enumerate(weights.T):
-            # Make plot
-            ax = fig.add_subplot(int('51' + str(i + 1)))
-            ax.plot(x, col, label = metric_names[i], lw = 1, marker = 'o', color = colors[i])
-
-        # Save
-        plt.savefig('data/' + test.replace(BASE_DIR, '').replace('/', '|') + '_ai_weights.png')
-        '''
-
-    '''
-    # Create generator object
-    gen = unique_city_generator()
-
-    # Keep track of AI moves
-    moves = []
-    density_indices = []
-    density_values = []
-    move_dict = defaultdict(int)
-    cell_types = []
-
-    while True:
-        try:
-            city = next(gen)
-            move_type = city.AIMov[0]
-            moves.append(move_type)
-            if move_type == 'DENSITY':
-                density_indices.append(city.AIMov[1])
-                density_values.append(city.AIMov[2])
-            elif move_type == 'CELL':
-                x, y = city.AIMov[1], city.AIMov[2]
-                move_dict[(x , y)] += 1
-                cell_types.append(city.AIMov[3])
-        except StopIteration:
-            break
-
-    # Analyze distribution
-    # unique, counts = np.unique(moves, return_counts = True)
-    # counts = counts / counts.sum()
-    # move_dict = dict(zip(unique, counts * 100))
-    # print(move_dict)
-
-    # Create histogram
-    # plt.hist(density_indices)
-    # plt.title("Density Index Changes")
-    # plt.xlabel("Index")
-    # plt.ylabel("Frequency in Data")
-    # plt.show()
-
-    # Create another hist
-    # plt.hist(density_values)
-    # plt.title("Density Values")
-    # plt.xlabel("Value")
-    # plt.ylabel("Frequency in Data")
-    # plt.show()
-
-    # Analyze move locations
-    # First, load into heatmap
-    # heatmap = np.zeros((CITY_SIZE, CITY_SIZE))
-    # for k, v in move_dict.items():
-    #   x, y = k
-    #   heatmap[y, x] = v
-
-    # Show the heatmap
-    # plt.imshow(heatmap, cmap = 'hot', interpolation = 'nearest')
-    # plt.title("AI Cell Change Location Heatmap", fontsize = 20)
-    # plt.show()
-
-    # Create hist for cell types
-    plt.hist(cell_types)
-    plt.title("Cell Type ID's")
-    plt.xlabel("Type ID")
-    plt.ylabel("Frequency in Data")
-    plt.show()
-    '''
 
 
 def base_method():
@@ -424,7 +251,7 @@ def ai_weight_track():
 
         plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.9, wspace=1, hspace=0.7)
-        fig.suptitle("Test = {}. AI Weights vs time (minutes).".format(
+        fig.suptitle("Test = {}. AI Weights vs time.".format(
             test_string), fontsize=15)
         # plt.show()
         plt.savefig('data_new/' + test_string + '_ai_weights.png')
@@ -460,9 +287,9 @@ def scores():
         x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
         mpl_times = matplotlib.dates.date2num(x_times_dt)
 
-        '''
         scores = np.array(scores)
 
+        '''
         fig = plt.figure(figsize=(10, 12))
         for i, col in enumerate(scores.T):
             # Plot this score column
@@ -479,19 +306,19 @@ def scores():
 
         plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.92, wspace=1, hspace=0.7)
-        fig.suptitle("Test = {}. Individual scores vs time (minutes).".format(
+        fig.suptitle("Test = {}. Individual scores vs time.".format(
             test_string), fontsize=15)
         plt.savefig('data_new/' + test_string + '_indi_scores_yes_weight.png')
-
-        # scores_avg = scores  # groupedAvg(scores, N=2)
-        # x_times_avg = x_times  # groupedAvg(x_times, N=2)
         '''
+
+        # scores_avg = scores  # grouped_average(scores, N=2)
+        # x_times_avg = x_times  # grouped_average(x_times, N=2)
 
         scores_avg_total = np.sum(scores, axis=1)
         plt.figure(figsize=(10, 8))
         plt.plot(mpl_times, scores_avg_total)
         plt.ylim([0, 1.5])
-        plt.title("Test = {}. Total city score vs time (minutes).".format(
+        plt.title("Test = {}. Total city score vs time.".format(
             test_string), fontsize=15)
         plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.92, wspace=1, hspace=0.3)
@@ -513,8 +340,9 @@ def ai_acceptance():
     for i, test in enumerate(glob.glob(BASE_DIR + '*')):
         test_string = test.replace(BASE_DIR, '').replace('/', '|')
         print("Working on test = {}...".format(test))
+
         # Create gen
-        gen = unique_city_generator(test + '/')
+        gen = unique_city_generator(test + '/', ai_only=True)
 
         # Tracker vars
         times = []
@@ -525,11 +353,15 @@ def ai_acceptance():
 
         for city, d, fname in gen:
             the_time = get_time(fname)
-            if the_time < 1499543294:  # Custom check
-                continue
             times.append(the_time)
 
-            if prev is None:
+            if city is None:  # no ai key here - 0 case
+                move_indicator.append(0)
+                data = dict(time=str(the_time), indicator='0')
+                df = df.append(pd.Series(data), ignore_index=True)
+                continue
+
+            elif prev is None or the_time < MIN_AI_TIME:
                 prev = city
                 move_indicator.append(0)
                 data = dict(time=str(the_time), indicator='0')
@@ -555,8 +387,11 @@ def ai_acceptance():
                     df = df.append(pd.Series(data), ignore_index=True)
 
         # Save CSV
-        # df.to_csv(os.path.join(BASE_DIR, os.pardir, 'ryan_alex_accept.csv'))
-
+        df.set_index(['time'], inplace=True)
+        print(df.head(), df.shape)
+        df.to_csv(os.path.join(BASE_DIR, os.pardir,
+                               'ryan_alex_accept_threshold={}.csv'
+                               .format(MOVE_THRESHOLD)))
         # sys.exit(1)
 
         x_times = np.array(times)
@@ -580,7 +415,7 @@ def ai_acceptance():
         plt.figure(figsize=(10, 8))
         plt.plot(mpl_times, all_sums)
         plt.ylim([0, 1.1])
-        plt.title("Test = {}. AI acceptance rate vs time (minutes).".format(
+        plt.title("Test = {}. AI acceptance rate vs time.".format(
             test_string), fontsize=15)
         plt.subplots_adjust(left=0.05, bottom=0.1,
                             right=0.95, top=0.92, wspace=1, hspace=0.3)
@@ -592,44 +427,9 @@ def ai_acceptance():
 
         # plt.show()
         # sys.exit(1)
-        plt.savefig('data_new/' + test_string + '_ai_acceptance.png')
+        plt.savefig('data_new/' + test_string + '_ai_acceptance_{}.png'.format(MOVE_THRESHOLD))
 
         # break # Debug only
-
-
-def ai_step():
-    # Outer vars
-
-    # Iterate over the tests
-    for i, test in enumerate(glob.glob(BASE_DIR + '*')):
-        test_string = test.replace(BASE_DIR, '').replace('/', '|')
-        print("Working on test = {}...".format(test))
-        # Create gen
-        gen = unique_city_generator(test + '/')
-
-        # Tracker vars
-        times = []
-        steps = []
-
-        for city, d, fname in gen:
-            time = get_time(fname)
-            if time < 1499541483:
-                continue
-
-            times.append(datetime.datetime.fromtimestamp(time))
-            steps.append(city.AIStep)
-
-        time_nums = matplotlib.dates.date2num(times)
-
-        plt.subplots_adjust(bottom=0.2)
-        plt.xticks(rotation=25)
-        ax = plt.gca()
-        xfmt = matplotlib.dates.DateFormatter('%Y-%m-%d %H:%M:%S')
-        ax.xaxis.set_major_formatter(xfmt)
-        plt.plot(time_nums, steps)
-        plt.show()
-
-        break  # Debug only
 
 
 def id_dist():
@@ -644,14 +444,44 @@ def id_dist():
 
         # Tracker vars
         times = []
+        id_list = list(range(-1, 7))
+        count_matrix = []
 
         for city, d, fname in gen:
             the_time = get_time(fname)
             times.append(the_time)
             type_array = [cell.type_id for cell in city.cells.values()]
             vals, counts = np.unique(type_array, return_counts=True)
-            print(counts, vals)
-            sys.exit(1)
+            count_matrix.append(counts)
+
+        count_matrix = np.array(count_matrix)
+        # print(count_matrix.shape)
+
+        x_times = np.array(times)
+        x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
+        mpl_times = matplotlib.dates.date2num(x_times_dt)
+
+        fig = plt.figure(figsize=(10, 22))
+        for i, col in enumerate(count_matrix.T):
+            # PLot the col
+            sub = fig.add_subplot(len(id_list), 1, i + 1)
+            sub.set_title("Cell count for ID = {} vs time."
+                          .format(id_list[i]))
+            # sub.set_ylim([0, 1])
+
+            plt.xticks(rotation=25)
+            ax = plt.gca()
+            xfmt = matplotlib.dates.DateFormatter('%I:%M:%S %p')
+            ax.xaxis.set_major_formatter(xfmt)
+
+            sub.plot(mpl_times, col)
+
+        plt.subplots_adjust(left=0.05, bottom=0.1,
+                            right=0.95, top=0.92, wspace=1, hspace=1)
+        fig.suptitle("Test = {}. Cell ID counts vs time.".format(
+            test_string), fontsize=15)
+        # plt.show()
+        plt.savefig('data_new/' + test_string + '_id_dist.png')
 
         break  # Debug only
 
@@ -667,7 +497,6 @@ if __name__ == '__main__':
     # scores()
     # ai_acceptance()
     # base_method()
-    # ai_step()
-    id_dist()
+    # id_dist()
 
     print("Process complete. Took {} seconds.".format(time.time() - start))
