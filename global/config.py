@@ -21,7 +21,7 @@ SEND_PORT = 7002
 
 UNITY_SERVER_NAME = 'UnityServer'
 UNITY_RECEIVE_PORT = 7009
-UNITY_SEND_PORT = 7001
+UNITY_SEND_PORT = 7003
 
 # If we want to ignore diff feature and always predict for debugging purposes
 FORCE_PREDICTION = False
