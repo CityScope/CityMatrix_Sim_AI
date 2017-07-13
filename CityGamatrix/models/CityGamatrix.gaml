@@ -29,7 +29,7 @@ global {
 	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 16;
-	string filename <- './../includes/general_input/city_great.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
+	string filename <- './../includes/general_input/SolarSimCity_11.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
 	bool first <- true;
 	bool gama_view<-false;
 	

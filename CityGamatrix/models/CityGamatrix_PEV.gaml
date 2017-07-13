@@ -58,7 +58,7 @@ global {
 	bool day_done <- false;
 	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
 	bool isBatch <- false;
-	string prefix <- 'city_great'; // Default option - configurable
+	string prefix <- 'SolarSimCity_11'; // Default option - configurable
    
 	init {
 		
@@ -77,7 +77,7 @@ global {
 		
 		box_size <- 1 # km / matrix_size;
 		
-		traffic <- 0 as_matrix({ matrix_size, matrix_size });
+		traffic <- 0.0 as_matrix({ matrix_size, matrix_size });
 		waiting <- 0.0 as_matrix({ matrix_size, matrix_size });
  		
 		do initGrid;
@@ -211,7 +211,7 @@ global {
 		// Add data dict with traffic and wait to each ROAD cell.
 		int a <- (matrix_size = 18) ? 1 : 0;
 		loop c over: cells where (each["type"] = 6) {
-			int x <- 15 - int(c["x"]) + a;
+			int x <- 16 - int(c["x"]) + a;
 			int y <- int(c["y"]) + a;
 			map<string, int> data;
 			data["traffic"] <- int(traffic[x, y]);
