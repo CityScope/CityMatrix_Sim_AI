@@ -33,7 +33,7 @@ def LUM(populations):
     probs = map(lambda x: (x / tot) * np.log10(x / tot) if x != 0 else 0, populations)
     return -sum(probs) / np.log10(len(populations))
 
-edp_min = 0.75
+edp_min = 0.25
 edp_max = 1.0 # need to determine this
 def pop_diversity_perf(city):
     pop_dict = id_pop_dict(city)
@@ -55,8 +55,8 @@ def energy_perf(city):
         tot += cell.density * floor_area * energy_per_sqm[cell.type_id]
     return normalize(tot, ep_min, ep_max)
 
-tp_min = 500
-tp_max = 1300 # need to determine this
+tp_min = 1000
+tp_max = 3000 # need to determine this
 def traffic_perf(city):
     #traffics = [cell.data["traffic"] for cell in city.cells.values()] #RZ 170703
     #RZ 170703
