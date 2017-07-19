@@ -152,7 +152,7 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Save result and send back to GH/Unity
-                if input_city.AIStep != 20:  # KL - accounting for AI step case
+                if input_city.AIStep < 20:  # KL - accounting for AI step case
                     result = {'predict': ml_city.to_dict(), 'ai': None}
                 else:
                     result = {'predict': ml_city.to_dict(),
