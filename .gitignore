@@ -16,3 +16,4 @@ output_cities/
 predicted_cities/
 sim_output/
 xml/
+runs/
