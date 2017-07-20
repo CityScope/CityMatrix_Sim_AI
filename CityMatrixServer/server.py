@@ -110,7 +110,7 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Save result and send back to GH/Unity
-                if input_city.AIStep != 20:  # KL - accounting for AI step case
+                if input_city.AIStep < 20:  # KL - accounting for AI step case
                     result = {'predict': ml_city.to_dict(), 'ai': None}
                 else:
                     result = {'predict': ml_city.to_dict(),
@@ -152,7 +152,7 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Save result and send back to GH/Unity
-                if input_city.AIStep != 20:  # KL - accounting for AI step case
+                if input_city.AIStep < 20:  # KL - accounting for AI step case
                     result = {'predict': ml_city.to_dict(), 'ai': None}
                 else:
                     result = {'predict': ml_city.to_dict(),
@@ -183,7 +183,7 @@ while True:
                 ai_city.updateMeta(input_city)
 
                 # Send resulting 2-city dictionary (predict/ai) back to GH
-                if input_city.AIStep != 20:  # KL - accounting for AI step case
+                if input_city.AIStep < 20:  # KL - accounting for AI step case
                     result = {'predict': ml_city.to_dict(), 'ai': None}
                 else:
                     result = {'predict': ml_city.to_dict(),
@@ -198,6 +198,7 @@ while True:
                     print("slider1: {}".format(ml_city.slider1))
                     print("slider2: {}".format(ml_city.slider2))
                     print("AIWeights: {}".format(ml_city.AIWeights))
+                    print("metrics: {}".format(ml_city.metrics))
                     print("startFlag: {}".format(ml_city.startFlag))
                     print("AIMov: {}".format(ml_city.AIMov))
                     print("animBlink: {}".format(ml_city.animBlink))
@@ -207,6 +208,7 @@ while True:
                     print("slider1: {}".format(ai_city.slider1))
                     print("slider2: {}".format(ai_city.slider2))
                     print("AIWeights: {}".format(ai_city.AIWeights))
+                    print("metrics: {}".format(ai_city.metrics))
                     print("startFlag: {}".format(ai_city.startFlag))
                     print("AIMov: {}".format(ai_city.AIMov))
                     print("animBlink: {}".format(ai_city.animBlink))
@@ -246,7 +248,7 @@ while True:
             ai_city.updateMeta(input_city)
 
             # Save result and send back to GH/Unity
-            if input_city.AIStep != 20:  # KL - accounting for AI step case
+            if input_city.AIStep < 20:  # KL - accounting for AI step case
                 result = {'predict': ml_city.to_dict(), 'ai': None}
             else:
                 result = {'predict': ml_city.to_dict(),
