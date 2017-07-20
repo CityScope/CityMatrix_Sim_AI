@@ -63,7 +63,7 @@ class City(object):
         self.AIMov = self.meta['AIMov']
         self.animBlink = self.meta['animBlink']
         self.startFlag = self.meta['startFlag']
-        self.score = self.meta['score']
+        # self.score = self.meta['score']
         self.dockID = self.meta['dockID']
         self.dockRotation = self.meta['dockRotation']
 
