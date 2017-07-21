@@ -33,7 +33,7 @@ def LUM(populations):
     probs = map(lambda x: (x / tot) * np.log10(x / tot) if x != 0 else 0, populations)
     return -sum(probs) / np.log10(len(populations))
 
-edp_min = 0.25
+edp_min = 0.65
 edp_max = 1.0 # need to determine this
 def pop_diversity_perf(city):
     pop_dict = id_pop_dict(city)
