@@ -18,8 +18,6 @@ from objective import objective
 
 log = logging.getLogger('__main__')
 
-''' --- CLASS DEFINITIONS --- '''
-
 
 class City(object):
     """General representation of a city matrix.
@@ -63,7 +61,7 @@ class City(object):
         self.AIMov = self.meta['AIMov']
         self.animBlink = self.meta['animBlink']
         self.startFlag = self.meta['startFlag']
-        # self.score = self.meta['score']
+        self.score = self.meta['score']
         self.dockID = self.meta['dockID']
         self.dockRotation = self.meta['dockRotation']
 
@@ -112,10 +110,10 @@ class City(object):
         self.meta["AIMov"] = self.AIMov  # RZ
         self.meta["animBlink"] = self.animBlink
         self.meta["startFlag"] = self.startFlag
-        # self.meta["score"] = self.score
+        self.meta["score"] = self.score
         self.meta["dockID"] = self.dockID
         self.meta["dockRotation"] = self.dockRotation
-        # self.meta["metrics"] = self.metrics
+        self.meta["metrics"] = self.metrics
 
         result = {
             "objects": self.meta,
