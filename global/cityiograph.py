@@ -18,8 +18,6 @@ from objective import objective
 
 log = logging.getLogger('__main__')
 
-''' --- CLASS DEFINITIONS --- '''
-
 
 class City(object):
     """General representation of a city matrix.
@@ -140,8 +138,7 @@ class City(object):
         self.dockRotation = other_city.dockRotation
         # self.densities = other_city.densities #RZ 170617 shouldn't pass densities, but handled by search()
         # self.AIMov = other_city.AIMov #RZ shouldn't pass from GH CV, but added by python server
-        # self.animBlink = other_city.animBlink #RZ this will be handled in
-        # server.py
+        # self.animBlink = other_city.animBlink #RZ this will be handled in server.py
 
     def to_json(self):
         """Converts the current city object to a JSON string.
@@ -237,6 +234,7 @@ class City(object):
 
         Args:
             data_array (nparray (self.width * self.height * 2, )): traffic/wait array
+                OR (nparray (self, width * self.height, )): solar array
             mode (str): describes the type of data copying we are looking for - traffic or solar
 
         Raises:
@@ -326,9 +324,11 @@ class Cell(object):
         except Exception:
             self.rot = 0
             self.magnitude = 0
-        # Changed by Kevin - adding solar
-        self.data = json_data.get(
-            'data', {'traffic': 0, "wait": 0, "solar": 0})
+        # Changed by Kevin - adding 0 case for missing keys
+        self.data = json_data.get('data', {})
+        for key in {'traffic', 'wait', 'solar'}:
+            if key not in self.data:
+                self.data[key] = 0
 
         if self.type_id == config.ROAD_ID:
             self.density = 0

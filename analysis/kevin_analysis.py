@@ -19,7 +19,7 @@ from tqdm import tqdm
 sys.path.append('../global/')
 import cityiograph
 
-BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/current/'
+BASE_DIR = '/Users/Kevin/Documents/mit/urop/data/server_test_data/final_tests/'
 CITY_SIZE = 16
 METRIC_NAMES = ["Density", "Diversity", "Energy", "Traffic", "Solar"]
 MOVE_THRESHOLD = 5
@@ -388,11 +388,13 @@ def ai_acceptance():
 
         # Save CSV
         df.set_index(['time'], inplace=True)
-        print(df.head(), df.shape)
-        df.to_csv(os.path.join(BASE_DIR, os.pardir,
-                               'ryan_alex_accept_threshold={}.csv'
-                               .format(MOVE_THRESHOLD)))
-        # sys.exit(1)
+        # print(df.head(), df.shape)
+        csv_path = os.path.abspath(os.path.join(BASE_DIR, os.pardir, 'output_csvs',
+                                                '{}_accept_threshold={}.csv'
+                                                .format(test_string, MOVE_THRESHOLD)))
+        df.to_csv(csv_path)
+        print("Wrote file for test = {}!".format(test_string))
+        continue
 
         x_times = np.array(times)
         x_times_dt = [datetime.datetime.fromtimestamp(t) for t in x_times]
@@ -427,7 +429,8 @@ def ai_acceptance():
 
         # plt.show()
         # sys.exit(1)
-        plt.savefig('data_new/' + test_string + '_ai_acceptance_{}.png'.format(MOVE_THRESHOLD))
+        plt.savefig('data_new/' + test_string +
+                    '_ai_acceptance_{}.png'.format(MOVE_THRESHOLD))
 
         # break # Debug only
 
@@ -495,7 +498,7 @@ if __name__ == '__main__':
     # get_density_info()
     # ai_weight_track()
     # scores()
-    # ai_acceptance()
+    ai_acceptance()
     # base_method()
     # id_dist()
 

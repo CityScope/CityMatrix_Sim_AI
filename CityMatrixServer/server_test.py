@@ -26,7 +26,8 @@ log = logging.getLogger('__main__')
 # filename = '../../../data/cities/cityIO.json'
 # filename = '../../../data/cities/city_9000.json'
 # filename = '../../../data/cities/new_city.json'
-filename = '../../../data/cities/latest_city_format.json'
+# filename = '../../../data/cities/latest_city_format.json'
+filename = '../MachineLearning/runs/65/predicted_cities/SolarSimCity_7000_output_predicted.json'
 # filename = random.choice(glob.glob('../../../data/train_good/*.json'))
 # d = '../CityPrediction/input_cities/'
 # files = glob.glob(d + '*')
@@ -41,6 +42,12 @@ with open(filename, 'r') as f:
     json_string = f.read()
 city = City(json_string)
 log.debug("Successfully loaded city.")
+
+traffic_matrix = city.get_data_matrix(key='traffic')
+print(traffic_matrix.shape)
+plt.imshow(traffic_matrix)
+plt.show()
+sys.exit(1)
 
 # Make some changes for testing purposes
 # x = np.random.randint(0, 16)
