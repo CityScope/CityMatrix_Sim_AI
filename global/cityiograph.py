@@ -23,7 +23,8 @@ class City(object):
     """General representation of a city matrix.
 
     Attributes:
-        AIMov (list): list data describing the move suggested by an AI for a given city
+        AIMov (list): list data describing the move suggested by an AI for
+            a given city
         AIStep (int): indexer used by GH to show AI progress
         AIWeights (list): list of weights corresponding to metrics used by AI
         animBlink (int): describes the current blink state for GH
@@ -38,7 +39,8 @@ class City(object):
         scores (list): list of objective scores for the city
         slider1 (int): data from table
         slider2 (int): data from table
-        startFlag (int): 1 = restart process with fresh input city; copy solar values
+        startFlag (int): 1 = restart process with fresh input city;
+            copy solar values
         toggle1 (unknown): -
         width (int): city dimensionality
     """
@@ -79,8 +81,8 @@ class City(object):
         return metrics_dictionary(objective.get_metrics(self))
 
     def equals(self, other):
-        '''Determines if this city object is equivalent to another. Need all cells, densities and
-            densities to be equal.
+        '''Determines if this city object is equivalent to another.
+        Need all cells, densities and densities to be equal.
 
         Args:
             other (cityiograph.City): the city to be compared
@@ -95,7 +97,8 @@ class City(object):
             and self.AIWeights == other.AIWeights
 
     def to_dict(self):
-        '''Converts this city to a dictionary object for storage and other purposes.
+        '''Converts this city to a dictionary object for storage
+        and other purposes.
 
         Returns:
             dict: dictionary mapping of this city
@@ -123,7 +126,8 @@ class City(object):
         return result
 
     def updateMeta(self, other_city):
-        '''Ignoring a prediction of any sort, simply update the metadata of a given city with the data from another.
+        '''Ignoring a prediction of any sort, simply update the metadata
+        of a given city with the data from another.
 
         Args:
             other_city (cityiograph.City): -
@@ -160,7 +164,8 @@ class City(object):
         """Helper method to get a cell from our dictionary.
 
         Args:
-            pos (2-tuple): (x, y) tuple describing the cell location we want to retreive
+            pos (2-tuple): (x, y) tuple describing the cell location we want
+                to retreive
 
         Returns:
             cityiograph.Cell: the cell object at that location
@@ -171,7 +176,8 @@ class City(object):
         """Get a data output for the city in a numpy format for data analysis.
 
         Args:
-            key (string): data key we will check in cell { 'traffic', 'wait', 'solar' }
+            key (string): data key we will check in cell
+                { 'traffic', 'wait', 'solar' }
 
         Returns:
             nparray (self.height, self.width): -
@@ -199,7 +205,8 @@ class City(object):
         self.densities[idx] = new_density
 
     def change_cell(self, x, y, new_id):
-        """Helper method to update a particular cell on a city. Used in AI modeling.
+        """Helper method to update a particular cell on a city.
+        Used in AI modeling.
 
         Args:
             x (int): x location
@@ -235,7 +242,8 @@ class City(object):
         Args:
             data_array (nparray (self.width * self.height * 2, )): traffic/wait array
                 OR (nparray (self, width * self.height, )): solar array
-            mode (str): describes the type of data copying we are looking for - traffic or solar
+            mode (str): describes the type of data copying we are
+                looking for - traffic or solar
 
         Raises:
             ValueError: if an invalid mode string is passed
@@ -259,13 +267,15 @@ class City(object):
                     raise ValueError("Invalid mode string detected.")
 
     def get_move(self, other):
-        """Get the difference between the current city and another, according to either cell or density changes.
+        """Get the difference between the current city and another,
+        according to either cell or density changes.
 
         Args:
             other (cityiograph.City): the other instance in question
 
         Returns:
-            tuple: descibes change type and data about WHERE that change takes place (i.e. density index, cell loc)
+            tuple: descibes change type and data about WHERE that change
+                takes place (i.e. density index, cell loc)
         """
         if self.AIWeights != other.AIWeights:
             # Weights change
@@ -291,7 +301,8 @@ class City(object):
 
 
 class Cell(object):
-    """General representation of a single block within an instance of a cityiograph.City.
+    """General representation of a single block within an instance
+    of a cityiograph.City.
 
     Attributes:
         data (dict): contains ML attributes of city
@@ -437,7 +448,8 @@ def density_to_pop(type_id, density):
 
 
 def density_to_height(type_id, density):
-    """Converts the raw floor density to the height of a building - used in solar prediction.
+    """Converts the raw floor density to the height of a building - used
+    in solar prediction.
 
     Args:
         type_id (int): -
@@ -457,7 +469,8 @@ def cell_features(cell, mode):
 
     Args:
         cell (cityiograph.Cell): -
-        mode (str): describes the type of feature extraction we are looking for - traffic or solar
+        mode (str): describes the type of feature extraction we
+            are looking for - traffic or solar
 
     Returns:
         list: input features for this cell
@@ -483,7 +496,8 @@ def cell_results(cell, mode):
 
     Args:
         cell (cityiograph.Cell): -
-        mode (str): describes the type of feature extraction we are looking for - traffic or solar
+        mode (str): describes the type of feature extraction we are
+            looking for - traffic or solar
 
     Returns:
         list: output features for this cell
@@ -506,7 +520,8 @@ def get_features(city, mode):
 
     Args:
         city (cityiograph.City): -
-        mode (str): describes the type of feature extraction we are looking for - traffic or solar
+        mode (str): describes the type of feature extraction we are
+            looking for - traffic or solar
 
     Returns:
         nparray: input features for this city
@@ -525,7 +540,8 @@ def get_results(city, mode):
 
     Args:
         city (cityiograph.City): -
-        mode (str): describes the type of feature extraction we are looking for - traffic or solar
+        mode (str): describes the type of feature extraction we are
+            looking for - traffic or solar
 
     Returns:
         nparray: output features for this city
@@ -540,7 +556,8 @@ def get_results(city, mode):
 
 
 def metrics_dictionary(metrics):
-    '''Helper method to convert list of tuples to dictionary for JSON submission.
+    '''Helper method to convert list of tuples to dictionary for
+    JSON submission.
 
     Args:
         metrics (list): list of tuples (name, value, weight)
