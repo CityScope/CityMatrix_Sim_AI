@@ -29,7 +29,7 @@ global {
 	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 16;
-	string filename <- './../includes/general_input/SolarSimCity_11.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
+	string filename <- './../includes/general_input/city_ryan.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
 	bool first <- true;
 	bool gama_view<-false;
 	
@@ -46,7 +46,7 @@ global {
 	    }	
 		cells <- matrixData["grid"];
 		objects <- matrixData["objects"];
-		density_array <- matrixData["objects"]["densities"];
+		density_array <- matrixData["objects"]["density"];
 		//density_array <- [30.0, 20.0, 10.0, 25.0, 15.0, 5.0];
 		max_density <- max(density_array);
 		int a <- (matrix_size = 18) ? 1 : 0;
@@ -144,9 +144,7 @@ grid cityMatrix width:matrix_size height:matrix_size {
 
 experiment Display  type: gui {
 	output {
-		display cityMatrixView  type:opengl fullscreen:0 
-		keystone: [{-0.03448275862068967,0.14245810055865915,0.0},{0.0235109717868337,1.0265363128491622,0.0},{0.9858934169278997,1.027932960893855,0.0},{1.0415360501567386,0.14804469273743026,0.0}]
-		background:#black {
+		display cityMatrixView  type:opengl background:#black {
 			species cityMatrix aspect:base;
 		}
 	}
