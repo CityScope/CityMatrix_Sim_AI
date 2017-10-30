@@ -136,7 +136,7 @@ experiment PNGDisplay type: gui {
 	// float minimum_cycle_duration <- 1.0 #ms;
 	output {
 		
-		display cityMatrixView2 autosave: true refresh:every(4000 #cycles) type:opengl background: # black autosave: true camera_pos: {500,234234,12423000} camera_look_pos: {250.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	
+		display cityMatrixView2 refresh:every(4000 #cycles) type:opengl background: # black autosave: false camera_pos: {500,234234,12423000} camera_look_pos: {250.0,500.0,0.0} camera_up_vector: {0,0.7071067811865476,0.7071067811865475} {	
 			species cityMatrix aspect:base;
 			graphics "text" {
                draw "PEV Fleet: " + string(fleet) color: # white font: font("Helvetica", 24, #bold) at: { -600, 100};// perspective: true;
