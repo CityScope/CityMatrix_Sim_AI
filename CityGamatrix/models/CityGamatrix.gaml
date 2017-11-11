@@ -26,10 +26,10 @@ global {
 	bool onlineGrid <- false parameter: "Online Grid:" category: "Grid";
 	bool dynamicGrid <- false parameter: "Update Grid:" category: "Grid";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Grid";
-	bool surround <- false parameter: "Surrounding Road:" category: "Grid";
+	bool surround <- true parameter: "Surrounding Road:" category: "Grid";
 	bool looping <- false parameter: "Continuous Demo:" category: "Environment";
 	int matrix_size <- 16;
-	string filename <- './../includes/general_input/city_ryan.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
+	string filename <- './../includes/general_input/city_great.json' parameter: "filename" category: "Environment"; // Default option in case no other file is selected.
 	bool first <- true;
 	bool gama_view<-false;
 	
@@ -47,7 +47,6 @@ global {
 		cells <- matrixData["grid"];
 		objects <- matrixData["objects"];
 		density_array <- matrixData["objects"]["density"];
-		//density_array <- [30.0, 20.0, 10.0, 25.0, 15.0, 5.0];
 		max_density <- max(density_array);
 		int a <- (matrix_size = 18) ? 1 : 0;
 		loop c over: cells {
@@ -55,10 +54,8 @@ global {
 			int y <- int(c["y"]) + a;
             cityMatrix cell <- cityMatrix grid_at { x, y };
             if (! first and c["type"] = cell.type) {
-            	// Same type on update - don't change color.
             } else {
             	if (int(c["type"]) = 7) {
-            		// Camera  boy edge case. Assume road.
             		cell.type <- 6;
             	} else {
             		cell.type <- int(c["type"]);
@@ -144,8 +141,8 @@ grid cityMatrix width:matrix_size height:matrix_size {
 
 experiment Display  type: gui {
 	output {
-		display cityMatrixView  type:opengl background:#black {
-			species cityMatrix aspect:base;
+		display cityMatrixView  type:opengl background:#white {
+			species cityMatrix aspect:flat;
 		}
 	}
 }

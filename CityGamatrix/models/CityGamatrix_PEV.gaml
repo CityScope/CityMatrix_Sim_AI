@@ -58,7 +58,7 @@ global {
 	bool day_done <- false;
 	list<string> file_list <- folder(input_dir) select (string(each) contains "json");
 	bool isBatch <- false;
-	string prefix <- 'SolarSimCity_11'; // Default option - configurable
+	string prefix <- 'city_great'; // Default option - configurable
    
 	init {
 		
