@@ -100,7 +100,7 @@ if __name__ == '__main__':
                 # Check if this city is different from the previous one
                 if not previous_city.equals(input_city):
                     # New city received - write to local file for later use
-                    input_city.write_to_file(timestamp)
+                    #RZ input_city.write_to_file(timestamp)
 
                     # Clear queue
                     AI_move_queue = set()
@@ -148,7 +148,7 @@ if __name__ == '__main__':
                     else:
                         result = {'predict': ml_city.to_dict(),
                                 'ai': ai_city.to_dict()}
-                    write_dict(result, timestamp)
+                    #RZ write_dict(result, timestamp)
                     server.send_data(result)
                     unity_server.send_data(result)
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
                     else:
                         result = {'predict': ml_city.to_dict(),
                                 'ai': ai_city.to_dict()}
-                    write_dict(result, timestamp)
+                    #RZ write_dict(result, timestamp)
                     server.send_data(result)
                     unity_server.send_data(result)
 
@@ -254,7 +254,7 @@ if __name__ == '__main__':
             else:
                 # This is the first city
                 # Write to local file for later use
-                input_city.write_to_file(timestamp)
+                #RZ input_city.write_to_file(timestamp)
 
                 # Run full ML/AI prediction
                 # ML first
@@ -287,7 +287,7 @@ if __name__ == '__main__':
                 else:
                     result = {'predict': ml_city.to_dict(),
                             'ai': ai_city.to_dict()}
-                write_dict(result, timestamp)
+                #RZ write_dict(result, timestamp)
                 server.send_data(result)
                 unity_server.send_data(result)
 
